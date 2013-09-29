@@ -1,0 +1,12 @@
+=====================
+QUEST readme file
+=====================
+
+* To install QUEST modify make.inc file to indicate where necesary libraries are installed in the system.
+makefiles are stored in the folder "makefiles"
+
+
+make.inc.gcc:
+	Compelers: GNU C++ compiler(g++), GNU fortran compiler(gfortran)
+	Libraries: LAPACK, BLAS
+
