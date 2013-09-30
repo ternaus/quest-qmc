@@ -1,2 +1,9 @@
 syntax: glob
 *.out
+*.aux
+*latexmk
+*.synctex.gz
+*.toc
+*.o
+.cproject
+.project

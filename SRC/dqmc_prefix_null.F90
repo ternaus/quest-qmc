@@ -22,21 +22,21 @@ module DQMC_SEQB
      integer  :: nOrth
      
      ! B matrix
-     type(MatB), pointer :: B
-     real(wp),   pointer :: V(:,:)
+     type(MatB), pointer :: B 
+     real(wp),   pointer :: V(:,:) 
 
      ! For UDT decomposition
-     real(wp),   pointer :: U(:,:)
-     real(wp),   pointer :: D(:)
-     real(wp),   pointer :: T(:,:)
+     real(wp),   pointer :: U(:,:) 
+     real(wp),   pointer :: D(:)   
+     real(wp),   pointer :: T(:,:) 
 
      ! Working space
      real(wp),   pointer :: W1(:,:)
      real(wp),   pointer :: W2(:,:)
-     real(wp),   pointer :: rw(:)
-     real(wp),   pointer :: tau(:)
-     integer,    pointer :: piv(:)
-     real(wp),   pointer :: lw(:)
+     real(wp),   pointer :: rw(:)  
+     real(wp),   pointer :: tau(:) 
+     integer,    pointer :: piv(:) 
+     real(wp),   pointer :: lw(:)  
   end type SeqB
   
 contains

@@ -87,8 +87,8 @@ module DQMC_STRUCT
      integer, pointer  :: F(:)          ! Frequency 
      integer           :: nGroup
      integer, pointer  :: map(:)        ! site classification
-     integer, pointer  :: gf_phase(:,:)
-     integer, pointer  :: chi_phase(:,:)
+     integer, pointer  :: gf_phase(:,:) 
+     integer, pointer  :: chi_phase(:,:) 
                               
 
      integer           :: n_b           ! number of neighbors types

@@ -39,5 +39,5 @@ dlamch.o: dlamch.f
 	$(FC) $(FC_FLAGS) -c $<
 
 clean:
-	rm -f ../liblapack.a *.o
+	rm -f ../liblapack.a *.o *genmod*
 

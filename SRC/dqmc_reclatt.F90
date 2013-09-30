@@ -9,26 +9,26 @@ implicit none
 type :: recip_lattice_t
 
  integer                :: ndim
- integer                :: nkpts             !number of k-points (equal to ncell)
- real*8, pointer        :: klist(:,:)        !list of k-points(nkpts,rdim)
- real*8                 :: kpoint(rdim)      !Input k-point 
- real*8                 :: ktwist(rdim)      !Twist vector
- real*8                 :: kcs(rdim,rdim)    !cartesian component of reciprocal superlattice***
- real*8                 :: ks(rdim,rdim)     !fractional components of reciprocal superlattice*** 
- real*8                 :: kc(rdim,rdim)     !cartesian components of reciprocal unit cell***
-                                             !*** rows of these matrices are the vectors
+ integer                :: nkpts              !number of k-points (equal to ncell)
+ real*8, pointer        :: klist(:,:)         !list of k-points(nkpts,rdim)
+ real*8                 :: kpoint(rdim)       !Input k-point 
+ real*8                 :: ktwist(rdim)       !Twist vector
+ real*8                 :: kcs(rdim,rdim)     !cartesian component of reciprocal superlattice***
+ real*8                 :: ks(rdim,rdim)      !fractional components of reciprocal superlattice*** 
+ real*8                 :: kc(rdim,rdim)      !cartesian components of reciprocal unit cell***
+                                              !*** rows of these matrices are the vectors
 
- integer                :: nmomenta          !number of momenta for pair of particles
- real*8, pointer        :: ksum(:,:)         !list of momentum of pair of particles(nmomenta,rdim)
- integer, pointer       :: kmate(:,:)        !mate of each k-points that gives total momentum ksum
-                                             !(nkpts, nmomenta)
+ integer                :: nmomenta           !number of momenta for pair of particles
+ real*8, pointer        :: ksum(:,:)          !list of momentum of pair of particles(nmomenta,rdim)
+ integer, pointer       :: kmate(:,:)         !mate of each k-points that gives total momentum ksum
+                                              !(nkpts, nmomenta)
 
- integer                :: nclass_k          !number of inequivalent k-points
- integer, pointer       :: myclass_k(:)      !class for each k-point (nkpts)
- integer, pointer       :: class_size_k(:)   !number of equivalent k-points in each class (nclass_k)
- integer, pointer       :: class_repr_k(:)   !representative k-point for each class (nclass_k)
+ integer                :: nclass_k           !number of inequivalent k-points
+ integer, pointer       :: myclass_k(:)       !class for each k-point (nkpts)
+ integer, pointer       :: class_size_k(:)    !number of equivalent k-points in each class (nclass_k)
+ integer, pointer       :: class_repr_k(:)    !representative k-point for each class (nclass_k)
    
- complex*16, pointer    :: FourierC(:,:)
+ complex*16, pointer    :: FourierC(:,:) 
 
  logical                :: initialized
  logical                :: constructed
@@ -60,8 +60,12 @@ contains
 subroutine init_recip_latt(lattice,recip_lattice,applytwist,cfg) 
  integer                                     :: ndim, i, j
  real*8                                      :: projk(rdim)
- real*8, pointer                             :: kc(:,:),kcs(:,:),ktwist(:),kpoint(:)
- real*8, pointer                             :: ac(:,:),scc(:,:)
+ real*8, pointer                             :: kc(:,:) 
+ real*8, pointer                             :: kcs(:,:) 
+ real*8, pointer                             :: ktwist(:) 
+ real*8, pointer                             :: kpoint(:) 
+ real*8, pointer                             :: ac(:,:) 
+ real*8, pointer                             :: scc(:,:) 
  type(lattice_t),intent(in),target           :: lattice
  type(recip_lattice_t),intent(out),target    :: recip_lattice
  type(config),intent(in),target              :: cfg
@@ -159,7 +163,7 @@ subroutine construct_recip_lattice(recip_lattice)
  integer*8, allocatable :: indedge(:)
  real*8                 :: invkc(rdim,rdim)
  real*8, allocatable    :: kset(:,:)
- real*8, pointer        :: klist(:,:)
+ real*8, pointer        :: klist(:,:) 
  type(recip_lattice_t), intent(inout)  :: recip_lattice
 
  if(.not.recip_lattice%initialized)stop'Need to initialize recip_lattice before construction'
@@ -442,8 +446,9 @@ end function closer_to_zero
   type(lattice_t),intent(in),target           :: lattice
   type(recip_lattice_t),intent(inout),target    :: Reciplattice
   integer               :: nt,nk,i,ii,j
-  real*8, pointer       :: tr(:,:),kpts(:,:)
-  integer, pointer      :: indx(:)
+  real*8, pointer       :: tr(:,:)  
+  real*8, pointer       :: kpts(:,:)
+  integer, pointer      :: indx(:)  
 
   !initialize
   tr   => lattice%translation

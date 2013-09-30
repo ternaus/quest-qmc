@@ -25,12 +25,13 @@ module DQMC_CKB
   !  =========
   !
   type matB
-     integer  :: n                           ! dim of B
-     integer  :: m                           ! number of neighbors of lattice
-     integer, pointer  :: A(:,:)             ! Adjacency info
-     real(wp), pointer :: sinht(:), cosht(:) ! sinh(t), cosh(t)
-     real(wp), pointer :: exptaumu(:)        ! parameters for checkerboard method
-     real(wp), pointer :: work(:)            ! parameters for checkerboard method
+     integer  :: n                      ! dim of B
+     integer  :: m                      ! number of neighbors of lattice
+     integer, pointer  :: A(:,:)        ! Adjacency info
+     real(wp), pointer :: sinht(:)      ! sinh(t), cosh(t)
+     real(wp), pointer :: cosht(:)      ! sinh(t), cosh(t)
+     real(wp), pointer :: exptaumu(:)   ! parameters for checkerboard method
+     real(wp), pointer :: work(:)       ! parameters for checkerboard method
      character(12) :: name
 
      logical :: exactb  !unused in ckb
@@ -69,7 +70,7 @@ contains
     integer :: h, k, i, j, nt, nckb
     integer :: ckbmat(n,n)
     integer :: hopmat(n,n)
-    real(wp), pointer :: dum(:,:)
+    real(wp), pointer :: dum(:,:) 
     
     ! ... Executable ...
 

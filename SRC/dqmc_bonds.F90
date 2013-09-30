@@ -6,16 +6,16 @@ use DQMC_LATT
 implicit none
 
 type :: bonds_t
- integer               :: ntotbond              !number of bonds read from input, possibly augmented by symmetry
- integer, pointer      :: bond_label(:)         !label of bond (ntotbond)
- integer, pointer      :: bond_origin(:)        !primitive cell site from which bond originates (ntotbond)
- integer, pointer      :: bond_target(:)        
+ integer               :: ntotbond         !number of bonds read from input, possibly augmented by symmetry
+ integer, pointer      :: bond_label(:)    !label of bond (ntotbond)
+ integer, pointer      :: bond_origin(:)   !primitive cell site from which bond originates (ntotbond)
+ integer, pointer      :: bond_target(:) 
 
- real(wp), pointer       :: xxbond(:,:)           !bond vector cartesian coordinates (rdim,ntotbond)
+ real(wp), pointer       :: xxbond(:,:)    !bond vector cartesian coordinates (rdim,ntotbond)
 
- integer               :: nclass_b              !number of inequivalent bond pairs
- integer, pointer      :: myclass_b(:,:)        !class for pair of bonds (ntotbond,ntotbond)
- integer, pointer      :: class_size_b(:)       !number of equivalent pairs of bond in each class (nclass_b)
+ integer               :: nclass_b         !number of inequivalent bond pairs
+ integer, pointer      :: myclass_b(:,:)   !class for pair of bonds (ntotbond,ntotbond)
+ integer, pointer      :: class_size_b(:)  !number of equivalent pairs of bond in each class (nclass_b)
 
  logical               :: initialized
  logical               :: analyzed
@@ -38,9 +38,9 @@ type :: pairing
 
  character*20, pointer :: wave_label(:)         !label of wave: s-wave, d-wave etc... (nwave)
 
- integer, pointer      :: myclass_p(:,:)
+ integer, pointer      :: myclass_p(:,:) 
  integer               :: nclass_p
- integer, pointer      :: class_size_p(:)
+ integer, pointer      :: class_size_p(:) 
 
  logical               :: initialized
 end type
@@ -94,9 +94,11 @@ end subroutine free_pairs
 subroutine read_bonds(Bonds)
 type(bonds_t) :: Bonds
 integer :: nrecord,iat,jat,ibond,irec,ios,i,ntotbond
-integer, pointer :: bond_label(:),bond_origin(:),bond_target(:)
+integer, pointer :: bond_label(:) 
+integer, pointer :: bond_origin(:) 
+integer, pointer :: bond_target(:) 
 real(wp) :: delta(rdim)
-real(wp),pointer :: xxbond(:,:)
+real(wp),pointer :: xxbond(:,:) 
 character*100 string
 logical ldum
 
@@ -177,12 +179,16 @@ type(pairing) :: Pairs
 type(lattice_t) :: lattice
 integer :: ios,idum,ibond,iwave,iat,jat,icell,isite,jbond,nwave,npairbond,natom,nsites,ncell
 integer, allocatable :: pair_bond_label(:)
-integer, pointer     :: pair_bond_origin(:,:),pair_bond_end(:,:),pair_bond_map(:),npairbondv(:),pair_bond_number(:,:)
+integer, pointer     :: pair_bond_origin(:,:) 
+integer, pointer     :: pair_bond_end(:,:) 
+integer, pointer     :: pair_bond_map(:) 
+integer, pointer     :: npairbondv(:) 
+integer, pointer     :: pair_bond_number(:,:) 
 real(wp)  :: rdum
-real(wp), pointer     :: pair_bond_wgt(:,:)
+real(wp), pointer     :: pair_bond_wgt(:,:) 
 character*100 string
 character*10 :: label
-character*20,pointer :: wave_label(:)
+character*20,pointer :: wave_label(:) 
 logical :: ldum, donullify
 
 natom=lattice%natom

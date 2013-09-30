@@ -39,11 +39,11 @@ module DQMC_PREFIX
   !  UDT decomposition
   !
   type UDT
-     integer  :: n                      ! dim of B
-     integer  :: il, ir                 ! indices of B_i
-     real(wp),pointer :: U(:,:)    ! 
-     real(wp),pointer :: D(:)      ! 
-     real(wp),pointer :: T(:,:)    ! 
+     integer  :: n               ! dim of B
+     integer  :: il, ir          ! indices of B_i
+     real(wp),pointer :: U(:,:)  ! 
+     real(wp),pointer :: D(:)    ! 
+     real(wp),pointer :: T(:,:)  ! 
   end type UDT
 
   integer, parameter :: POS_LEFT  = 0
@@ -54,15 +54,15 @@ module DQMC_PREFIX
   ! Intermediate results
   !
   type PrefixB
-     integer   :: n                     ! dim of Bs
-     integer   :: L                     ! number of Bs
-     integer   :: nOrth                 ! number of Bs per node
-     integer   :: nSeg                  ! number of leaf segments
-     type(UDT), pointer :: Bseg(:)      ! nodes (UDT)
-     integer, pointer   :: queue(:)     ! queue of product
-     integer   :: leaflevel             !
-     integer   :: maxq                  !
-     real(wp), pointer  :: W3(:,:)
+     integer   :: n                  ! dim of Bs
+     integer   :: L                  ! number of Bs
+     integer   :: nOrth              ! number of Bs per node
+     integer   :: nSeg               ! number of leaf segments
+     type(UDT), pointer :: Bseg(:)   ! nodes (UDT)
+     integer, pointer   :: queue(:)  ! queue of product
+     integer   :: leaflevel          !
+     integer   :: maxq               !
+     real(wp), pointer  :: W3(:,:) 
      logical   :: inv
   end type PrefixB
   

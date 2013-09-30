@@ -9,16 +9,16 @@ type :: kbonds_t
    integer :: nbonds
    integer :: nmomenta
 
-   integer,  pointer  :: map_symm_ak(:,:)
-   integer,  pointer  :: map_symm_bak(:,:,:)
-   integer,  pointer  :: class_size(:,:)
-   integer,  pointer  :: myclass(:,:,:)
-   integer,  pointer  :: nclass(:)
-   integer,  pointer  :: bond_origin(:, :)
-   integer,  pointer  :: bond_target(:, :)
+   integer,  pointer  :: map_symm_ak(:,:)    
+   integer,  pointer  :: map_symm_bak(:,:,:) 
+   integer,  pointer  :: class_size(:,:)     
+   integer,  pointer  :: myclass(:,:,:) 
+   integer,  pointer  :: nclass(:) 
+   integer,  pointer  :: bond_origin(:, :) 
+   integer,  pointer  :: bond_target(:, :) 
    integer,  pointer  :: bmap(:, :, :)    
 
-   real(wp), pointer  :: ksum(:,:)
+   real(wp), pointer  :: ksum(:,:) 
 
 end type
 
@@ -247,9 +247,9 @@ contains
    integer :: ib, isymm, iclass, istart, im, ak1 ,ak2
    integer :: csize, csizenew, maxclass, nsymm
    integer :: id, bx, by, jclass, jstart, idj, mclass, jb, i, j
-   integer,pointer :: myclass(:,:)
+   integer,pointer :: myclass(:,:) 
    integer, allocatable :: bond1(:,:), bond2(:,:), csizev(:)
-   integer, pointer :: map_symm_b(:,:)
+   integer, pointer :: map_symm_b(:,:) 
    
    ntotbond   = kbonds%nbonds
    nsymm      = size(kbonds%map_symm_ak, 2)

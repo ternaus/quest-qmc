@@ -178,7 +178,8 @@ module DQMC_Phy0
      real(wp), pointer :: Pair(:,:)     ! on-site pairing
 
      ! working space
-     real(wp), pointer :: up(:), dn(:)
+     real(wp), pointer :: up(:) 
+     real(wp), pointer :: dn(:) 
      logical :: compSAF
      logical :: init
      logical :: initFT
@@ -690,7 +691,9 @@ contains
     integer  :: tmp, idx, m                      ! Helper variables
     real(wp) :: sgn                        
     real(wp) :: var1, var2, var3          
-    integer, pointer  :: start(:), r(:), A(:)
+    integer, pointer  :: start(:) 
+    integer, pointer  :: r(:) 
+    integer, pointer  :: A(:) 
 
     ! Auxiliary variable for chi_thermal and C_v
     real(wp) :: Cbar, Nbar, Tbar, un
@@ -1008,12 +1011,13 @@ contains
 
     ! ... Local variables ...
     real(wp) :: rwork(3*na), phcurr
-    real(wp), pointer :: curr(:), currft(:)
+    real(wp), pointer :: curr(:) 
+    real(wp), pointer :: currft(:) 
     integer :: ph(na*nt,na*nt)
     integer :: nak, ip, ibin, nBin
     integer :: avg, err, ia, ja, ik, i, j, it, nk, jt
     complex*16 ::  work(2*na), U(na,na), W(na,na)
-    complex*16, pointer :: ft_wgt(:,:)
+    complex*16, pointer :: ft_wgt(:,:) 
     complex*16, parameter :: ZEROZ=(0.d0, 0.d0), ONEZ=(1.d0, 0.d0)
 
     nBin = P0%nBin
@@ -1192,9 +1196,9 @@ contains
 
     ! ... Local varaiables ...
     integer :: i, ia, ja, ii, avg, err, nakt, nakg
-    real(wp), pointer :: FTptr(:,:)
-    complex*16, pointer :: Nmptr(:,:,:)
-    character(len=30), pointer :: clabel(:)
+    real(wp), pointer :: FTptr(:,:) 
+    complex*16, pointer :: Nmptr(:,:,:) 
+    character(len=30), pointer :: clabel(:) 
 
     if (qmc_sim%rank .ne. 0) return
 

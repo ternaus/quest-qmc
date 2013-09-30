@@ -19,13 +19,13 @@ type :: lattice_t
  real*8, pointer        :: xat(:,:)          !fractional coordinate of site inside primitive cell(rdim,0:natom-1)
  real*8, pointer        :: phase(:)          !Phase for order parameter(0:nsites-1)
  real*8, pointer        :: translation(:,:)  !list of translation vectors(columns)(rdim,0:ncell-1)
-                                             !** columns of these matrices are the vectors
+                                                       !** columns of these matrices are the vectors
 
  integer                :: nclass            !number of classes for distance 
  integer, pointer       :: myclass(:,:)      !class for pair of sites (0:nsites-1, 0:nsites-1)
  integer, pointer       :: class_size(:)     !number of equivalent pairs in each class (nclass)
  real*8, pointer        :: class_label(:,:)  !label for pair classes
- integer, pointer       :: gf_phase(:,:)
+ integer, pointer       :: gf_phase(:,:) 
 
  character*3, pointer   :: olabel(:)         !label of each site in primitive cell
 
@@ -64,8 +64,9 @@ end subroutine free_lattice
 subroutine init_lattice(lattice) 
  integer          :: ndim,nsites,natom,ncell,ios,i,j
  real*8           :: ainv(rdim,rdim)
- real*8, pointer  :: ac(:,:),scc(:,:)
- integer, pointer :: sc(:,:)
+ real*8, pointer  :: ac(:,:) 
+ real*8, pointer  :: scc(:,:) 
+ integer, pointer :: sc(:,:) 
  character*3      :: olab1
  character*50     :: string
  logical          :: ldum
@@ -173,8 +174,12 @@ end subroutine init_lattice
 subroutine construct_lattice(lattice)
  type(lattice_t),intent(inout),target         :: lattice
  integer                 :: natom,nsites,iat,jat,xxmax(rdim),xxmin(rdim),ix,iy,iz,icount,j,jcount,ndim,it
- real*8, pointer         :: ac(:,:),pos(:,:),xat(:,:),cartpos(:,:),translation(:,:)
- integer, pointer        :: sc(:,:)
+ real*8, pointer         :: ac(:,:)  
+ real*8, pointer         :: pos(:,:) 
+ real*8, pointer         :: xat(:,:) 
+ real*8, pointer         :: cartpos(:,:) 
+ real*8, pointer         :: translation(:,:) 
+ integer, pointer        :: sc(:,:) 
  real*8                  :: projk(rdim),xxat(rdim),xx(rdim),invscc(rdim,rdim),ainv(rdim,rdim),cmin,cmax
  
  if(.not.lattice%initialized)stop'Need to initialize lattice before construct_lattice'
@@ -333,7 +338,7 @@ real*8              :: rpc(rdim,rdim),volume_ph,inv(rdim,rdim),projph(rdim,rdim)
 character*50        :: string
 character*3         :: olab1
 real*8, allocatable :: xat_ph(:,:),tmp_phase(:)
-real*8, pointer     :: phase(:)
+real*8, pointer     :: phase(:) 
 logical             :: phase_assigned(0:lattice%nsites-1)
 
 ndim=lattice%ndim

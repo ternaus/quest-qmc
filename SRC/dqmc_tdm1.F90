@@ -35,10 +35,10 @@ module DQMC_TDM1
      complex(wp), pointer :: ftk(:,:) 
      complex(wp), pointer :: ftw(:,:) 
 
-     real(wp),    pointer :: values(:,:,:)
-     complex(wp), pointer :: valuesk(:,:,:)
+     real(wp),    pointer :: values(:,:,:) 
+     complex(wp), pointer :: valuesk(:,:,:) 
 
-     real(wp),    pointer :: tlink(:,:)
+     real(wp),    pointer :: tlink(:,:) 
 
      character(label_len), pointer :: clabel(:)
 
@@ -80,11 +80,12 @@ module DQMC_TDM1
      logical  :: compute=.false.
 
      real(wp) :: dtau
-     real(wp), pointer :: sgn(:)
-     type(tdmarray), pointer :: properties(:)
+     real(wp), pointer :: sgn(:) 
+     type(tdmarray), pointer :: properties(:) 
 
      ! Fourier transform matrix for bosonic and fermionic fields
-     complex(wp), pointer :: ftwfer(:,:), ftwbos(:,:)
+     complex(wp), pointer :: ftwfer(:,:) 
+     complex(wp), pointer :: ftwbos(:,:) 
 
   end type TDM1
   
@@ -352,8 +353,14 @@ contains
     ! ... Local var ...
     integer  :: i, k, m, L, cnt, dt, i0, it, j0, jt, dtau, iprop
     real(wp) :: sgn, factor
-    real(wp),pointer :: up0t(:,:), upt0(:,:), dn0t(:,:), dnt0(:,:)
-    real(wp),pointer :: up00(:,:), uptt(:,:), dn00(:,:), dntt(:,:)
+    real(wp),pointer :: up0t(:,:)
+    real(wp),pointer :: upt0(:,:)
+    real(wp),pointer :: dn0t(:,:)
+    real(wp),pointer :: dnt0(:,:)
+    real(wp),pointer :: up00(:,:)
+    real(wp),pointer :: uptt(:,:)
+    real(wp),pointer :: dn00(:,:)
+    real(wp),pointer :: dntt(:,:)
     real(wp), pointer :: values(:,:,:)
 
     if (.not.T1%compute) return
@@ -464,8 +471,12 @@ contains
     ! ... Local scalar ...
 
     integer  :: i, j, k, dt, dt1, dt2
-    real(wp), pointer :: value1(:), value2(:)
+    real(wp), pointer :: value1(:)
+    real(wp), pointer :: value2(:)
     real(wp) :: factor
+
+    integer :: nsite, ic, jc, l1s, l1e, l2s, l2e
+    real(wp) :: tl1up2up, tl1dn2dn, tl1up2dn, tl1dn2up, dxl1, dxl2, dxl1l2
 
     ! ... Executable ...
     if (.not.T1%compute) return
@@ -574,6 +585,83 @@ contains
           end do
        end do
 
+       ! Conductivity
+       value1  => T1%properties(ICOND)%values(:, dt1, T1%tmp)
+       value2  => T1%properties(ICOND)%values(:, dt2, T1%tmp)
+
+       ! J-J correlation is following Simone's trick:
+       ! use link correlation, instead of site. see Eq.(16) in the note
+       ! Below is only k=0 component, which is for conductivity
+       
+       ! n:  the number of sites in one primitive cell
+       ! nk: the number of cells in the cluster
+       ! D:  the list of sites making up the primitive links
+       ! np: the number of all links, instead of primitive links
+
+       ! Double Loops over all links:
+
+       nsite  = T1%properties(ICOND)%n*T1%properties(ICOND)%nk
+
+       ! Call nk the number of unit cells, than the first nk entries of plink
+       ! are the translation of the first primitive link. Likewise from nk+1 to 2nk
+       ! you have all the links obtained by translation of the second link and so on
+       ! T1%properties(iprop)%np = Gwrap%hamilt%nplink
+
+       do i = 0,  T1%properties(ICOND)%np - 1
+          do j = 0,  T1%properties(ICOND)%np - 1
+
+             ! find out if this type of link contribute to conductivity
+             dxl1  = T1%properties(ICOND)%tlink(3, i)
+             dxl2  = T1%properties(ICOND)%tlink(3, j)
+
+             if (abs(dxl1)<1.0E-5 .or. abs(dxl2)<1.0E-5) then
+                value1(1) = value1(1)
+                value2(1) = value2(1)
+             else
+
+                ! x-coordinate (for JxJx component of J-J tensor) difference
+                dxl1l2 = dxl1*dxl2*0.5_wp/nsite
+                tl1up2up = T1%properties(ICOND)%tlink(1, i)*T1%properties(ICOND)%tlink(1, j)
+                tl1dn2dn = T1%properties(ICOND)%tlink(2, i)*T1%properties(ICOND)%tlink(2, j)
+                tl1up2dn = T1%properties(ICOND)%tlink(1, i)*T1%properties(ICOND)%tlink(2, j)
+                tl1dn2up = T1%properties(ICOND)%tlink(2, i)*T1%properties(ICOND)%tlink(1, j)
+
+                do ic = 0,  T1%properties(ICOND)%nk - 1
+                  do jc = 0,  T1%properties(ICOND)%nk - 1
+                     l1s = T1%properties(ICOND)%D(1, i*T1%properties(ICOND)%nk+ic) + 1
+                     l1e = T1%properties(ICOND)%D(2, i*T1%properties(ICOND)%nk+ic) + 1
+                     l2s = T1%properties(ICOND)%D(1, j*T1%properties(ICOND)%nk+jc) + 1
+                     l2e = T1%properties(ICOND)%D(2, j*T1%properties(ICOND)%nk+jc) + 1
+
+                     ! jx-jx for links l and l':
+
+                     value1(1) = value1(1) - dxl1l2*tl1up2up*((uptt(l1e,l1s)-uptt(l1s,l1e))*(up00(l2e,l2s)-up00(l2s,l2e)) ) &
+                                           - dxl1l2*tl1up2dn*((uptt(l1e,l1s)-uptt(l1s,l1e))*(dn00(l2e,l2s)-dn00(l2s,l2e)) ) &
+                                           - dxl1l2*tl1dn2up*((dntt(l1e,l1s)-dntt(l1s,l1e))*(up00(l2e,l2s)-up00(l2s,l2e)) ) &
+                                           - dxl1l2*tl1dn2dn*((dntt(l1e,l1s)-dntt(l1s,l1e))*(dn00(l2e,l2s)-dn00(l2s,l2e)) )
+  
+                     ! cross terms
+                     value1(1) = value1(1) + dxl1l2*tl1up2up*( upt0(l1e,l2s)*up0t(l2e,l1s) + upt0(l1s,l2e)*up0t(l2s,l1e) &
+                                           - upt0(l1e,l2e)*up0t(l2s,l1s) - upt0(l1s,l2s)*up0t(l2e,l1e) )
+                     value1(1) = value1(1) + dxl1l2*tl1dn2dn*( dnt0(l1e,l2s)*dn0t(l2e,l1s) + dnt0(l1s,l2e)*dn0t(l2s,l1e) &
+                                           - dnt0(l1e,l2e)*dn0t(l2s,l1s) - dnt0(l1s,l2s)*dn0t(l2e,l1e) )
+
+                     ! value2: see the rules at the beginning of routine
+                     value2(1) = value2(1) - dxl1l2*tl1up2up*((up00(l1e,l1s)-up00(l1s,l1e))*(uptt(l2e,l2s)-uptt(l2s,l2e)) ) &
+                                           - dxl1l2*tl1up2dn*((up00(l1e,l1s)-up00(l1s,l1e))*(dntt(l2e,l2s)-dntt(l2s,l2e)) ) &
+                                           - dxl1l2*tl1dn2up*((dn00(l1e,l1s)-dn00(l1s,l1e))*(uptt(l2e,l2s)-uptt(l2s,l2e)) ) &
+                                           - dxl1l2*tl1dn2dn*((dn00(l1e,l1s)-dn00(l1s,l1e))*(dntt(l2e,l2s)-dntt(l2s,l2e)) )
+
+                     ! cross terms
+                     value2(1) = value2(1) + dxl1l2*tl1up2up*( up0t(l1e,l2s)*upt0(l2e,l1s) + up0t(l1s,l2e)*upt0(l2s,l1e) &
+                                           - up0t(l1e,l2e)*upt0(l2s,l1s) - up0t(l1s,l2s)*upt0(l2e,l1e) )
+                     value2(1) = value2(1) + dxl1l2*tl1dn2dn*( dn0t(l1e,l2s)*dnt0(l2e,l1s) + dn0t(l1s,l2e)*dnt0(l2s,l1e) &
+                                           - dn0t(l1e,l2e)*dnt0(l2s,l1s) - dn0t(l1s,l2s)*dnt0(l2e,l1e) )
+                  end do
+                 end do
+               endif
+             end do
+           end do
 
     else
 
@@ -643,6 +731,54 @@ contains
                   + dn0t(j,i)*up0t(j,i)
           end do
        end do
+
+       value1  => T1%properties(ICOND)%values(:, dt1, T1%tmp)
+
+       nsite  = T1%properties(ICOND)%n*T1%properties(ICOND)%nk
+
+       do i = 0,  T1%properties(ICOND)%np - 1
+          do j = 0,  T1%properties(ICOND)%np - 1
+
+             ! find out if this type of link contribute to conductivity
+             dxl1  = T1%properties(ICOND)%tlink(3, i)
+             dxl2  = T1%properties(ICOND)%tlink(3, j)
+             if (abs(dxl1)<1.0E-5 .or. abs(dxl2)<1.0E-5) then
+                value1(1) = value1(1)
+             else
+
+             dxl1l2 = dxl1*dxl2/nsite
+             tl1up2up = T1%properties(ICOND)%tlink(1, i)*T1%properties(ICOND)%tlink(1, j)
+             tl1dn2dn = T1%properties(ICOND)%tlink(2, i)*T1%properties(ICOND)%tlink(2, j)
+             tl1up2dn = T1%properties(ICOND)%tlink(1, i)*T1%properties(ICOND)%tlink(2, j)
+             tl1dn2up = T1%properties(ICOND)%tlink(2, i)*T1%properties(ICOND)%tlink(1, j)
+
+             do ic = 0,  T1%properties(ICOND)%nk - 1
+               do jc = 0,  T1%properties(ICOND)%nk - 1
+                  l1s = T1%properties(ICOND)%D(1, i*T1%properties(ICOND)%nk+ic) + 1
+                  l1e = T1%properties(ICOND)%D(2, i*T1%properties(ICOND)%nk+ic) + 1
+                  l2s = T1%properties(ICOND)%D(1, j*T1%properties(ICOND)%nk+jc) + 1
+                  l2e = T1%properties(ICOND)%D(2, j*T1%properties(ICOND)%nk+jc) + 1
+
+          ! jx-jx for links l and l':
+          ! include x-coordinate (for JxJx component of J-J tensor) difference
+
+          ! normal terms (see Eq.(21) in Simone's notes for example)
+          value1(1) = value1(1) - dxl1l2*tl1up2up*((uptt(l1e,l1s)-uptt(l1s,l1e))*(up00(l2e,l2s)-up00(l2s,l2e)) ) &
+                                - dxl1l2*tl1up2dn*((uptt(l1e,l1s)-uptt(l1s,l1e))*(dn00(l2e,l2s)-dn00(l2s,l2e)) ) &
+                                - dxl1l2*tl1dn2up*((dntt(l1e,l1s)-dntt(l1s,l1e))*(up00(l2e,l2s)-up00(l2s,l2e)) ) &
+                                - dxl1l2*tl1dn2dn*((dntt(l1e,l1s)-dntt(l1s,l1e))*(dn00(l2e,l2s)-dn00(l2s,l2e)) )
+
+          ! cross terms
+          value1(1) = value1(1) + dxl1l2*tl1up2up*( upt0(l1e,l2s)*up0t(l2e,l1s) + upt0(l1s,l2e)*up0t(l2s,l1e) &
+                                - upt0(l1e,l2e)*up0t(l2s,l1s) - upt0(l1s,l2s)*up0t(l2e,l1e) )
+          value1(1) = value1(1) + dxl1l2*tl1dn2dn*( dnt0(l1e,l2s)*dn0t(l2e,l1s) + dnt0(l1s,l2e)*dn0t(l2s,l1e) &
+                                - dnt0(l1e,l2e)*dn0t(l2s,l1s) - dnt0(l1s,l2s)*dn0t(l2e,l1e) )
+             end do
+            end do
+           endif
+        end do
+       end do
+
 
     endif
 
@@ -882,7 +1018,10 @@ contains
 
     integer :: ip, it, n, nproc, i
 
-    complex(wp), pointer  :: average(:), binval(:), error(:), temp(:)
+    complex(wp), pointer  :: average(:)
+    complex(wp), pointer  :: binval(:) 
+    complex(wp), pointer  :: error(:)  
+    complex(wp), pointer  :: temp(:)   
  
     !Loop over properties to Fourier transform
     nproc = qmc_sim%size
@@ -964,7 +1103,7 @@ contains
     integer             :: np, npp
     complex(wp)         :: tmp(T1%L, 2)
     character(len=10)   :: label(T1%L)
-    character(len=slen) :: title
+    character(len=60) :: title
 
     ! ... Executable ...
     if (.not.T1%compute) return
@@ -1016,8 +1155,10 @@ contains
 
     integer :: i, j, k, h, m
     integer :: L, n, nclass, np, nk, npp
-    integer,     pointer :: class(:,:), ph(:,:)
-    complex(wp), pointer :: ftk(:,:), ftw(:,:)
+    integer,     pointer :: class(:,:)
+    integer,     pointer :: ph(:,:)   
+    complex(wp), pointer :: ftk(:,:)  
+    complex(wp), pointer :: ftw(:,:)  
 
     complex(wp)          :: tmp(T1%L,2)
     character(len=10)    :: label(T1%L)

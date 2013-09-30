@@ -1,7 +1,12 @@
 module DQMC_SEQB
 #include "dqmc_include.h"
 
-  use _DQMC_MATB
+#ifdef _CKB
+  use DQMC_CKB
+#else 
+  use DQMC_MATB
+#endif
+
   use DQMC_UTIL
   use DQMC_WSPACE
 
@@ -22,21 +27,21 @@ module DQMC_SEQB
      integer  :: nOrth
      
      ! B matrix
-     type(MatB), pointer :: B
+     type(MatB), pointer :: B      
 
      ! For UDT decomposition
-     real(wp),   pointer :: U(:,:)
-     real(wp),   pointer :: D(:)
-     real(wp),   pointer :: T(:,:)
+     real(wp),   pointer :: U(:,:) 
+     real(wp),   pointer :: D(:)   
+     real(wp),   pointer :: T(:,:) 
 
      ! Working space
      real(wp),   pointer :: W1(:,:)
      real(wp),   pointer :: W2(:,:)
      real(wp),   pointer :: W3(:,:)
-     real(wp),   pointer :: rw(:)
-     real(wp),   pointer :: tau(:)
-     integer,    pointer :: piv(:)
-     integer,    pointer :: lw(:)
+     real(wp),   pointer :: rw(:)  
+     real(wp),   pointer :: tau(:) 
+     integer,    pointer :: piv(:) 
+     integer,    pointer :: lw(:)  
 
   end type SeqB
   
@@ -272,9 +277,15 @@ contains
     ! ... local scalars    ...
     integer :: i, si, interval          ! iterator
     integer :: n, L                     ! alias 
-    real(wp), pointer :: U(:,:), T(:,:), D(:)
-    real(wp), pointer :: W1(:,:), W2(:,:), tau(:), rw(:)
-    integer,  pointer :: piv(:), lw(:)
+    real(wp), pointer :: U(:,:) 
+    real(wp), pointer :: T(:,:) 
+    real(wp), pointer :: D(:)   
+    real(wp), pointer :: W1(:,:)
+    real(wp), pointer :: W2(:,:)
+    real(wp), pointer :: tau(:) 
+    real(wp), pointer :: rw(:)  
+    integer,  pointer :: piv(:) 
+    integer,  pointer :: lw(:)  
 
     ! ... Executable ...
 
@@ -358,9 +369,15 @@ contains
     ! ... local scalars    ...
     integer :: i, si, interval          ! iterator
     integer :: n, L                     ! alias 
-    real(wp), pointer :: U(:,:), T(:,:), D(:)
-    real(wp), pointer :: W1(:,:), W2(:,:), tau(:), rw(:)
-    integer,  pointer :: piv(:), lw(:)
+    real(wp), pointer :: U(:,:) 
+    real(wp), pointer :: T(:,:) 
+    real(wp), pointer :: D(:)   
+    real(wp), pointer :: W1(:,:)
+    real(wp), pointer :: W2(:,:)
+    real(wp), pointer :: tau(:) 
+    real(wp), pointer :: rw(:)  
+    integer,  pointer :: piv(:) 
+    integer,  pointer :: lw(:)  
 
     ! ... Executable ...
 

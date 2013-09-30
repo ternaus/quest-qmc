@@ -14,12 +14,12 @@ module DQMC_MATB
   !  =========
   !
   type matB
-     integer  :: n                      ! dim of B
-     real(wp), pointer :: K(:,:)        ! The Hamiltonian
-     real(wp), pointer :: B(:,:)        ! Matrix B 
-     real(wp), pointer :: Bi(:,:)       ! Inverse of matrix B
-     real(wp), pointer :: rtB(:,:)        ! Matrix B 
-     real(wp), pointer :: rtBi(:,:)       ! Inverse of matrix B
+     integer  :: n                   ! dim of B
+     real(wp), pointer :: K(:,:)     ! The Hamiltonian
+     real(wp), pointer :: B(:,:)     ! Matrix B 
+     real(wp), pointer :: Bi(:,:)    ! Inverse of matrix B
+     real(wp), pointer :: rtB(:,:)   ! Matrix B 
+     real(wp), pointer :: rtBi(:,:)  ! Inverse of matrix B
      character(12)     :: name
      logical           :: exactb
   end type matB
@@ -99,8 +99,10 @@ contains
 
     ! ... local scalars    ...
     integer  :: i, j                          ! iterator
-    real(wp), pointer :: H(:,:)
-    integer, pointer  :: start(:), r(:), A(:)
+    real(wp), pointer :: H(:,:) 
+    integer, pointer  :: start(:) 
+    integer, pointer  :: r(:) 
+    integer, pointer  :: A(:) 
 
     ! ... Executable ...
 
@@ -173,7 +175,8 @@ contains
 
     ! ... local scalars    ...
     integer  :: i, info, n       ! iterator
-    real(wp), pointer :: W5(:), W4(:)
+    real(wp), pointer :: W5(:) 
+    real(wp), pointer :: W4(:) 
 
     ! ... Executable ...
 
@@ -274,7 +277,9 @@ contains
 
     integer :: i
     integer :: lwork
-    real(wp), pointer :: W1(:), W2(:), W3(:,:)
+    real(wp), pointer :: W1(:)   
+    real(wp), pointer :: W2(:)   
+    real(wp), pointer :: W3(:,:) 
     ! ... executable ...
 
     PROF_BEGIN
@@ -352,7 +357,9 @@ contains
 
     integer :: i
     integer :: lwork
-    real(wp), pointer :: W1(:), W2(:), W3(:,:)
+    real(wp), pointer :: W1(:)   
+    real(wp), pointer :: W2(:)   
+    real(wp), pointer :: W3(:,:) 
     ! ... executable ...
 
     PROF_BEGIN
@@ -431,7 +438,9 @@ contains
 
     integer :: i
     integer :: lwork
-    real(wp), pointer :: W1(:), W2(:), W3(:,:)
+    real(wp), pointer :: W1(:)   
+    real(wp), pointer :: W2(:)   
+    real(wp), pointer :: W3(:,:) 
     ! ... executable ...
 
     PROF_BEGIN
@@ -508,7 +517,9 @@ contains
 
     integer :: i
     integer :: lwork
-    real(wp), pointer :: W1(:), W2(:), W3(:,:)
+    real(wp), pointer :: W1(:)   
+    real(wp), pointer :: W2(:)   
+    real(wp), pointer :: W3(:,:) 
     ! ... executable ...
 
     PROF_BEGIN

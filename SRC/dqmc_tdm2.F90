@@ -33,11 +33,11 @@ module DQMC_TDM2
      type(CCS),pointer :: Bond          ! bonds
      integer,  pointer :: D(:,:,:)      ! nonvertex info
      integer, pointer  :: SD(:,:)       ! neighbor info
-     real(wp), pointer :: Wave(:,:)
+     real(wp), pointer :: Wave(:,:) 
      real(wp), pointer :: T(:,:)        ! working space for getting wave
      integer  :: ldt
 
-     character(30), pointer :: label(:)
+     character(30), pointer :: label(:) 
   end type TDM2
   
 contains
@@ -243,8 +243,9 @@ contains
     real(wp), external :: ddot
 
     ! ... local scalar ...
-    real(wp), pointer :: susnl(:,:,:)
-    integer, pointer  :: D(:,:,:), SD(:,:)
+    real(wp), pointer :: susnl(:,:,:) 
+    integer, pointer  :: D(:,:,:) 
+    integer, pointer  :: SD(:,:) 
     
     integer  :: ti, i, j, nWave, L, nB, inbr, jnbr
  

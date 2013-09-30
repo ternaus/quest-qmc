@@ -50,6 +50,7 @@ module DQMC_GEOM_WRAP
      call DQMC_Error("cannot open geom def file "//gfile, 0)
     endif
 
+
     !Scan file to see which fields are specified
     call analyze_input
   
@@ -142,9 +143,10 @@ module DQMC_GEOM_WRAP
     integer  :: n                ! Order of matrix T and D 
     integer  :: i, j             ! Loop iterator
     integer  :: ic, ib
-    real(wp), pointer  :: clab(:,:) 
-    real(wp), pointer  :: tupvalue(:), tdnvalue(:)
-    integer, pointer   :: tmp(:,:)
+    real(wp), pointer  :: clab(:,:) => null()
+    real(wp), pointer  :: tupvalue(:) => null()
+    real(wp), pointer  :: tdnvalue(:) => null()
+    integer, pointer   :: tmp(:,:) => null()
 
     ! ... Executable ...
     S%checklist=.false.
@@ -181,7 +183,8 @@ module DQMC_GEOM_WRAP
     S%F(:)       =  gwrap%Lattice%class_size(:)
     clab         => gwrap%Lattice%class_label
     do ic=1,S%nClass
-       write(S%clabel(ic),'(i3,3(f8.4))') int(clab(ic,4)),(clab(ic,j),j=1,3)
+       ! 03/26/2013: added orbital index to clab(ic,4) and clab(ic,5)
+       write(S%clabel(ic),'(2(i3),3(f8.4))') (int(clab(ic,j)),j=4,5),(clab(ic,j),j=1,3)
     enddo
 
     !store GF phase
@@ -270,7 +273,7 @@ module DQMC_GEOM_WRAP
     ! ... Local scalar ...
     integer :: na, nk, ii, i, ik, j, jj, nkpts
     integer, pointer :: myclass_k(:) 
-    real*8, pointer  :: klist(:,:)
+    real*8, pointer  :: klist(:,:) 
 
     ! ... Executable ...
 

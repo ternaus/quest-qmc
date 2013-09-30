@@ -421,7 +421,7 @@ contains
     !
     integer, intent(in)         :: n, nx, ny  ! dimension of the lattice
     type(Struct), intent(inout) :: S          ! Struct
-    real(wp), pointer           :: cord(:,:)
+    real(wp), pointer           :: cord(:,:) 
 
     ! ... local vars ...
     integer  :: L(nx*ny,nx*ny)   ! distance table

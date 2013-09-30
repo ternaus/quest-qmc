@@ -95,8 +95,10 @@ real*8 xpoint(3),xaxis(3),xnorm
 character*50 string
 character*1 label
 logical dum
-character*1, pointer :: symmlabel(:)
-real*8, pointer      :: symmangle(:),symmpoint(:,:),symmaxis(:,:)
+character*1, pointer :: symmlabel(:)  
+real*8, pointer      :: symmangle(:)  
+real*8, pointer      :: symmpoint(:,:)
+real*8, pointer      :: symmaxis(:,:) 
 type(symm_operations),intent(out) :: SymmOp
 
 !Count the symmetry operation specified in input
@@ -352,7 +354,9 @@ integer :: tmp_symm(0:lattice%nsites-1,SymmOp%ntotsymm)
 
 real*8  :: diff(rdim), projsc(rdim), invscc(rdim,rdim)
 real*8  :: newpos(rdim,0:lattice%nsites-1)
-real*8, pointer  :: symmangle(:), symmpoint(:,:), symmaxis(:,:)
+real*8, pointer  :: symmangle(:)  
+real*8, pointer  :: symmpoint(:,:)
+real*8, pointer  :: symmaxis(:,:) 
 
 logical :: mapped(0:lattice%nsites-1,SymmOp%ntotsymm)
 logical :: mappedt(0:lattice%nsites-1,0:lattice%ncell-1)
@@ -538,10 +542,14 @@ integer                            :: i,j,ii,nsymm,ndim,ik,jk
 real*8                             :: diff(rdim),projsc(rdim),invkc(rdim,rdim), &
                                       newklist(recip_lattice%nkpts,rdim),zerovec(rdim)
 logical                            :: mapped(recip_lattice%nkpts), includesymm
-character*1, pointer               :: symmlabel(:)
-real*8, pointer                    :: symmangle(:),symmpoint(:,:),symmaxis(:,:)
+character*1, pointer               :: symmlabel(:)  
+real*8, pointer                    :: symmangle(:)  
+real*8, pointer                    :: symmpoint(:,:)
+real*8, pointer                    :: symmaxis(:,:) 
 integer :: msymm, nsites, valid_symm(SymmOp%nsymm)
-integer, pointer :: tmp_symm(:,:), tmp_symm_k(:,:), tmp_valid(:)
+integer, pointer :: tmp_symm(:,:)  
+integer, pointer :: tmp_symm_k(:,:)
+integer, pointer :: tmp_valid(:)   
 
 if(.not.SymmOp%lattice_mapped)stop'Need to map lattice symmetries before recip lattice ones'
 
@@ -712,7 +720,9 @@ subroutine map_symm_bonds(Bonds,SymmOp,Lattice)
  integer :: nbclass,ibond,iat,jat,ntotpair,natom,nsites,bcl,newlabel,jbond,it, &
  & isymm,ndim
  integer, allocatable :: class(:),tag(:),pair_origin(:),pair_target(:),pair_label(:)
- integer, pointer :: bond_origin(:),bond_target(:),map_symm(:,:)
+ integer, pointer :: bond_origin(:)
+ integer, pointer :: bond_target(:)
+ integer, pointer :: map_symm(:,:)
  real*8 :: invscc(rdim,rdim),proj(rdim)
  real*8, allocatable :: xxpair(:,:)
  logical, allocatable :: bond_on(:,:)
@@ -1035,13 +1045,15 @@ deallocate(patom,satom,csizev)
 nclass=mclass
 
 !Define a class label using the distance between the sites
-allocate(lattice%class_label(nclass,4))
+allocate(lattice%class_label(nclass,5))
 do iclass=1,nclass
  prim:do i=0,natom-1
   super:do j=0,nsites-1
    if(myclass(i,j)==iclass)then
     lattice%class_label(iclass,1:3)=lattice%cartpos(1:3,j)-lattice%cartpos(1:3,i)
+    ! 03/26/2013: added the second orbital index in lattice%class_label(iclass,5)
     lattice%class_label(iclass,4)=dble(i)
+    lattice%class_label(iclass,5)=mod(j,natom)
     exit prim
    endif
   enddo super
@@ -1100,7 +1112,8 @@ integer               :: i,ip,j,isymm,iclass,istart,csize,csizenew,&
                          &jclass,idj,id,mclass,ip2,jstart,&
                          &nsymm,nkpts
 integer,allocatable   :: patom(:,:),csizev(:)
-integer, pointer      :: myclass_k(:),map_symm(:,:)
+integer, pointer      :: myclass_k(:)
+integer, pointer      :: map_symm(:,:)
 type(symm_operations) :: SymmOp
 type(recip_lattice_t) :: recip_lattice
 logical,intent(in)    :: applytwist
@@ -1206,7 +1219,7 @@ type(symm_operations),intent(in) :: SymmOp
 type(bonds_t),intent(inout) :: Bonds
 integer :: ib,nclass,ntotbond,ntotbondsq,isymm,iclass,istart,csize,csizenew,&
 & id,bx,by,jclass,jstart,idj,mclass,jb,i,j
-integer,pointer :: myclass(:,:)
+integer,pointer :: myclass(:,:) 
 integer, allocatable :: bond1(:,:),bond2(:,:),csizev(:)
 
 if(.not.SymmOp%bonds_mapped)stop'Need to map bonds before analyzing symmetry'

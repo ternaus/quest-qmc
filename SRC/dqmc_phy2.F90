@@ -48,7 +48,7 @@ module DQMC_Phy2
      real(wp), pointer :: M5(:,:)            ! averaged pair measurement connected
 
      ! working space
-     real(wp), pointer :: T(:,:)
+     real(wp), pointer :: T(:,:) 
      integer  :: ldt
      integer  :: nData
      logical  :: compute
@@ -86,7 +86,7 @@ contains
 
     ! ... Local Vars ...
     integer :: nb, nWave
-    real(wp), pointer :: dum(:,:)
+    real(wp), pointer :: dum(:,:) 
 
     ! ... Executable ...
 
@@ -238,7 +238,9 @@ contains
  
     ! ... local variables ...
     integer  :: i, j, inbr, jnbr, ni, nj, nci, ncj
-    integer, pointer  :: start(:), r(:), A(:)
+    integer, pointer  :: start(:) 
+    integer, pointer  :: r(:) 
+    integer, pointer  :: A(:) 
 
     ! ... Executable ...
 
@@ -744,8 +746,9 @@ contains
   type(phy2), intent(inout)          :: P2
   type(Symm_operations), intent(in)           :: Symm
 
-  real(wp), pointer   :: W(:,:), wa(:)
-  integer, pointer    :: maps(:,:)
+  real(wp), pointer   :: W(:,:) 
+  real(wp), pointer   :: wa(:) 
+  integer, pointer    :: maps(:,:) 
   integer             :: iw, ir, jr, is, ib, jw, nirrep, nw, nb, ns
   integer             :: reprlabel(S%nwave),rdim(S%nwave)
   real(wp)            :: newWave(S%n_b), WaveSymm(S%nwave,S%nwave,Symm%nsymm), irrepChar(S%nwave,Symm%nsymm)

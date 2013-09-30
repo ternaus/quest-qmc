@@ -19,4 +19,5 @@ lib: 	$(OBJ)
 	$(FC) $(FC_FLAGS) -c $<
 
 clean:
-	rm -f ../libblas.a *.o
+	rm -f ../libblas.a *.o *genmod*
+	

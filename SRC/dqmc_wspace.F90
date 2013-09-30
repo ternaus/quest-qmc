@@ -12,9 +12,16 @@ module DQMC_WSpace
   !
   type WSpace
      integer :: lw(5)
-     real(wp), pointer :: R1(:,:), R2(:,:), R3(:,:), R4(:,:)
-     real(wp), pointer :: R5(:),   R6(:),   R7(:),   R8(:,:)
-     integer,  pointer :: I1(:),   I2(:)
+     real(wp), pointer :: R1(:,:)
+     real(wp), pointer :: R2(:,:)
+     real(wp), pointer :: R3(:,:)
+     real(wp), pointer :: R4(:,:)
+     real(wp), pointer :: R5(:)  
+     real(wp), pointer :: R6(:)  
+     real(wp), pointer :: R7(:)  
+     real(wp), pointer :: R8(:,:)
+     integer,  pointer :: I1(:)  
+     integer,  pointer :: I2(:)  
   end type WSpace
 
   !

@@ -58,69 +58,69 @@ module DQMC_Hubbard
 
      ! Parameters for Hubbard model
      integer  :: n_U
-     real(wp), pointer :: U(:)            ! Param of Potential energy
-     integer  :: n_t                      ! Number of hopping
-     real(wp), pointer :: t_up(:)         ! Param of Kinetic energy
-     real(wp), pointer :: t_dn(:)         ! Param of Kinetic energy
+     real(wp), pointer :: U(:)        ! Param of Potential energy
+     integer  :: n_t                  ! Number of hopping
+     real(wp), pointer :: t_up(:)     ! Param of Kinetic energy
+     real(wp), pointer :: t_dn(:)     ! Param of Kinetic energy
      integer  :: n_mu
-     real(wp), pointer :: mu_up(:)        ! Param of Chemical energy
-     real(wp), pointer :: mu_dn(:)        ! Param of Chemical energy
-     real(wp) :: dtau                     ! size of time slice
-     integer,  pointer :: HSF (:,:)       ! Hubbard-Stratonovich Field
-     real(wp), pointer :: CHSF (:,:)      ! continuous Hubbard-Stratonovich Field
+     real(wp), pointer :: mu_up(:)    ! Param of Chemical energy
+     real(wp), pointer :: mu_dn(:)    ! Param of Chemical energy
+     real(wp) :: dtau                 ! size of time slice
+     integer,  pointer :: HSF (:,:)   ! Hubbard-Stratonovich Field
+     real(wp), pointer :: CHSF (:,:)  ! continuous Hubbard-Stratonovich Field
      integer  :: HSFtype
-     logical  :: outputHSF                ! flag for output HSF
-     logical  :: continuous               ! flag for continuous HSF
-     real(wp) :: delta1                   ! parameter for contunuous HSF 
-     real(wp) :: delta2                   ! parameter for contunuous HSF 
-     real(wp), pointer :: lambda(:)       ! parameter for contunuous HSF 
+     logical  :: outputHSF            ! flag for output HSF
+     logical  :: continuous           ! flag for continuous HSF
+     real(wp) :: delta1               ! parameter for contunuous HSF 
+     real(wp) :: delta2               ! parameter for contunuous HSF 
+     real(wp), pointer :: lambda(:)   ! parameter for contunuous HSF 
      integer  :: n_start, n_end 
      
      ! Underline structure  
-     type(Struct) :: S                    ! Lattice structure
+     type(Struct) :: S                ! Lattice structure
      
 
      ! For Green function computation
-     type(matB)   :: B_up                    ! 
-     type(seqB)   :: SB_up                   ! Sequential Bs 
-     type(matB)   :: B_dn                    ! 
-     type(seqB)   :: SB_dn                   ! Sequential Bs 
-     type(G_fun)  :: G_up                 ! Green's fun for spin up
-     type(G_fun)  :: G_dn                 ! Green's fun for spin down
-     real(wp), pointer :: V_up(:,:)       !
-     real(wp), pointer :: V_dn(:,:)       !
+     type(matB)   :: B_up             ! 
+     type(seqB)   :: SB_up            ! Sequential Bs 
+     type(matB)   :: B_dn             ! 
+     type(seqB)   :: SB_dn            ! Sequential Bs 
+     type(G_fun)  :: G_up             ! Green's fun for spin up
+     type(G_fun)  :: G_dn             ! Green's fun for spin down
+     real(wp), pointer :: V_up(:,:)   !
+     real(wp), pointer :: V_dn(:,:)   !
      
      ! Parameters for random number
-     integer  :: idum                     ! random seed for ran2
-     integer  :: seed(4)                  ! random seed for ran1
+     integer  :: idum                 ! random seed for ran2
+     integer  :: seed(4)              ! random seed for ran1
 
      ! Auxiliary variables
-     real(wp), pointer :: explook(:,:)    ! Lookup table for computing V
-     logical  :: comp_dn                  ! indicator for wheather computing
-                                          ! G_dn or not
-     logical  :: neg_u                    ! are all U_i < 0 ?
-                                          ! CAVEAT: mixed sign may not work
+     real(wp), pointer :: explook(:,:) ! Lookup table for computing V
+     logical  :: comp_dn               ! indicator for wheather computing
+                                       ! G_dn or not
+     logical  :: neg_u                 ! are all U_i < 0 ?
+                                       ! CAVEAT: mixed sign may not work
 
      ! Part 2: Parameters for Monte Carlo algorithm
      ! ============================================
-     integer  :: nWarm                    ! Number of warm up step
-     integer  :: nPass                    ! Number of measurement step
-     integer  :: nTry                     ! Number of global move
-     real(wp) :: gamma                    ! Parameters for Metopolis alg
+     integer  :: nWarm                 ! Number of warm up step
+     integer  :: nPass                 ! Number of measurement step
+     integer  :: nTry                  ! Number of global move
+     real(wp) :: gamma                 ! Parameters for Metopolis alg
      
-     integer  :: nAccept                  ! The following parameters  
-     integer  :: nReject                  ! are used to dynamically
-                                          ! adjust gamma.
+     integer  :: nAccept               ! The following parameters  
+     integer  :: nReject               ! are used to dynamically
+                                       ! adjust gamma.
 
-     integer  :: nAcceptGlobal            ! global move acceptance
+     integer  :: nAcceptGlobal         ! global move acceptance
      integer  :: nRejectGlobal
 
      ! Part 3: Physical measurements
      ! =============================
-     type(Phy0)   :: P0                   ! Meas0
-     type(Phy2)   :: P2                   ! MeasPair
+     type(Phy0)   :: P0                ! Meas0
+     type(Phy2)   :: P2                ! MeasPair
      integer      :: nMeas             
-     integer      :: tausk               ! Frequency of performing Phy0 measurement 
+     integer      :: tausk             ! Frequency of performing Phy0 measurement 
      logical      :: meas2
 
      ! Part 4: Working space
@@ -178,7 +178,11 @@ contains
     integer :: seed, nOrth, nWrap, nTry, nBin, nMeas, ntausk, ssxx
     character(len=slen) :: HSF_ipt, HSF_opt
     logical :: valid
-    real(wp), pointer :: t_up(:), t_dn(:), U(:), mu_up(:), mu_dn(:)
+    real(wp), pointer :: t_up(:) => null()
+    real(wp), pointer :: t_dn(:) => null()  
+    real(wp), pointer :: U(:) => null()   
+    real(wp), pointer :: mu_up(:) => null() 
+    real(wp), pointer :: mu_dn(:) => null() 
     real(wp) :: dtau, errrate, difflim, gamma, delta1, delta2
     !character(len=30) :: fname, outname
 
@@ -1004,15 +1008,23 @@ contains
 #   endif
     
     ! To speed up the computation
-    real(wp), pointer :: G_up(:,:), G_dn(:,:)
-    real(wp), pointer :: U_up(:,:), U_dn(:,:)
-    real(wp), pointer :: W_up(:,:), W_dn(:,:)
-    real(wp), pointer :: V_up(:,:), V_dn(:,:)
-    integer,  pointer :: blksz_up, blksz_dn
-    real(wp), pointer :: sgn_up, sgn_dn
+    real(wp), pointer :: G_up(:,:) 
+    real(wp), pointer :: G_dn(:,:) 
+    real(wp), pointer :: U_up(:,:) 
+    real(wp), pointer :: U_dn(:,:) 
+    real(wp), pointer :: W_up(:,:) 
+    real(wp), pointer :: W_dn(:,:) 
+    real(wp), pointer :: V_up(:,:) 
+    real(wp), pointer :: V_dn(:,:) 
+    integer,  pointer :: blksz_up  
+    integer,  pointer :: blksz_dn  
+    real(wp), pointer :: sgn_up    
+    real(wp), pointer :: sgn_dn    
 
-    real(wp), pointer :: ranlist(:), explook(:,:)
-    integer,  pointer :: HSF(:,:), map(:)
+    real(wp), pointer :: ranlist(:)   
+    real(wp), pointer :: explook(:,:) 
+    integer,  pointer :: HSF(:,:)     
+    integer,  pointer :: map(:)       
     real(wp)  :: gamma
     logical   :: comp_dn, neg_u
 
@@ -1270,7 +1282,7 @@ contains
     integer  :: i, j, n, L, accept, tmp, nSite, tslice
     real(wp) :: det_up, det_dn, new_up, new_dn
     real(wp) :: copy_sgn_up, copy_sgn_dn
-    integer, pointer :: map(:)
+    integer, pointer :: map(:) 
     integer  :: siteList(Hub%n), site(numTry)
     integer  :: hs_sum          ! sum over HS fields at site, for U<0
     
@@ -1498,15 +1510,23 @@ contains
     real(wp) :: gjj                   ! (j,j) element of G_up or G_dn
     
     ! To speed up the computation
-    real(wp), pointer :: G_up(:,:), G_dn(:,:)
-    real(wp), pointer :: U_up(:,:), U_dn(:,:)
-    real(wp), pointer :: W_up(:,:), W_dn(:,:)
-    real(wp), pointer :: V_up(:,:), V_dn(:,:)
-    integer,  pointer :: blksz_up, blksz_dn
-    real(wp), pointer :: sgn_up, sgn_dn
+    real(wp), pointer :: G_up(:,:) 
+    real(wp), pointer :: G_dn(:,:) 
+    real(wp), pointer :: U_up(:,:) 
+    real(wp), pointer :: U_dn(:,:) 
+    real(wp), pointer :: W_up(:,:) 
+    real(wp), pointer :: W_dn(:,:) 
+    real(wp), pointer :: V_up(:,:) 
+    real(wp), pointer :: V_dn(:,:) 
+    integer,  pointer :: blksz_up  
+    integer,  pointer :: blksz_dn  
+    real(wp), pointer :: sgn_up    
+    real(wp), pointer :: sgn_dn    
 
-    real(wp), pointer :: ranlist(:), CHSF(:,:), lambda(:)
-    integer,  pointer :: map(:)
+    real(wp), pointer :: ranlist(:)
+    real(wp), pointer :: CHSF(:,:) 
+    real(wp), pointer :: lambda(:) 
+    integer,  pointer :: map(:)    
     real(wp)  :: gamma, edx, delta,  dx, dE
     logical   :: comp_dn
 
@@ -1720,10 +1740,10 @@ contains
     integer  :: i, j, n, L, accept, tmp, nSite
     real(wp) :: det_up, det_dn, new_up, new_dn
     real(wp) :: copy_sgn_up, copy_sgn_dn, delta, dx
-    integer, pointer :: map(:)
+    integer, pointer :: map(:) 
     integer  :: siteList(Hub%n), site(numTry), si, sj
     integer  :: slice(numTry)
-    real(wp), pointer :: CHSF(:,:)
+    real(wp), pointer :: CHSF(:,:) 
     logical  :: compute_dn
     real(wp) :: G_dn_tmp(Hub%n,Hub%n)
 
@@ -1979,7 +1999,8 @@ contains
 
      ! Extra space for dtau^2-correct estimate
      type(G_fun), target :: G_up_local, G_dn_local
-     real(wp), pointer   :: G_up(:,:), G_dn(:,:)
+     real(wp), pointer   :: G_up(:,:) 
+     real(wp), pointer   :: G_dn(:,:) 
      
      !Duplicate the Green's function 
      call DQMC_Gfun_Duplicate(G_up_local, Hub%G_up)
@@ -2059,8 +2080,10 @@ contains
      integer, intent(inout)       :: slice
 
      type(G_fun), target :: G_up_local, G_dn_local
-     real(wp), pointer   :: G_up(:,:), G_dn(:,:)
-     real(wp), pointer   :: sgn_up, sgn_dn
+     real(wp), pointer   :: G_up(:,:) 
+     real(wp), pointer   :: G_dn(:,:) 
+     real(wp), pointer   :: sgn_up    
+     real(wp), pointer   :: sgn_dn    
      real(wp)            :: randn(1)
  
      ! 05/10/2012, CC

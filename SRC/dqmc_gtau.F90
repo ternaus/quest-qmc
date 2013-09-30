@@ -53,50 +53,53 @@ module DQMC_GTAU
      integer  :: sfc     ! safe count
 
      ! Green's functions
-     real(wp), pointer :: upt0(:,:) ! Gup(t,0)
-     real(wp), pointer :: up0t(:,:) ! Gup(0,t)
-     real(wp), pointer :: dnt0(:,:) ! Gdn(t,0)
-     real(wp), pointer :: dn0t(:,:) ! Gdn(0,t)
-     real(wp), pointer :: up00(:,:) ! Gup(0,0)
-     real(wp), pointer :: uptt(:,:) ! Gup(t,t)
-     real(wp), pointer :: dn00(:,:) ! Gdn(0,0)
-     real(wp), pointer :: dntt(:,:) ! Gdn(t,t)
+     real(wp), pointer :: upt0(:,:)  ! Gup(t,0)
+     real(wp), pointer :: up0t(:,:)  ! Gup(0,t)
+     real(wp), pointer :: dnt0(:,:)  ! Gdn(t,0)
+     real(wp), pointer :: dn0t(:,:)  ! Gdn(0,t)
+     real(wp), pointer :: up00(:,:)  ! Gup(0,0)
+     real(wp), pointer :: uptt(:,:)  ! Gup(t,t)
+     real(wp), pointer :: dn00(:,:)  ! Gdn(0,0)
+     real(wp), pointer :: dntt(:,:)  ! Gdn(t,t)
 
      ! Full Green's functions (nb imag-times. Not L!)
      real(wp), pointer :: A_up(:,:) 
-     real(wp), pointer :: A_dn(:,:)
+     real(wp), pointer :: A_dn(:,:) 
      ! Indices of imag-times stored in the A's
-     integer, pointer  :: itau_up(:)
-     integer, pointer  :: itau_dn(:)
+     integer, pointer  :: itau_up(:) 
+     integer, pointer  :: itau_dn(:) 
      
      ! Pointers to B matrices (no fields)
-     type(MatB), pointer :: B_up, B_dn
+     type(MatB), pointer :: B_up 
+     type(MatB), pointer :: B_dn 
      ! Pointers to B matrices with fields
-     real(wp), pointer   :: V_up(:,:), V_dn(:,:)
+     real(wp), pointer   :: V_up(:,:) 
+     real(wp), pointer   :: V_dn(:,:) 
  
      ! Pointers to phase
-     real(wp), pointer   :: P(:)
+     real(wp), pointer   :: P(:) 
 
      ! Control variables for dn computation
      logical :: comp_dn
      logical :: neg_u
     
      ! Signs
-     real(wp), pointer   :: sgnup, sgndn
+     real(wp), pointer   :: sgnup 
+     real(wp), pointer   :: sgndn 
 
      ! Workspace variables
      integer             :: lw
-     integer, pointer    :: IW(:)
-     real(wp), pointer   :: W1(:)
-     real(wp), pointer   :: W2(:,:)
-     real(wp), pointer   :: W3(:,:)
+     integer, pointer    :: IW(:)   
+     real(wp), pointer   :: W1(:)   
+     real(wp), pointer   :: W2(:,:) 
+     real(wp), pointer   :: W3(:,:) 
 
      ! Workspace for g0 computation
      logical           :: g0_stored = .false.
-     real(wp), pointer :: e0up(:)
-     real(wp), pointer :: e0dn(:)
-     real(wp), pointer :: U0up(:,:)
-     real(wp), pointer :: U0dn(:,:)
+     real(wp), pointer :: e0up(:)   
+     real(wp), pointer :: e0dn(:)   
+     real(wp), pointer :: U0up(:,:) 
+     real(wp), pointer :: U0dn(:,:) 
 
   end type Gtau
   
@@ -259,12 +262,13 @@ contains
     real(wp),   intent(out)           :: sgn
     
     ! ... Local var ...
-    real(wp),   pointer :: A(:,:)
-    real(wp),   pointer :: V(:,:)
-    type(MatB), pointer :: B
-    real(wp),   pointer :: s
-    integer,    pointer :: t(:)
-    real(wp),   pointer :: gtau1(:,:), gtau2(:,:)
+    real(wp),   pointer :: A(:,:)     
+    real(wp),   pointer :: V(:,:)     
+    type(MatB), pointer :: B          
+    real(wp),   pointer :: s          
+    integer,    pointer :: t(:)       
+    real(wp),   pointer :: gtau1(:,:) 
+    real(wp),   pointer :: gtau2(:,:) 
 
     integer  :: i, j, k, h, isl, jsl
     integer  :: n, nb, nnb, nor, L
@@ -383,11 +387,14 @@ contains
     integer, intent(in)       :: it, i0, spin
 
     integer  :: n, i, j0, jt
-    integer,  pointer :: itptr, i0ptr
-    integer,  pointer :: t(:)
-    real(wp), pointer :: gt0(:,:), g0t(:,:)
-    real(wp), pointer :: g00(:,:), gtt(:,:)
-    real(wp), pointer :: A(:,:)
+    integer,  pointer :: itptr    
+    integer,  pointer :: i0ptr    
+    integer,  pointer :: t(:)     
+    real(wp), pointer :: gt0(:,:) 
+    real(wp), pointer :: g0t(:,:) 
+    real(wp), pointer :: g00(:,:) 
+    real(wp), pointer :: gtt(:,:) 
+    real(wp), pointer :: A(:,:)   
 
     n = tau%n
 
@@ -591,26 +598,27 @@ contains
     integer :: n
     integer :: which
 
-    real(wp), pointer :: U1(:,:)       ! 
-    real(wp), pointer :: D1(:)         ! 
-    real(wp), pointer :: T1(:,:)       ! 
-    real(wp), pointer :: U2(:,:)       ! 
-    real(wp), pointer :: D2(:)         ! 
-    real(wp), pointer :: T2(:,:)       ! 
-    real(wp), pointer :: W1(:,:)       ! working space
-    real(wp), pointer :: W2(:,:)       !
-    real(wp), pointer :: rw(:)         ! working space
-    real(wp), pointer :: V(:,:)        ! HSF
-    integer,  pointer :: lw(:)         !
-    integer,  pointer :: pvt1(:)       !
-    integer,  pointer :: pvt2(:)       !
+    real(wp), pointer :: U1(:,:)        ! 
+    real(wp), pointer :: D1(:)          ! 
+    real(wp), pointer :: T1(:,:)        ! 
+    real(wp), pointer :: U2(:,:)        ! 
+    real(wp), pointer :: D2(:)          ! 
+    real(wp), pointer :: T2(:,:)        ! 
+    real(wp), pointer :: W1(:,:)        ! working space
+    real(wp), pointer :: W2(:,:)        !
+    real(wp), pointer :: rw(:)          ! working space
+    real(wp), pointer :: V(:,:)         ! HSF
+    integer,  pointer :: lw(:)          !
+    integer,  pointer :: pvt1(:)        !
+    integer,  pointer :: pvt2(:)        !
 
-    real(wp), pointer :: bar1i(:)      ! 
-    real(wp), pointer :: bar2i(:)      ! 
-    real(wp), pointer :: hat1(:)       ! 
-    real(wp), pointer :: hat2(:)       ! 
+    real(wp), pointer :: bar1i(:)       ! 
+    real(wp), pointer :: bar2i(:)       ! 
+    real(wp), pointer :: hat1(:)        ! 
+    real(wp), pointer :: hat2(:)        ! 
     
-    type(SeqB), pointer :: SB1, SB2
+    type(SeqB), pointer :: SB1 
+    type(SeqB), pointer :: SB2 
 
     ! ... Executable ...
 
@@ -920,14 +928,15 @@ contains
     integer :: i, j, id, n, L
 
     ! ... aliases ...
-    type(matB), pointer :: B
-    real(wp),   pointer :: gt0(:,:)
-    real(wp),   pointer :: g0t(:,:)
-    real(wp),   pointer :: g00(:,:)
-    real(wp),   pointer :: gtt(:,:)
-    real(wp),   pointer :: W(:,:)
-    real(wp),   pointer :: V(:,:)
-    integer,    pointer :: it, i0
+    type(matB), pointer :: B        
+    real(wp),   pointer :: gt0(:,:) 
+    real(wp),   pointer :: g0t(:,:) 
+    real(wp),   pointer :: g00(:,:) 
+    real(wp),   pointer :: gtt(:,:) 
+    real(wp),   pointer :: W(:,:)   
+    real(wp),   pointer :: V(:,:)   
+    integer,    pointer :: it       
+    integer,    pointer :: i0       
 
     n = tau%n
     L = tau%L
@@ -1110,16 +1119,17 @@ contains
      integer,    intent(in) :: spin
      type(gtau), target, intent(in) :: tau
 
-     type(MatB), pointer, optional :: B
-     integer,    pointer, optional :: itau(:)
-     real(wp),   pointer, optional :: A(:,:)
-     real(wp),   pointer, optional :: V(:,:)
-     real(wp),   pointer, optional :: gt0(:,:)
-     real(wp),   pointer, optional :: g0t(:,:)
-     real(wp),   pointer, optional :: g00(:,:)
-     real(wp),   pointer, optional :: gtt(:,:)
-     integer,    pointer, optional :: it, i0
-     real(wp),   pointer, optional :: sgn
+     type(MatB), pointer, optional :: B        
+     integer,    pointer, optional :: itau(:)  
+     real(wp),   pointer, optional :: A(:,:)   
+     real(wp),   pointer, optional :: V(:,:)   
+     real(wp),   pointer, optional :: gt0(:,:) 
+     real(wp),   pointer, optional :: g0t(:,:) 
+     real(wp),   pointer, optional :: g00(:,:) 
+     real(wp),   pointer, optional :: gtt(:,:) 
+     integer,    pointer, optional :: it       
+     integer,    pointer, optional :: i0       
+     real(wp),   pointer, optional :: sgn      
 
      select case (spin)
        case (TAU_UP)

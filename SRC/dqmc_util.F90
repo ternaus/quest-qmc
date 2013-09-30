@@ -75,7 +75,7 @@ contains
 
   function conjg_real(x) result(y)
       real*8, target, intent(in) :: x
-      real*8, pointer :: y
+      real*8, pointer :: y 
       y => x
   end function conjg_real
 

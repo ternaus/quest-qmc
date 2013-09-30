@@ -50,7 +50,7 @@ contains
     
     ! ... Local variables ...
     integer :: n, val(8), i, j
-    type(Hubbard), pointer :: Hub
+    type(Hubbard), pointer :: Hub 
     real(wp) :: temp, lambda
     integer,  parameter :: nort  = 12
     integer,  parameter :: nwrap = 12
@@ -362,7 +362,8 @@ contains
     real(wp), intent(out)         :: sgnup, sgndn
     
     target  :: qmc
-    pointer :: G_up, G_dn
+    pointer :: G_up
+    pointer :: G_dn
 
     ! ... Executable ...
 
@@ -398,7 +399,7 @@ contains
 
     ! ... Local variables ...
     integer :: i, j, k, nIter 
-    type(Hubbard), pointer :: Hub
+    type(Hubbard), pointer :: Hub 
 
     ! ... Executable ...
 

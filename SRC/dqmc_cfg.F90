@@ -218,13 +218,13 @@ module DQMC_Cfg
      logical        :: isArray      ! is the param an array?
      logical        :: isSet        ! is the parameter been set?
      character(len=slen)  :: defaultval   ! default value
-     type(Param), pointer :: next
+     type(Param), pointer :: next 
 
      ! values
      integer        :: ival
      real(wp)       :: rval
-     integer, pointer     :: iptr(:)
-     real(wp), pointer    :: rptr(:)
+     integer, pointer     :: iptr(:) 
+     real(wp), pointer    :: rptr(:) 
   end type Param
 
   type config
@@ -313,7 +313,7 @@ contains
     type(config), intent(inout)  :: cfg          ! configuration
     
     ! ... Local Variable ...
-    type(Param),pointer    :: curr
+    type(Param),pointer    :: curr 
     integer :: i
 
     ! ... Executable ...
@@ -391,7 +391,9 @@ contains
     ! ... Local Variable ...
     integer                :: stat, i, cnt
     character(len=llen)    :: str
-    type(Param),pointer    :: head, curr, tmp
+    type(Param),pointer    :: head 
+    type(Param),pointer    :: curr 
+    type(Param),pointer    :: tmp 
     logical                :: found
     ! ... Executable ...
 
@@ -501,7 +503,7 @@ contains
 
     ! ... Local Variable ...
     integer                :: i
-    type(Param), pointer   :: curr
+    type(Param), pointer   :: curr 
 
     ! ... Executable ...
 
@@ -615,7 +617,7 @@ contains
     character(len=llen)    :: str, attr, val
     logical                :: found
     real(wp)               :: tmp(alen)          ! for reading t
-    type(Param), pointer   :: curr
+    type(Param), pointer   :: curr 
     integer, parameter     :: funit = 10
     character(len=30)      :: iname
     integer                :: IPT, status
@@ -1017,7 +1019,7 @@ contains
     !
     type(config), intent(in)  :: cfg          ! configuration
     character(*), intent(in)  :: name
-    real(wp), pointer         :: value(:)
+    real(wp), pointer         :: value(:) 
     integer, intent(out)      :: n
 
     ! ... local variables
@@ -1025,6 +1027,9 @@ contains
 
     ! ... Executable ...
     id = DQMC_Find_Param(cfg, name)
+!    write(*,*) "in DQMC_Config_GetPR, id=",id
+!    write(*,*) "in DQMC_Config_GetPR, name=",name
+!    write(*,*) "in DQMC_Config_GetPR, value associated?",associated(value)
     if (id .gt. 0) then
        if (.not.cfg%record(id)%isSet) then
           call DQMC_Warning(name//" wasn't initialized,&
@@ -1062,7 +1067,7 @@ contains
     !
     type(config), intent(in)  :: cfg          ! configuration
     character(*), intent(in)  :: name
-    integer, pointer          :: value(:)
+    integer, pointer          :: value(:) 
     integer, intent(out)      :: n
 
     ! ... local variables
@@ -1070,6 +1075,9 @@ contains
 
     ! ... Executable ...
     id = DQMC_Find_Param(cfg, name)
+!    write(*,*) "in DQMC_Config_GetPI, id=",id
+!    write(*,*) "in DQMC_Config_GetPI, name=",name
+!    write(*,*) "in DQMC_Config_GetPI, value associated?",associated(value)
     if (id .gt. 0) then
        if (.not.cfg%record(id)%isSet) then
           call DQMC_Warning(name//" wasn't initialized, &

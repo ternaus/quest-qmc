@@ -3,7 +3,11 @@ module DQMC_GFun
 
   use DQMC_UTIL
   use DQMC_WSPACE
-  use _DQMC_MATB
+#ifdef _CKB
+  use DQMC_CKB
+#else
+  use DQMC_MATB
+#endif
   use DQMC_SEQB
 
   implicit none 
@@ -38,18 +42,18 @@ module DQMC_GFun
   !  =========
   !
   type G_fun
-     integer  :: n                      ! Number of sites in Hubbard's model
-     integer  :: L                      ! Number of slice
-     real(wp) :: sgn                    ! Sign of det(G)
-     real(wp), pointer :: G(:,:)        ! Matrix of Green's function
-     logical  :: owns_G                 ! does this G_fun own its G's storage?
-     real(wp), pointer :: V(:,:)        ! Matrix info of V(1)...V(l)
-     integer  :: ilb                    ! index of left most B
+     integer  :: n                 ! Number of sites in Hubbard's model
+     integer  :: L                 ! Number of slice
+     real(wp) :: sgn               ! Sign of det(G)
+     real(wp), pointer :: G(:,:)   ! Matrix of Green's function
+     logical  :: owns_G            ! does this G_fun own its G's storage?
+     real(wp), pointer :: V(:,:)   ! Matrix info of V(1)...V(l)
+     integer  :: ilb               ! index of left most B
      real(wp) :: det
 
      ! working space, in addition to SB's
-     integer, pointer  :: pvt(:)
-     real(wp),pointer  :: tmp(:,:)
+     integer, pointer  :: pvt(:) 
+     real(wp),pointer  :: tmp(:,:) 
      
      ! data pointer for the C++ module
 #if defined(DQMC_ASQRD)
@@ -64,10 +68,12 @@ module DQMC_GFun
      ! Block size of delayed update
      integer  :: nBlk   
      integer  :: blkSz
-     real(wp),pointer  :: U(:,:), W(:,:)
+     real(wp),pointer  :: U(:,:) 
+     real(wp),pointer  :: W(:,:) 
      integer  :: nModify
 
-     real(wp), pointer :: GS(:,:), WS(:,:)
+     real(wp), pointer :: GS(:,:) 
+     real(wp), pointer :: WS(:,:) 
 
      logical :: sxx
 
@@ -576,9 +582,16 @@ contains
 #   endif
 
     !Alias to SB's working space
-    real(wp), pointer :: U(:,:), T(:,:), D(:), D2(:), R(:), C(:)
-    real(wp), pointer :: W1(:,:), W2(:,:), W3(:,:)
-    integer,  pointer :: pvt1(:)
+    real(wp), pointer :: U(:,:)  
+    real(wp), pointer :: T(:,:)  
+    real(wp), pointer :: D(:)    
+    real(wp), pointer :: D2(:)   
+    real(wp), pointer :: R(:)    
+    real(wp), pointer :: C(:)    
+    real(wp), pointer :: W1(:,:) 
+    real(wp), pointer :: W2(:,:) 
+    real(wp), pointer :: W3(:,:) 
+    integer,  pointer :: pvt1(:) 
 
     !real(wp) :: W3(n,n)
 
@@ -998,7 +1011,8 @@ contains
     type(g_fun), intent(inout), target :: G
 
     ! ... local variables ...
-    real(wp), pointer :: x(:), y(:)
+    real(wp), pointer :: x(:) 
+    real(wp), pointer :: y(:) 
     real(wp)  :: xx(G%n)
     integer   :: n, blksz
 
