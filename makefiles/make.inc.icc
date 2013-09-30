@@ -22,8 +22,8 @@
 # Intel Fortran compiler
 # ----------------------
 FC = ifort
-FC_FLAGS    = -O3 -warn all
-#FC_FLAGS    = -fast -warn all
+#FC_FLAGS    = -O3 -warn all
+FC_FLAGS    = -m64 -fast -warn all
 #FC_FLAGS    = -O3 -warn -openmp
 NOOPT_FLAGS = -O0 -warn all
 
@@ -98,7 +98,7 @@ LIB        = $(CXXLIB) $(LAPACKLIB) # $(CUDALIB) $(MAGMALIB)
 
 # Archiver and flags
 # ------------------
-ARCH       = ar
+ARCH       = xiar
 ARFLAG     = cr
 RANLIB     = ranlib
 
