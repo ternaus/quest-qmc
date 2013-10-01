@@ -97,7 +97,7 @@ LIB        = $(CXXLIB) $(LAPACKLIB) # $(CUDALIB) $(MAGMALIB)
 
 # Archiver and flags
 # ------------------
-ARCH       = xiar
+ARCH       = ar
 ARFLAG     = cr
 RANLIB     = ranlib
 

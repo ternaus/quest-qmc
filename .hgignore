@@ -9,3 +9,5 @@ syntax: glob
 .project
 *.log
 *.mod
+*genmod*
+*.a
