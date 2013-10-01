@@ -79,7 +79,7 @@ program dqmc_ggeom
      do i = 1, nBin
         do j = 1, nIter
            do k = 1, Hub%tausk
-              call DQMC_Hub_Sweep(Hub, Hub%nMeas)
+              call DQMC_Hub_Sweep(Hub, NO_MEAS0)
               call DQMC_Hub_Sweep2(Hub, Hub%nTry)
            enddo
 
@@ -96,6 +96,8 @@ program dqmc_ggeom
               call DQMC_Hub_FullMeas(Hub, tau%nnb, tau%A_up, tau%A_dn, tau%sgnup, tau%sgndn)
               ! Measure time-dependent properties
               call DQMC_TDM1_Meas(tm, tau)
+           else if (comp_tdm .eq. 0) then
+              call DQMC_Hub_Meas(Hub, slice)
            endif
 
            !Write fields 

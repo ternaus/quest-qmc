@@ -7,3 +7,5 @@ syntax: glob
 *.o
 .cproject
 .project
+*.log
+*.mod

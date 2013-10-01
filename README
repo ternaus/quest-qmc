@@ -15,6 +15,14 @@ make.inc.icc:
 	Compilers: Intel C++(icc), Intel fortran(ifort)
 	Libraries: LAPACK, BLAS
 
+make.inc.mkl-gcc:
+	Compilers: GNU C++ compiler(g++), GNU fortran compiler(gfortran)
+	Libraries: Intel MKL
+
+make.inc.mkl-icc:
+	Compilers: Intel C++(icc), Intel fortran(ifort)
+	Libraries: Intel MKL
+
 
 Folders:
 	BLAS - sourcecode of the BLAS.
