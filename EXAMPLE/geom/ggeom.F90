@@ -18,9 +18,9 @@ program dqmc_ggeom
   logical             :: tformat
   integer             :: na, nt, nkt, nkg, i, j, k, slice, nhist, comp_tdm
   integer             :: nBin, nIter
-  character(len=30), allocatable   :: clabelt(:), clabelg(:)
+  !character(len=30), allocatable   :: clabelt(:), clabelg(:)
   character(len=30)   :: ofile
-  complex*16, pointer :: GFC(:,:), RFC(:,:)
+  !complex*16, pointer :: GFC(:,:), RFC(:,:)
   integer             :: OPT, FOP, FLD_UNIT, TDM_UNIT
   real(wp)            :: randn(1)
 

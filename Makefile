@@ -11,9 +11,9 @@ QUEST_DIR = .
 
 include make.inc
 
-all: libblas liblapack lib example_
+#all: libblas liblapack lib example_
 
-#all : lib example_
+all : lib example_
 libblas:
 	(cd BLAS; $(MAKE))
 

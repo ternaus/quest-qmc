@@ -22,7 +22,7 @@ bcond  =  0.0, 0.0, 0.0
 
 nwarm  = 100
 npass  = 200
-nmeas  = -1
+#nmeas  = -1
 ntry   = 0
 tausk  = 1
 tdm    = 1
