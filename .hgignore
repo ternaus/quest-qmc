@@ -11,3 +11,8 @@ syntax: glob
 *.mod
 *genmod*
 *.a
+EXAMPLE/verify/verify
+EXAMPLE/geom/ggeom
+EXAMPLE/geom/symmetry_map.info
+EXAMPLE/geom/test.HSF.stream
+EXAMPLE/test/test

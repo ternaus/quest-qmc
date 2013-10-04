@@ -1,9 +1,10 @@
 \documentclass[12pt]{article}
-
+\usepackage{amsmath}
+\usepackage{hyperref}
 \title{QUEST Users' Guide \\  
-Version 1.0}
+Version 1.0 (Updated draft)}
 \author{Che-Rung Lee}
-\date{August 21 2008}
+\date{\today}
 \begin{document}
 \maketitle
 \newpage
@@ -147,7 +148,8 @@ The basic parameters include
   \item \verb"nwrap" (integer): frequency of performing recomputing in Green's function calculation.
   \item \verb"difflim" (real): tolerable difference of the matrices computed from different methods.
   \item \verb"errrate" (real): tolerable error rate of recomputing.
-  \item \verb"ntry" (integer): number of sites to be flipped in the global sweep.
+  \item \verb"ntry" (integer): number of sites to be flipped in the global sweep. UPD: This parameter controls the frequency of
+  a type of Monte Carlo move which is needed for $U \geq 8$.
 \end{enumerate}
 
 The parameters can be roughly divided into three groups:
@@ -382,6 +384,60 @@ For example, the parameter \verb"rmv_ratio" can be defined in the \verb"config.d
 \end{verbatim}
 
 The file \verb"config.def" should be placed in the directory where the executable is.
+
+
+\subsection{Square lattice geometry file with comments.}
+\begin{verbatim}
+#NDIM
+2
+\end{verbatim}
+Dimension of the lattice. 3 for cubic, 2 for square, triangular, etc
+
+\begin{verbatim}
+#PRIM
+1.0 0.0
+0.0 1.0
+\end{verbatim}
+Primitive lattice vectors.  One can give a full $3 \times 3$ matrix for \#PRIM even if \#NDIM < 3. If you do that, QUEST only reads the upper left \#NDIM $\times$ \#NDIM block.
+
+\begin{verbatim}
+#ORB 
+s0 0.0 0.0 0.0 #0
+\end{verbatim}
+This is what alllows QUEST to do geometries like the honeycomb lattice which requires a basis. \#ORB has one line for each atom in the basis. The first entry is a string which serves as a label for the atom. The next three entries in the line are the position of the atom in the unit cell. QUEST authomatically assignes a number to each atom (ie to each line in the \#ORB section of the .geom file) beginning with zero. In the \#ORB section QUEST demands three dimensional objects.
+
+\#HAMILT block of the code defines the hoppings, on-site energies, and interaction strenghts. The convebtion for the lines in \#HAMILT is following: Each line begins with two entries which are the (automatically assigned) atom numbers from \#ORB. For problems without a basis these will just be '0.0'. To include a hopping, the next three entries in the line should be the direction to the neighboring site. QUEST authomatically makes $\hat{H}$ Hermitian, so each pair of connected sites requires only one line. The next two entries are the hopping values for the up and down electrons, which are allowed to be different in QUEST. The final entry is $U$, which should be set to zero for lines defining hopping. To include a $U$ value, use '0.0 0.0 0.0' for the neighboring site inputs and insert a value in the last (eighth) entry.
+
+If you have a geometry with a basis (more than one line in \#ORB) the different atoms can be assigned different site energies and interactions.
+
+Here is example for the rectangular geometry:
+\begin{verbatim}
+#HAMILT
+0 0 1.0 0.0 0.0 1.0 1.0 0.0
+0 0 0.0 1.0 0.0 2.2 2.2 0.0
+0.0 0.0 0.0 0.0 0.5 0.5 4.0
+\end{verbatim}
+The first two lines are the hoppings in the $x$ and $y$ directions. The third line is an on-site energu 0.5, and is the same for th eup and down species. (the sign convebtion for the site energies is $+\epsilon n_i$, so that 0,5 in \#HAMILT corresponds to -0.5 in the Chemical potential. The third line also sets $U = 4$. (If you want, you can separate this into two distinct lines)). We again note that in \#HAMILT it is required to supply a three component vector as the pointer to the site, even if \#NDIM is two.
+
+Note: The chemical potential defined in input is a \textbf{global} chemical potential which applies to all sites in the lattice. The on-site energies in \#HAMILT allow for different chemical potentials on different atoms. Thus there is a slight redundancy in the code. Rather than having a global chemical potential one could shift all the site energies. If you do not specify chemical potentials in input, they are set, by default, equal to zero.
+
+There is some redundancy in the way QUEST knows the geometry is rectangular. If the defined supercell in \#SUPER has different diagonal entries, then QUEST knows not to assume $x$ and $y$ directions are equivalent. Likewise, a different entry for $t_x$ and $t_y$ will automatically be flagged by QUEST (Finally, the strange string label in \#ORB about which we have been so silent can also be used to distinguish different types of atoms and can break symmetries. If you had a three band Cu-O model of the cuprates you could, for example, make the oxygen atoms along the $x$ and $y$ bonds have distinct labels and hence different entries in \#HAMILT)
+
+But more fundamentally, QUEST knows about the symmetries of the lattice from the \#SYMM block in the .geom file, which is the last one we shall discuss. In square.geom this looks like,
+\begin{verbatim}
+#SYMM
+d  0.0 0.0 0.0 1.0 0.0 0.0
+d  0.0 0.0 0.0 0.0 1.0 0.0
+c4 0.0 0.0 0.0 0.0 0.0 1.0
+\end{verbatim}
+QUEST supports 3 types of symmetry definitions. 'cn', where 'n' is an integer, tells QUEST the lattice is symmetric under rotations by $2 \pi / n$. The six numbers following by 'cn' specify the three cartesian coordinates of a point belonging to the axis, following by the axis direction in the cartesian coordinates. In this case 'c4' is $\pi / 2$ and indicates the $x$ and $y$ directions are equivalent. the point belonging to the axis is the origin '0.0 0.0 0.0' and the axis is the $z$ direction '0.0 0.0 1.0'.
+
+The symmetry 'd' is a mirror plane symmetry. It too is followed by six numbers. The first three are the cartesian coordinates of a point in the plane, and the final three are the cartesian cordinates of the normal to the plane.
+
+Finally, 'I' is used for inversion symmetry. It is followed by three numbers, the cartesian coordinates of the inversion point.
+
+In specifying \#SYMM you must list all three components of teh vectors even if the lattice is two dimensional.
+
 
 %------------------------------------------------------------------------------
 \subsection{Create new lattice geometries}
