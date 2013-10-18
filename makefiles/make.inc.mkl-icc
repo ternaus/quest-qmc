@@ -22,8 +22,8 @@
 # Intel Fortran compiler
 # ----------------------
 FC = ifort
-#FC_FLAGS    = -m64 -fast #-warn all
-FC_FLAGS    = -O3 -warn all #-warn all
+#FC_FLAGS    = -O3 -warn all -check all -traceback
+FC_FLAGS = -O3 -warn all -g -traceback -check pointers
 NOOPT_FLAGS = -O0 -warn all
 
 
@@ -59,7 +59,7 @@ NOOPT_FLAGS = -O0 -warn all
 # ------------------
 CXX = icpc
 #CXX_FLAGS = -O3 -openmp $(CUDAINC) $(MAGMAINC)
-CXX_FLAGS = -fast -Wall#$(CUDAINC) $(MAGMAINC)
+CXX_FLAGS = -O3 -Wall#$(CUDAINC) $(MAGMAINC)
 
 # C++ libraries
 # -------------
@@ -84,6 +84,9 @@ MKLPATH   = $(MKLROOT)/lib/intel64
 
 #dynamic linking
 LAPACKLIB = -L$(MKLPATH) -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+#static linking
+#LAPACKLIB = -Wl,--start-group -L$(MKLPATH) $(MKLPATH)/libmkl_intel_lp64.a $(MKLPATH)/libmkl_sequential.a $(MKLPATH)/libmkl_core.a -Wl,--end-group -lpthread -static-intel
+
 
 # DQMC library
 # ------------

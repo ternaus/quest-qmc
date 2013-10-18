@@ -64,7 +64,7 @@ CXX_FLAGS = -Wall -O3 # $(CUDAINC) $(MAGMAINC)
 
 # C++ libraries
 # -------------
-CXXLIB = -lstdc++ #-lrt
+CXXLIB = -lstdc++ -ldl #-lrt
 
 # Path to system's default BLAS and LAPACK libraries
 # This should work on most Linux and MacOS X. If not,
@@ -84,7 +84,9 @@ CXXLIB = -lstdc++ #-lrt
 MKLPATH   = $(MKLROOT)/lib/intel64
 
 #dynamic linking
-LAPACKLIB = -L$(MKLPATH) -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+#LAPACKLIB = -L$(MKLPATH) -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+#static linking
+LAPACKLIB = -Wl,--start-group -L$(MKLPATH) $(MKLPATH)/libmkl_intel_lp64.a $(MKLPATH)/libmkl_sequential.a $(MKLPATH)/libmkl_core.a -Wl,--end-group -lpthread -static
 
 # DQMC library
 # ------------

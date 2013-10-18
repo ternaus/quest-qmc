@@ -111,20 +111,26 @@ void cpu_sort(int n, double *Db, int *ipiv)
   double tmp, max;
   PROFILE_BEGIN();
 
-  for (j = 0; j < n; j++) ipiv[j] = j;
+  for (j = 0; j < n; j++) {
+    ipiv[j] = j;
+  }
   for (j = 0; j < n - 1; j++) {
     // find column with maximum norm
     max = Db[j];
     p = j;
     for (i = j + 1; i < n; i++)
       if (Db[i] > max) {
-	max = Db[i];
-	p = i;
+      	max = Db[i];
+      	p = i;
       }
     // swap columns
     if (p != j) {
-      t = ipiv[j]; ipiv[j] = ipiv[p]; ipiv[p] = t;
-      tmp = Db[j]; Db[j] = Db[p]; Db[p] = tmp;
+      t = ipiv[j]; 
+      ipiv[j] = ipiv[p]; 
+      ipiv[p] = t;
+      tmp = Db[j]; 
+      Db[j] = Db[p]; 
+      Db[p] = tmp;
     }
   }
   PROFILE_END(profile_sort, 0);

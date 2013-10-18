@@ -16,7 +16,7 @@ program dqmc_test
 #endif
 
   call system_clock(t1)
-
+  !count number of processors
   call DQMC_MPI_Init(qmc_sim, PLEVEL_1)
 
   call DQMC_Comp_2DPerl
