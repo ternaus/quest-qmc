@@ -16,45 +16,34 @@ implicit none
    integer                :: maxneig                           
  
    !Number of neighbors of each site (0:nsites-1)
-   integer, pointer       :: tnneig(:) 
-   integer, pointer       :: Unneig(:) 
-   integer, pointer       :: Jnneig(:) 
+   integer, pointer       :: tnneig(:), Unneig(:), Jnneig(:)
  
    !Sites havind a non-zero J,U,t (0:nsites-1)
-   integer, pointer       :: tsite(:) 
-   integer, pointer       :: Usite(:) 
-   integer, pointer       :: Jsite(:) 
+   integer, pointer       :: tsite(:), Usite(:), Jsite(:)
  
    !Sites neighboring each site   (0:nsites-1,nsites)
-   integer, pointer       :: tneig(:,:) 
-   integer, pointer       :: Uneig(:,:) 
-   integer, pointer       :: Jneig(:,:) 
+   integer, pointer       :: tneig(:,:), Uneig(:,:), Jneig(:,:)  
 
    !Pair of sites associated to each hopping throughout the system
-   integer, pointer       :: tckb(:,:) 
+   integer, pointer       :: tckb(:,:)
  
    !chemical potential
    real*8                 :: mu_up, mu_dn
  
    !value of U and J for each pair (0:nsites-1, 0:nsites-1)
-   real*8, pointer        :: Uv(:,:) 
-   real*8, pointer        :: Jv(:,:) 
+   real*8, pointer        :: Uv(:,:), Jv(:,:)                   
  
    !values of U and mu inequivalent by symmetry (nlocclass)
-   real*8, pointer        :: Uvalue(:)    
-   real*8, pointer        :: muupvalue(:) 
-   real*8, pointer        :: mudnvalue(:) 
+   real*8, pointer        :: Uvalue(:), muupvalue(:), mudnvalue(:)
  
    !value of t for each pair (0:nsites-1, 0:nsites-1)
-   complex*16, pointer    :: hopup(:,:) 
-   complex*16, pointer    :: hopdn(:,:) 
+   complex*16, pointer    :: hopup(:,:), hopdn(:,:)
  
    !values of t inequivalent by symmetry (nhopclass)
-   complex*16, pointer    :: tupvalue(:) 
-   complex*16, pointer    :: tdnvalue(:) 
+   complex*16, pointer    :: tupvalue(:), tdnvalue(:)
  
    !wave function phase(not used in QMC)
-   complex*16, pointer    :: phase(:) 
+   complex*16, pointer    :: phase(:)
  
    !number of different hoppings
    integer                :: nhopclass
@@ -63,22 +52,23 @@ implicit none
    integer                :: nlocclass
  
    !class for each site having U/mu (0:nsites-1)
-   integer, pointer       :: mylocclass(:) 
+   integer, pointer       :: mylocclass(:)
  
    !hopping class for each pair of neighboring site (0:nsites-1,maxval(tnneig))
-   integer, pointer       :: myhopclass(:,:) 
+   integer, pointer       :: myhopclass(:,:)
 
    !number of primitive links 
    integer                :: nplink
    !sites involved in primitive links (2, 0:nplink-1)
    !plink(1:2,il) stores the two orbitals involved in the link.
    !plink(1,il) is always contained in the original primitive cell
-   integer, pointer       :: plink(:,:) 
+   integer, pointer       :: plink(:,:)
    !array (5,0:nplink-1) containing the following info:
    ! tlink(1, il) value of up-hopping   on primitive link il
    ! tlink(2, il) value of down-hopping on primitive link il
    ! tlink(3:5,il) = R_2 - R_1
-   real(wp), pointer      :: tlink(:,:) 
+   real(wp), pointer      :: tlink(:,:)
+ 
  
    logical                :: constructed
    logical                :: neig_found
@@ -140,8 +130,7 @@ contains
     logical :: ldum, doeshop
     character(len=50) :: string
 
-    real*8, pointer :: pos(:,:) => null()
-    real*8, pointer :: tcfg(:) => null()
+    real*8, pointer :: pos(:,:), tcfg(:)
 
 
     character(len=*), parameter :: mu(2) = (/'mu_up','mu_dn'/)
@@ -164,7 +153,6 @@ contains
     allocate(hamilt%Uv(0:nsites-1, 0:nsites-1)) 
     allocate(hamilt%Jv(0:nsites-1, 0:nsites-1))
     allocate(hamilt%phase(0:nsites-1))
-
 
     !Read chemical potential
     do iat = 1, 2
@@ -202,11 +190,11 @@ contains
     enddo
 
     hamilt%nplink = nhop
-    allocate(hamilt%plink(2,0:nhop-1))
     allocate(hamilt%tlink(5,0:nhop-1))
 
     nhop = nhop*lattice%ncell
     allocate(hamilt%tckb(3,0:nhop-1))
+    allocate(hamilt%plink(2,0:nhop-1))
 
     ihop = -1
     jhop = -1
@@ -234,12 +222,12 @@ contains
 
           if (doeshop) then
              ihop = ihop + 1
-             hamilt%tckb(1,ihop) = min(is,js)
-             hamilt%tckb(2,ihop) = max(is,js)
+             hamilt%tckb(1,ihop)  = min(is,js)
+             hamilt%tckb(2,ihop)  = max(is,js)
+             hamilt%plink(1,ihop) = is
+             hamilt%plink(2,ihop) = js
              if (it .eq. 0) then
                 jhop = jhop + 1
-                hamilt%plink(1,jhop)   = is
-                hamilt%plink(2,jhop)   = js
                 hamilt%tlink(1,jhop)   = tijup
                 hamilt%tlink(2,jhop)   = tijdn
                 hamilt%tlink(3:5,jhop) = hop3d(1:3)
@@ -297,40 +285,20 @@ contains
      type(Hamiltonian_t),intent(inout) :: hamilt
 
      integer is, js, ntsites, nUsites, nJsites, n
-     integer, pointer :: tnneig(:) => null() 
-     integer, pointer :: Unneig(:) => null() 
-     integer, pointer :: Jnneig(:) => null()  
-
-     integer, pointer :: tneig(:,:) => null() 
-     integer, pointer :: Uneig(:,:) => null() 
-     integer, pointer :: Jneig(:,:) => null() 
-
-     integer, pointer :: tsite(:) => null()   
-     integer, pointer :: Usite(:) => null()   
-     integer, pointer :: Jsite(:) => null()   
-
+     integer, pointer :: tnneig(:),Unneig(:),Jnneig(:)
+     integer, pointer :: tneig(:,:),Uneig(:,:),Jneig(:,:)
+     integer, pointer :: tsite(:),Usite(:),Jsite(:)
+     
      if(.not.hamilt%constructed) stop'Hamiltonian needs to be &
         &constructed before neig can be found'
     
      n=size(hamilt%hopup,1)
 
-     if(associated(Unneig)) deallocate(Unneig)
-     if(associated(tnneig)) deallocate(tnneig)
-     if(associated(Jnneig)) deallocate(Jnneig)
-
-     if(associated(Uneig)) deallocate(Uneig)
-     if(associated(tneig)) deallocate(tneig)
-     if(associated(Jneig)) deallocate(Jneig)
-
-     if(associated(Usite)) deallocate(Usite)
-     if(associated(tsite)) deallocate(tsite)
-     if(associated(Jsite)) deallocate(Jsite)
-     !if(associated(tnneig)) then
-     !   deallocate(tnneig, Unneig, Jnneig)
-     !   deallocate(tneig, Uneig, Jneig)
-     !   deallocate(tsite, Usite, Jsite)
-     !endif
-     !write(*,*) " ******** in dqmc_hamilt, find_neighbors() **********"
+     if(associated(tnneig)) then
+        deallocate(tnneig, Unneig, Jnneig)
+        deallocate(tneig, Uneig, Jneig)
+        deallocate(tsite, Usite, Jsite)
+     endif
 
      allocate(tnneig(0:n-1),Unneig(0:n-1),Jnneig(0:n-1))
      allocate(tneig(0:n-1,n),Uneig(0:n-1,n),Jneig(0:n-1,n))
@@ -553,7 +521,7 @@ contains
 
     integer :: nh, ickb, ih, jh, kh, ns, hop(3)
     logical :: skip 
-    logical, pointer :: vs(:) 
+    logical, pointer :: vs(:)
 
     ! Allocate array for visited sites (vs)
     ns = 1 + maxval(hamilt%tckb)
