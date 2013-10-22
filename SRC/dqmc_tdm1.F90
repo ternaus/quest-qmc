@@ -585,13 +585,11 @@ contains
           end do
        end do
 
-       ! Conductivity
+       ! Uniform (q=0) current structure factor. Used to get approximated dc conductivity.
        value1  => T1%properties(ICOND)%values(:, dt1, T1%tmp)
        value2  => T1%properties(ICOND)%values(:, dt2, T1%tmp)
 
        ! J-J correlation is following Simone's trick:
-       ! use link correlation, instead of site. see Eq.(16) in the note
-       ! Below is only k=0 component, which is for conductivity
        
        ! n:  the number of sites in one primitive cell
        ! nk: the number of cells in the cluster
@@ -605,7 +603,6 @@ contains
        ! Call nk the number of unit cells, than the first nk entries of plink
        ! are the translation of the first primitive link. Likewise from nk+1 to 2nk
        ! you have all the links obtained by translation of the second link and so on
-       ! T1%properties(iprop)%np = Gwrap%hamilt%nplink
 
        do i = 0,  T1%properties(ICOND)%np - 1
           do j = 0,  T1%properties(ICOND)%np - 1
@@ -759,19 +756,18 @@ contains
                   l2s = T1%properties(ICOND)%D(1, j*T1%properties(ICOND)%nk+jc) + 1
                   l2e = T1%properties(ICOND)%D(2, j*T1%properties(ICOND)%nk+jc) + 1
 
-          ! jx-jx for links l and l':
-          ! include x-coordinate (for JxJx component of J-J tensor) difference
+                  ! jx-jx for links l and l':
+                  ! include x-coordinate (for JxJx component of J-J tensor) difference
+  
+                  value1(1) = value1(1) - dxl1l2*tl1up2up*((uptt(l1e,l1s)-uptt(l1s,l1e))*(up00(l2e,l2s)-up00(l2s,l2e)) ) &
+                                     - dxl1l2*tl1up2dn*((uptt(l1e,l1s)-uptt(l1s,l1e))*(dn00(l2e,l2s)-dn00(l2s,l2e)) ) &
+                                     - dxl1l2*tl1dn2up*((dntt(l1e,l1s)-dntt(l1s,l1e))*(up00(l2e,l2s)-up00(l2s,l2e)) ) &
+                                     - dxl1l2*tl1dn2dn*((dntt(l1e,l1s)-dntt(l1s,l1e))*(dn00(l2e,l2s)-dn00(l2s,l2e)) )
 
-          ! normal terms (see Eq.(21) in Simone's notes for example)
-          value1(1) = value1(1) - dxl1l2*tl1up2up*((uptt(l1e,l1s)-uptt(l1s,l1e))*(up00(l2e,l2s)-up00(l2s,l2e)) ) &
-                                - dxl1l2*tl1up2dn*((uptt(l1e,l1s)-uptt(l1s,l1e))*(dn00(l2e,l2s)-dn00(l2s,l2e)) ) &
-                                - dxl1l2*tl1dn2up*((dntt(l1e,l1s)-dntt(l1s,l1e))*(up00(l2e,l2s)-up00(l2s,l2e)) ) &
-                                - dxl1l2*tl1dn2dn*((dntt(l1e,l1s)-dntt(l1s,l1e))*(dn00(l2e,l2s)-dn00(l2s,l2e)) )
-
-          ! cross terms
-          value1(1) = value1(1) + dxl1l2*tl1up2up*( upt0(l1e,l2s)*up0t(l2e,l1s) + upt0(l1s,l2e)*up0t(l2s,l1e) &
-                                - upt0(l1e,l2e)*up0t(l2s,l1s) - upt0(l1s,l2s)*up0t(l2e,l1e) )
-          value1(1) = value1(1) + dxl1l2*tl1dn2dn*( dnt0(l1e,l2s)*dn0t(l2e,l1s) + dnt0(l1s,l2e)*dn0t(l2s,l1e) &
+                  ! cross terms
+                  value1(1) = value1(1) + dxl1l2*tl1up2up*( upt0(l1e,l2s)*up0t(l2e,l1s) + upt0(l1s,l2e)*up0t(l2s,l1e) &
+                                     - upt0(l1e,l2e)*up0t(l2s,l1s) - upt0(l1s,l2s)*up0t(l2e,l1e) )
+                  value1(1) = value1(1) + dxl1l2*tl1dn2dn*( dnt0(l1e,l2s)*dn0t(l2e,l1s) + dnt0(l1s,l2e)*dn0t(l2s,l1e) &
                                 - dnt0(l1e,l2e)*dn0t(l2s,l1s) - dnt0(l1s,l2s)*dn0t(l2e,l1e) )
              end do
             end do
