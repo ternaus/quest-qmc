@@ -899,6 +899,13 @@ contains
        write(OPT,FMT_STRDBL)  "    Approximate accept rate : ", &
             dble(Hub%naccept)/dble(Hub%naccept+Hub%nreject)
        write(OPT,FMT_STRDBL)  "                      gamma : ", Hub%gamma
+       if (Hub%nTry > 0) then
+         write(OPT,FMT_STRINT)  "Number of global move sites : ", Hub%nTry
+         write(OPT,FMT_STRINT)  "   Global move accept count : ", Hub%nAcceptGlobal
+         write(OPT,FMT_STRINT)  "   Global move reject count : ", Hub%nRejectGlobal
+         write(OPT,FMT_STRDBL)  "    Global move accept rate : ", &
+              dble(Hub%nAcceptGlobal)/dble(Hub%nAcceptGlobal + Hub%nRejectGlobal)
+       end if
        write(OPT,*)           "          Type of matrix B : ", Hub%B_up%name
        if (Hub%HSFtype .eq. HSF_DISC) then
           write(OPT,*)        "        Type of matrix HSF : discrete"
