@@ -17,3 +17,4 @@ EXAMPLE/geom/symmetry_map.info
 EXAMPLE/geom/test.HSF.stream
 EXAMPLE/test/test
 ADEPT/*
+utils/benchmark/logl*

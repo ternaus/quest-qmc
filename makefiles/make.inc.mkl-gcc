@@ -14,7 +14,7 @@
 # GNU Fortran compiler
 # --------------------
 FC = gfortran
-FC_FLAGS   = -m64 -Ofast -Wall
+FC_FLAGS   = -m64 -O3 -funroll-loops -Wall
 #FC_FLAGS = -O3 -Wall
 NOOPT_FLAGS = -O0 -Wall
 
@@ -52,7 +52,7 @@ NOOPT_FLAGS = -O0 -Wall
 # GNU C++ compiler
 # ----------------
 CXX = g++
-CXX_FLAGS = -Wall -O3 # $(CUDAINC) $(MAGMAINC)
+CXX_FLAGS = -Wall -O3 -funroll-loops# $(CUDAINC) $(MAGMAINC)
 
 
 
@@ -84,9 +84,9 @@ CXXLIB = -lstdc++ -ldl #-lrt
 MKLPATH   = $(MKLROOT)/lib/intel64
 
 #dynamic linking
-#LAPACKLIB = -L$(MKLPATH) -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+LAPACKLIB = -lm -L$(MKLPATH) -mkl:sequential -lpthread
 #static linking
-LAPACKLIB = -Wl,--start-group -L$(MKLPATH) $(MKLPATH)/libmkl_intel_lp64.a $(MKLPATH)/libmkl_sequential.a $(MKLPATH)/libmkl_core.a -Wl,--end-group -lpthread -static
+#LAPACKLIB = -Wl,--start-group -L$(MKLPATH) $(MKLPATH)/libmkl_intel_lp64.a $(MKLPATH)/libmkl_sequential.a $(MKLPATH)/libmkl_core.a -Wl,--end-group -lpthread -static
 
 # DQMC library
 # ------------

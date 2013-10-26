@@ -14,7 +14,7 @@
 # GNU Fortran compiler
 # --------------------
 FC = gfortran
-FC_FLAGS   = -m64 -Ofast -Wall
+FC_FLAGS   = -m64 -Ofast -funroll-loops -Wall
 #FC_FLAGS = -O3 -Wall
 NOOPT_FLAGS = -O0 -Wall
 
@@ -52,7 +52,7 @@ NOOPT_FLAGS = -O0 -Wall
 # GNU C++ compiler
 # ----------------
 CXX = g++
-CXX_FLAGS = -Wall -O3 # $(CUDAINC) $(MAGMAINC)
+CXX_FLAGS = -m64 -Wall -funroll-loops -Ofast # $(CUDAINC) $(MAGMAINC)
 
 
 
