@@ -23,7 +23,7 @@
 # ----------------------
 FC = ifort
 #FC_FLAGS    = -O3 -warn all -check all -traceback
-FC_FLAGS = -m64 -O3 -warn all -unroll -traceback -check pointers
+FC_FLAGS = -m64 -fast -warn all -unroll -traceback -check pointers
 NOOPT_FLAGS = -O0 -warn all
 
 

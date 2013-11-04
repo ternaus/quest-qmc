@@ -29,5 +29,3 @@ for inFile in inList:
 	print >> fName, inFile, " used ", resultTimes[inFile], "seconds"	
 	fName.close()
 	print inFile, " used ", resultTimes[inFile], "seconds"	
-
-os.remove

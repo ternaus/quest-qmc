@@ -262,12 +262,12 @@ contains
     call find_neighbors(hamilt)
     hamilt%neig_found = .true.
 
-    if (sum(hamilt%tnneig) .ne. 2*nhop) then
-       write(*,*) "neighbors and hops are incompatible. Bug"
-       write(*,*) "nhop =", nhop
-       write(*,*) "nneig =", sum(hamilt%tnneig)
-       stop
-    endif
+    !if (sum(hamilt%tnneig) .ne. 2*nhop) then
+    !   write(*,*) "neighbors and hops are incompatible. Bug"
+    !   write(*,*) "nhop =", nhop
+    !   write(*,*) "nneig =", sum(hamilt%tnneig)
+    !   stop
+    !endif
     call dqmc_hamilt_groupckb(hamilt)
 
  end subroutine 
