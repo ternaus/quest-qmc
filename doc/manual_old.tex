@@ -2,8 +2,7 @@
 \usepackage{amsmath}
 \usepackage{hyperref}
 \title{QUEST Users' Guide \\  
-Version 1.0 (Updated draft)}
-\author{Che-Rung Lee}
+Version 1.4 (Updated draft)}
 \date{\today}
 \begin{document}
 \maketitle
@@ -27,7 +26,7 @@ Version 1.0 (Updated draft)}
     Currently, QUEST is still under development and debug.
     The latest version can be downloaded from the following link
     \begin{center}
-    {\tt http://wwwcsif.cs.ucdavis.edu/$\sim$leech/quest/}
+    \url{http://www.quest-googlecode.com}
     \end{center}
 
 \subsection{Problems that QUEST can solve}
@@ -71,44 +70,8 @@ Under \verb"EXAMPLE" directory, several example programs are contained.
 The details for each program will be illustrated in Appendix \ref{sec exp}.
 
 \subsection{Compilation and execution}
-The compilation of QUEST can be done through the following steps.
-\begin{enumerate}
-  \item Download package from the link
-\begin{verbatim}
-http://wwwcsif.cs.ucdavis.edu/~leech/quest/quest1.0.tar.gz
-\end{verbatim}
-    and save it to a desired directory.
-  \item Extract the file by
-\begin{verbatim}
-    tar -xzf quest1.0.tar.gz
-\end{verbatim}
-    which will create a directory \verb"QUEST"
-  \item Edit \verb"QUEST\make.inc". The major changes should be made include
-    \begin{enumerate}
-      \item \verb"FC": The Fortran 90 compiler.
-      \item \verb"FC_FLAG": The flags of Fortran compiler.
-      \item \verb"HOME": The full path where \verb"QUEST" is installed.
-      \item \verb"BLASLIB" and \verb"LAPACKLIB": path of BLAS/LAPACK library.
-            The reference implementation is available on
-\begin{verbatim}
-    http://www.netlib.org
-\end{verbatim}
-    \end{enumerate}
-    \item Use the command \verb"make" or \verb"make lib" to compile the library.
-          A successful compilation will generate \verb"dqmclib.a" under \verb"QUEST" directory.
-    \item Go to any example directory, such as \verb"EXAMPLE\test", and use the
-          command \verb"make" to generate executables. To compile the program in \verb"EXAMPLE\parallel", one needs \verb"mpifc", an MPI Fortran compiler, to compile the program.
-    \item Use \verb"make clean" to clean up the compiled library and programs.
-\end{enumerate}
-
-Most executables require input parameters from standard input, which means keyboard.
-A simple way to input those parameters is to use IO redirect. For example, suppose the executable is called \verb"test". The execution of \verb"test" will be like
-\begin{verbatim}
-    ./test < param.in
-\end{verbatim}
-where \verb"param.in" is a file that contains input parameters.
-In each directories of executables, there will be some sample input files provided.
-The meaning of each parameter will be explained in the following section.
+The compilation of QUEST can be done through the following steps, following guide at the 
+\url{https://code.google.com/p/quest-qmc/wiki/Download}.
 
 \section{Basic usages}
 In this section we will introduce the basic input parameters and output formats of QUEST.
@@ -157,13 +120,13 @@ The parameters can be roughly divided into three groups:
 \item Parameters for Hubbard model:
 
 parameters \verb|nx| and \verb|ny|
-specify the x-dimension and y-dimension of the 2-D rectangular lattice to
+specify the $x$-dimension and $y$-dimension of the 2-D rectangular lattice to
 be simulated. Note that parameter $n$, the number of total sites,
 is equivalent to \verb|nx|$\times$\verb|ny|.
 Parameter \verb|t|, \verb|mu|, and \verb|U| are used in the Hubbard Hamiltonian
-$$\mathcal{H}=-t \sum_{<i,j>, \sigma}(c^{\dag}_{i\sigma}c_{j\sigma}+c^{\dag}_{j\sigma}c_{i\sigma})
+$$\mathcal{H}=-t \sum_{\langle i,j\rangle, \sigma} \left(c^{\dag}_{i\sigma}c_{j\sigma}+c^{\dag}_{j\sigma}c_{i\sigma}\right)
              -\mu \sum_{i, \sigma}n_{i\sigma}
-             +U \sum_{i} (n_{i\uparrow}-\frac{1}{2})(n_{i\downarrow}-\frac{1}{2}),$$
+             +U \sum_{i} \left(n_{i\uparrow}-\frac{1}{2}\right) \left(n_{i\downarrow}-\frac{1}{2}\right),$$
 for kinetic energy, chemical energy and potential energy respectively.
 Parameter \verb|L| and \verb|dtau| are for inverse temperature $\beta$.
 $$\beta = L \Delta\tau.$$
@@ -661,6 +624,7 @@ Their execution time are summarized in Table \ref{tbl tdm}.
 	\verb|extra_large.in|  & $32\times 32$ & 192 & \multicolumn{2}{|c|}{unknown}\\
 	\hline	
 	 \end{tabular}
+   \label{tbl tdm}
 	\end{center}
 
 \subsection{Others}
