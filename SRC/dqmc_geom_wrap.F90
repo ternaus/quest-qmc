@@ -22,11 +22,12 @@ module DQMC_GEOM_WRAP
 
   contains
 
-  subroutine DQMC_Geom_Fill(gwrap,gfile,cfg)
+  subroutine DQMC_Geom_Fill(gwrap,gfile,cfg,SOP)
 
     type(GeomWrap),    intent(inout)  :: gwrap
     type(config), intent(inout)       :: cfg
     character(len=30), intent(in)     :: gfile
+    integer, intent(in)               :: SOP
     logical                           :: found, connected
 
     inquire(file=gfile,exist=found)
@@ -77,7 +78,7 @@ module DQMC_GEOM_WRAP
     call read_symm(gwrap%SymmOp)
 
     !pair-to-pair map of action of each symmetry in real space (also translations)
-    call map_symm_lattice(gwrap%SymmOp,gwrap%Lattice, gwrap%Hamilt)
+    call map_symm_lattice(gwrap%SymmOp,gwrap%Lattice, gwrap%Hamilt, SOP)
 
     !point-to-point map of action of each symmetry in reciprocal space
     call map_symm_recip_lattice(gwrap%SymmOp,gwrap%RecipLattice,.true.)
