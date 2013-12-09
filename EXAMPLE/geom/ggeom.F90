@@ -18,10 +18,10 @@ program dqmc_ggeom
   logical             :: tformat
   integer             :: na, nt, nkt, nkg, i, j, k, slice, nhist, comp_tdm
   integer             :: nBin, nIter
-  !character(len=30), allocatable   :: clabelt(:), clabelg(:)
+  character(len=30), allocatable   :: clabelt(:), clabelg(:)
   character(len=30)   :: ofile
-  !complex*16, pointer :: GFC(:,:), RFC(:,:)
-  integer             :: OPT, FOP, FLD_UNIT, TDM_UNIT
+  complex*16, pointer :: GFC(:,:), RFC(:,:)
+  integer             :: OPT, FOP, SOP, FLD_UNIT, TDM_UNIT
   real(wp)            :: randn(1)
 
   call cpu_time(t1)  
@@ -44,14 +44,16 @@ program dqmc_ggeom
      call DQMC_open_file(adjustl(trim(ofile))//'.HSF.stream','unknown', FOP)
   endif
 
+  call DQMC_open_file(adjustl(trim(ofile))//'.geometry','unknown', SOP)
   !Determins type of geometry file
   call DQMC_Geom_Read_Def(Hub%S, gfile, tformat)
   if (.not.tformat) then
      !If free format fill gwrap
-     call DQMC_Geom_Fill(Gwrap,gfile,cfg)
+     call DQMC_Geom_Fill(Gwrap,gfile,cfg,SOP)
      !Transfer info in Hub%S
      call DQMC_Geom_Init(Gwrap,Hub%S,cfg)
   endif
+  call DQMC_Geom_Print(Hub%S,SOP)
 
   ! Initialize the rest data
   call DQMC_Hub_Config(Hub, cfg)
@@ -79,7 +81,7 @@ program dqmc_ggeom
      do i = 1, nBin
         do j = 1, nIter
            do k = 1, Hub%tausk
-              call DQMC_Hub_Sweep(Hub, Hub%nMeas)
+              call DQMC_Hub_Sweep(Hub, NO_MEAS0)
               call DQMC_Hub_Sweep2(Hub, Hub%nTry)
            enddo
 
@@ -96,6 +98,8 @@ program dqmc_ggeom
               call DQMC_Hub_FullMeas(Hub, tau%nnb, tau%A_up, tau%A_dn, tau%sgnup, tau%sgndn)
               ! Measure time-dependent properties
               call DQMC_TDM1_Meas(tm, tau)
+           else if (comp_tdm .eq. 0) then
+              call DQMC_Hub_Meas(Hub, slice)
            endif
 
            !Write fields 
@@ -215,6 +219,8 @@ program dqmc_ggeom
   call cpu_time(t2)
   call DQMC_MPI_Final(qmc_sim)
   write(STDOUT,*) "Running time:",  t2-t1, "(second)"
+
+  close(SOP)
 
 end program dqmc_ggeom
 
