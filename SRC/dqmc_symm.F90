@@ -77,17 +77,17 @@ contains
 ! Read the point-symmetries from input.
 ! Rotation-axis : CN x y z x1 y1 z1
 !  2\pi/N is the rotation angle
-!  x y z specify a point belonging to the axis in Cartesian coordinates
-!  x1 y1 z1 specify the axis direction in Cartesian coordinates
+!  x y z specify a point belonging to the axis in cartesian coordinates
+!  x1 y1 z1 specify the axis direction in cartesian coordinates
 ! Rotorefelction-axis : SN x y z x1 y1 z1
 !  2\pi/N is the rotation angle
-!  x y z specify a point belonging to the axis in Cartesian coordinates
-!  x1 y1 z1 specify the axis direction in Cartesian coordinates
+!  x y z specify a point belonging to the axis in cartesian coordinates
+!  x1 y1 z1 specify the axis direction in cartesian coordinates
 ! Mirror plane : D x y z x1 y1 z1
-!  x y z specify a point belonging to the plane in Cartesian coordinate
-!  x1 y1 z1 specify the direction normal to the plane in Cartesian coordinates
+!  x y z specify a point belonging to the plane in cartesian coordinate
+!  x1 y1 z1 specify the direction normal to the plane in cartesian coordinates
 ! Inversion : I x y z
-!  x y z specify position of inversion point in Cartesian coordinates
+!  x y z specify position of inversion point in cartesian coordinates
 !------------------------------------------------------------------
 subroutine read_symm(SymmOp)
 integer isymm,axis_order,ios1,ios2,i,nsymm
@@ -218,10 +218,10 @@ end function count_symmetry
 
 
 !----------------------------------------------------------------------
-! Apply point-symmetry operation. label specifies the kind of
+! Apply point-symmetry operation. label specifis the kind of
 ! symmetry (C, S, D or I). Point and axis specify the "position" of
 ! the symmetry operation (see comments to read_symmetry). set is a set
-! of 3D vectors in Cartesian coordinates upon which the symmetry acts.
+! of 3D vectors in cartesian coordinates upon which the symmetry acts.
 ! newset returns the transformed set.
 !-----------------------------------------------------------------------
 subroutine apply_point_symm(label,point,axis,theta,set,new_set,nset,reciprocal)
@@ -339,13 +339,14 @@ end subroutine apply_point_symm
 !to ifrom reduces the latter to the equivalent orbital inside the
 !primitive cell.
 !---------------------------------------------------------------------
-subroutine map_symm_lattice(SymmOp,lattice, hamilt)
+subroutine map_symm_lattice(SymmOp,lattice, hamilt, SOP)
 use DQMC_LATT
 use DQMC_HAMILT
 
 type(symm_operations)          :: SymmOp
 type(lattice_t),intent(in)     :: lattice
 type(hamiltonian_t),intent(in) :: hamilt
+integer, intent(in)            :: SOP
 
 integer :: i, istart, ipat, jpat, iat, jat, ii, it, itl, is
 integer :: nsites, ntotsymm, ndim, msymm, nsymm, ntransl, natom
@@ -420,12 +421,12 @@ do i = 1, ntotsymm
   endif
 enddo
 
-!Check whether symmetry is compatible with Hamiltonian
+!Check whether symmetry is compatible with hamiltonian
 nsymm = msymm
 do i = msymm, 1, -1
    ii = valid_symm(i)
    equal=.true.
-   !Transform the 3 pieces of the Hamiltonian
+   !Transform the 3 pieces of the hamiltonian
    do iat = 0, nsites-1
       ipat = tmp_symm(iat,ii)
       do jat = 0, nsites-1
@@ -502,26 +503,24 @@ do is = 0, nsites-1
 enddo
 
 !Write out symmetry mappings
-open(unit=25, file='symmetry_map.info', status='unknown')
-write(25,*)'Number of symmetry operations in input: ',ntotsymm
-write(25,*)'Number of valid symmetry operations   : ',msymm
+write(SOP,*)'Number of symmetry operations in input: ',ntotsymm
+write(SOP,*)'Number of valid symmetry operations   : ',msymm
 do i = 1, msymm
-  write(25,*)'Mapping of Symmetry :',valid_symm(i),Symmlabel(valid_symm(i))
+  write(SOP,*)'Mapping of Simmetry :',valid_symm(i),Symmlabel(valid_symm(i))
   do iat = 0, nsites-1
-    write(25,*)iat,'->',SymmOp%map_symm(iat,i)
+    write(SOP,*)iat,'->',SymmOp%map_symm(iat,i)
   enddo
 enddo
 do it = 0, ntransl-1
-  write(25,*)'Mapping of Translation',it
+  write(SOP,*)'Mapping of Translation',it
   do iat = 0, nsites-1
-    write(25,*)iat,'->',SymmOp%translate(iat,it)
+    write(SOP,*)iat,'->',SymmOp%translate(iat,it)
   enddo
 enddo
-write(25,*)'Label of Translation mapping site in primitive cell'
+write(SOP,*)'Label of Translation mapping site in primitive cell'
 do iat = 0, nsites-1
-  write(25,*)iat,'->',SymmOp%translback(iat)
+  write(SOP,*)iat,'->',SymmOp%translback(iat)
 enddo
-close(25)
 
 SymmOp%lattice_mapped = .true.
 
@@ -918,7 +917,7 @@ end subroutine
 !  Returns nclass, the number of classes, and class_size(iclass), the 
 ! number of pairs inside class iclass.
 !  Returns class_label. This is a 4-components array. The first three are the
-! Cartesian separation of the two orbitals in the pair. The last component is
+! cartesian separation of the two orbitals in the pair. The last component is
 ! the number of the atom inside the primitive cell that belongs to the pair.
 !------------------------------------------------------------------------------
 subroutine construct_lattice_classes(SymmOp,lattice)
