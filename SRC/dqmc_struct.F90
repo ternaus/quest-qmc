@@ -783,10 +783,11 @@ contains
     
     if (S%checklist(STRUCT_WAVE)) then
        write(OPT, "(a,i5)") "nWave = ", S%nWave
+       write(OPT, "(a,i5)") "nBond = ", S%n_b
        write(OPT, "(a,i5)") "W = ", S%nWave*S%n_b
        do i = 1, S%nWave
           do j = 1, S%n_b
-             write(OPT, "(i5, i5, f15.8)") i, j, S%W(i, j)
+             write(OPT, "(i5, i5, f15.8)") j, i, S%W(j, i)
           end do
        end do       
        write(OPT, *)
