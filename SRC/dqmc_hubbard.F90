@@ -548,11 +548,9 @@ contains
     end if
 
     ! Initialize measurements
-    Hub%meas2 = .false.
     temp = Hub%dtau * Hub%L
     call DQMC_Phy0_Init(Hub%P0, Hub%S, temp, nBin, Hub%WS)
-    call DQMC_Phy2_Init(Hub%P2, nBin, Hub%S, Hub%WS)
-    Hub%meas2 = .true.
+    call DQMC_Phy2_Init(Hub%P2, nBin, Hub%S, Hub%WS, Hub%meas2)
 
     ! Initialize simulation range
     Hub%n_start = 1

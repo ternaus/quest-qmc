@@ -3,7 +3,7 @@
 # ==========================
 
 ofile  = test
-gfile  = square.geom
+gfile  = lieb.geom
 
 # ==========================
 # Hubbard model

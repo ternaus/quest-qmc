@@ -70,7 +70,7 @@ contains
   ! Subroutines
   ! ==================================================================
   
-  subroutine DQMC_Phy2_Init(P2, nBin, S, WS)
+  subroutine DQMC_Phy2_Init(P2, nBin, S, WS, meas)
     !
     ! Purpose
     ! =======
@@ -83,6 +83,7 @@ contains
     integer, intent(in)       :: nBin        ! No of bin
     type(Struct), intent(in)  :: S
     type(Wspace), intent(in), target :: WS   ! working space
+    logical, intent(out)      :: meas
 
     ! ... Local Vars ...
     integer :: nb, nWave
@@ -91,6 +92,7 @@ contains
     ! ... Executable ...
 
     P2%compute = S%checklist(STRUCT_BOND)
+    meas = P2%compute
 
     if (P2%compute) then
        nWave    = S%nWave
@@ -99,22 +101,8 @@ contains
        P2%nBin  = nBin
        P2%nb    = nb
        P2%nwave = nWave
-       ! Chia-Chen: 09/07/2011
-       ! S%ncell is not initialized and its value is zero.
-       ! This makes pair measurement blow up because the
-       ! normalization factor 1/nCell is infinity.
-       ! I put a quick patch using S%nSite. This is fine
-       ! if there is only one site per unit cell. A more
-       ! rigorous fix is to call dqmc_latt.F90 and determine
-       ! the number of unit cells.
-       !P2%ncell = S%ncell
-       P2%ncell = S%nSite
+       P2%ncell = S%ncell
 
-       !write(*,*) 'Phy2_Init',P2%nb   
-       !write(*,*) 'Phy2_Init',P2%nBin 
-       !write(*,*) 'Phy2_Init',P2%nWave
-       !write(*,*) 'Phy2_Init',P2%ncell
-       
        ! Allocate storages
        !! Allocate two additional bins for storing 
        !! average value and error

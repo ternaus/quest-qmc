@@ -23,7 +23,8 @@
 # ----------------------
 FC = ifort
 #FC_FLAGS    = -O3 -warn all -check all -traceback
-FC_FLAGS = -m64 -fast -warn all -unroll -traceback -check pointers
+#FC_FLAGS = -m64 -fast -warn all -unroll -traceback -check pointers
+FC_FLAGS = -m64 -warn all -traceback -check pointers -check bounds -fstack-security-check
 NOOPT_FLAGS = -O0 -warn all
 
 
@@ -80,11 +81,12 @@ CXXLIB = -lstdc++ #-lrt
 
 # Path to Intel MKL library
 # -------------------------
-MKLPATH   = $(MKLROOT)/lib/intel64
+MKLPATH   = /share/apps/intel/Compiler/11.1/073/mkl/lib/em64t/ 
 
 
 #dynamic linking sequential
-LAPACKLIB = -L$(MKLPATH) -mkl:sequential -lpthread
+LAPACKLIB = -L$(MKLPATH) -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
+#LAPACKLIB = -L$(MKLPATH) -mkl:sequential -lpthread
 
 #static linking sequential
 #LAPACKLIB = -L$(MKLPATH) -mkl:sequential -lpthread -static
@@ -104,7 +106,7 @@ LIB        = $(CXXLIB) $(LAPACKLIB) # $(CUDALIB) $(MAGMALIB)
 
 # Archiver and flags
 # ------------------
-ARCH       = xiar
+ARCH       = ar
 ARFLAG     = cr
 RANLIB     = ranlib
 

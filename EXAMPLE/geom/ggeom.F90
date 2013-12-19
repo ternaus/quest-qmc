@@ -110,6 +110,7 @@ program dqmc_ggeom
         call DQMC_Phy0_Avg(Hub%P0)
         call DQMC_tdm1_Avg(tm)
 
+  
         if (Hub%meas2) then
            if(Hub%P2%diagonalize)then
              call DQMC_Phy2_Avg(Hub%P2, Hub%S)
