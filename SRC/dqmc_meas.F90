@@ -67,7 +67,7 @@ contains
              call DQMC_Warning("Warning: sign problem", 1)
           else
              r = sum1/sum2
-             var(i) = var(i) + (r - ratio)^2
+             var(i) = var(i) + (r - ratio)**2
              avg(i) = avg(i) + r
           end if
        end do       
