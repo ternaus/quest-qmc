@@ -6,15 +6,6 @@ include $(QUEST_DIR)/make.inc
 
 FLAGS = $(FC_FLAGS) $(PRG_FLAGS)
 
-%.o: 	%.F90
-	$(FC) $(FLAGS) $(SPRNG_INC) -c $<
-
-%.o: 	%.c++ blaslapack.h profile.h kernel_cpu.h kernel_gpu.h
-	$(CXX) $(PRG_FLAGS) $(CXX_FLAGS) -c $<
-
-%.o:	%.cu blaslapack.h profile.h kernel_gpu.h
-	$(NVCC) $(PRG_FLAGS) $(CU_FLAGS) -c $<
-
 SRC =	dqmc_mpi.F90 dqmc_util.F90 dqmc_cfg.F90 \
 	dqmc_geom_param.F90 dqmc_latt.F90 dqmc_bonds.F90 dqmc_reclatt.F90 \
 	dqmc_hamilt.F90 dqmc_symm.F90 \
