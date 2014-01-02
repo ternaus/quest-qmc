@@ -1017,10 +1017,10 @@ contains
     ! Arguments
     ! =========
     !
-    type(config), intent(in)  :: cfg          ! configuration
-    character(*), intent(in)  :: name
-    real(wp), pointer         :: value(:) 
-    integer, intent(out)      :: n
+    type(config), intent(in)         :: cfg          ! configuration
+    character(*), intent(in)         :: name
+    real(wp), pointer, intent(inout) :: value(:) 
+    integer, intent(out)             :: n
 
     ! ... local variables
     integer :: id
@@ -1065,10 +1065,10 @@ contains
     ! Arguments
     ! =========
     !
-    type(config), intent(in)  :: cfg          ! configuration
-    character(*), intent(in)  :: name
-    integer, pointer          :: value(:) 
-    integer, intent(out)      :: n
+    type(config), intent(in)        :: cfg          ! configuration
+    character(*), intent(in)        :: name
+    integer, pointer, intent(inout) :: value(:) 
+    integer, intent(out)            :: n
 
     ! ... local variables
     integer :: id

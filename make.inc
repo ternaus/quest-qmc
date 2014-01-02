@@ -1,1 +1,1 @@
-include $(QUEST_DIR)/makefiles/make.inc.gcc
+include $(QUEST_DIR)/makefiles/make.inc.mkl-icc

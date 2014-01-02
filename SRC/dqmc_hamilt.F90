@@ -136,6 +136,7 @@ contains
     character(len=*), parameter :: mu(2) = (/'mu_up','mu_dn'/)
 
     pos => lattice%cartpos
+    nullify(tcfg)
 
     if(.not.lattice%constructed) &
        stop'Need to construct lattice before building Hamiltonian'
@@ -590,8 +591,8 @@ contains
     type(Hamiltonian_t), intent(in) :: hamilt
     integer, intent(in)             :: n
     integer, intent(out)            :: tmap(n,n), nt
-    real*8, pointer, intent(out)    :: tupvalue(:)
-    real*8, pointer, intent(out)    :: tdnvalue(:)
+    real*8, pointer, intent(inout)  :: tupvalue(:)
+    real*8, pointer, intent(inout)  :: tdnvalue(:)
 
     integer         :: is, js, it, jn
     real*8          :: tup, tdn

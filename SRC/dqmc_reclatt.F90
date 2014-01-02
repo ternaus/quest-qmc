@@ -80,6 +80,7 @@ subroutine init_recip_latt(lattice,recip_lattice,applytwist,cfg)
  kcs=>recip_lattice%kcs
  ktwist=>recip_lattice%ktwist
 
+ nullify(kpoint)
  ndim=lattice%ndim
  
  !twist of the boundary condition in untis of pi
