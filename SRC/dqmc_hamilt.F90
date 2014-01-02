@@ -295,11 +295,9 @@ contains
     
      n=size(hamilt%hopup,1)
 
-     if(associated(tnneig)) then
-        deallocate(tnneig, Unneig, Jnneig)
-        deallocate(tneig, Uneig, Jneig)
-        deallocate(tsite, Usite, Jsite)
-     endif
+     nullify(tnneig, Unneig, Jnneig)
+     nullify( tneig,  Uneig,  Jneig)
+     nullify( tsite,  Usite,  Jsite)
 
      allocate(tnneig(0:n-1),Unneig(0:n-1),Jnneig(0:n-1))
      allocate(tneig(0:n-1,n),Uneig(0:n-1,n),Jneig(0:n-1,n))
