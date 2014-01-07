@@ -1,11 +1,3 @@
-############################################################################
-#
-#  Program:         QUEST V1.4
-#  Module:          make.inc
-#  Purpose:         System dependent configuration
-#  Modified date:   10/24/2012
-#
-############################################################################
 
 #
 #  Compiler and flags
@@ -14,19 +6,8 @@
 # GNU Fortran compiler
 # --------------------
 FC = gfortran
-FC_FLAGS   = -m64 -Ofast -funroll-loops -Wall
-#FC_FLAGS = -O3 -Wall
+FC_FLAGS   = -m64 -O3 -funroll-loops -Wall
 NOOPT_FLAGS = -O0 -Wall
-
-
-# Intel Fortran compiler
-# ----------------------
-#FC = ifort
-#FC_FLAGS    = -O3 -warn all
-#FC_FLAGS    = -fast -warn all
-#FC_FLAGS    = -O3 -warn -openmp
-#NOOPT_FLAGS = -O0 -warn all
-
 
 # MAGMA library path
 # ------------------
@@ -52,14 +33,7 @@ NOOPT_FLAGS = -O0 -Wall
 # GNU C++ compiler
 # ----------------
 CXX = g++
-CXX_FLAGS = -m64 -Wall -funroll-loops -Ofast # $(CUDAINC) $(MAGMAINC)
-
-
-
-# Intel C++ compiler
-# ------------------
-# CXX = icc
-# CXX_FLAGS = -O3 -openmp $(CUDAINC) $(MAGMAINC)
+CXX_FLAGS = -m64 -Wall -funroll-loops -O3 # $(CUDAINC) $(MAGMAINC)
 
 
 # C++ libraries
@@ -77,13 +51,6 @@ CXXLIB = -lstdc++ -lrt
 # Note: they are not optimized
 # ----------------------------------------------------
 LAPACKLIB = $(QUEST_DIR)/liblapack.a $(QUEST_DIR)/libblas.a
-
-
-# Path to Intel MKL library
-# -------------------------
-#MKLPATH   = /PATH/to/Intel/MKL/Library
-#LAPACKLIB = -L$(MKLPATH) -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
-
 
 # DQMC library
 # ------------

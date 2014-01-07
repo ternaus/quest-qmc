@@ -1,30 +1,12 @@
-############################################################################
-#
-#  Program:         QUEST V1.4
-#  Module:          make.inc
-#  Purpose:         System dependent configuration
-#  Modified date:   10/24/2012
-#
-############################################################################
-
 #
 #  Compiler and flags
 #
-
-# GNU Fortran compiler
-# --------------------
-#FC = gfortran
-#FC_FLAGS   = -m64 -Ofast -Wall
-#FC_FLAGS = -O3 -Wall
-#NOOPT_FLAGS = -O0 -Wall
 
 
 # Intel Fortran compiler
 # ----------------------
 FC = ifort
-FC_FLAGS = -m64 -fast -warn all -unroll
-#FC_FLAGS = -m64 -warn all -traceback -check pointers -check bounds -fstack-security-check
-#FC_FLAGS = -m64 -warn all -unroll -O3
+FC_FLAGS = -m64 -O3 -warn all -unroll
 NOOPT_FLAGS = -O0 -warn all
 
 
@@ -49,54 +31,24 @@ NOOPT_FLAGS = -O0 -warn all
 #CUDAINC = -I$(CUDAPATH)/include
 
 
-# GNU C++ compiler
-# ----------------
-#CXX = g++
-#CXX_FLAGS = -Wall -O3 # $(CUDAINC) $(MAGMAINC)
-
-
-
 # Intel C++ compiler
 # ------------------
 CXX = icpc
-#CXX_FLAGS = -O3 -openmp $(CUDAINC) $(MAGMAINC)
 CXX_FLAGS = -m64 -O3 -Wall -unroll# $(CUDAINC) $(MAGMAINC)
 
 # C++ libraries
 # -------------
 CXXLIB = -lstdc++ #-lrt
 
-# Path to system's default BLAS and LAPACK libraries
-# This should work on most Linux and MacOS X. If not,
-# use the BLAS/LAPACK included in the QUEST package.
-# --------------------------------------------------
-#LAPACKLIB = -llapack -lblas
-
-
-# Path to BLAS and LAPACK libraries shipped with QUEST
-# Note: they are not optimized
-# ----------------------------------------------------
-#LAPACKLIB = $(QUEST_DIR)/liblapack.a $(QUEST_DIR)/libblas.a
-
-
 # Path to Intel MKL library
 # -------------------------
 MKLPATH = $(MKLROOT)/lib/intel64
 
-#dynamic linking sequential
-#LAPACKLIB = -L$(MKLPATH) -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5 -lpthread
 LAPACKLIB = -L$(MKLPATH) -mkl:sequential -lpthread
-
-#static linking sequential
-#LAPACKLIB = -L$(MKLPATH) -mkl:sequential -lpthread -static
-
-#dynamic linking parallel
-#LAPACKLIB = -L$(MKLPATH) -mkl:parallel -lpthread
 
 # DQMC library
 # ------------
 DQMCLIB    = libdqmc.a
-
 
 # Library linking
 # ---------------

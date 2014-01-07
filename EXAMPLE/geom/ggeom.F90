@@ -17,11 +17,12 @@ program dqmc_ggeom
   character(len=slen) :: gfile
   logical             :: tformat
   integer             :: na, nt, nkt, nkg, i, j, k, slice, nhist, comp_tdm
-  integer             :: nBin, nIter
-  !character(len=30), allocatable   :: clabelt(:), clabelg(:)
-  character(len=30)   :: ofile
-  !complex*16, pointer :: GFC(:,:), RFC(:,:)
-  integer             :: OPT, FOP, SOP, FLD_UNIT, TDM_UNIT
+  integer             :: nBin, nIter  
+  character(len=30)   :: ofile  
+  integer             :: OPT
+  !integer             :: HSF_output_file_unit
+  integer             :: symmetries_output_file_unit
+  integer             :: FLD_UNIT, TDM_UNIT
   real(wp)            :: randn(1)
 
   call cpu_time(t1)  
@@ -41,19 +42,19 @@ program dqmc_ggeom
   !Save whether to use refinement for G used in measurements.
   call CFG_Get(cfg, "nhist", nhist)
   !if (nhist > 0) then
-  !   call DQMC_open_file(adjustl(trim(ofile))//'.HSF.stream','unknown', FOP)
+  !   call DQMC_open_file(adjustl(trim(ofile))//'.HSF.stream','unknown', HSF_output_file_unit)
   !endif
 
-  call DQMC_open_file(adjustl(trim(ofile))//'.geometry','unknown', SOP)
-  !Determins type of geometry file
+  call DQMC_open_file(adjustl(trim(ofile))//'.geometry','unknown', symmetries_output_file_unit)
+  !Determines type of geometry file
   call DQMC_Geom_Read_Def(Hub%S, gfile, tformat)
   if (.not.tformat) then
      !If free format fill gwrap
-     call DQMC_Geom_Fill(Gwrap,gfile,cfg,SOP)
+     call DQMC_Geom_Fill(Gwrap, gfile, cfg, symmetries_output_file_unit)
      !Transfer info in Hub%S
      call DQMC_Geom_Init(Gwrap,Hub%S,cfg)
   endif
-  call DQMC_Geom_Print(Hub%S,SOP)
+  call DQMC_Geom_Print(Hub%S, symmetries_output_file_unit)
 
   ! Initialize the rest data
   call DQMC_Hub_Config(Hub, cfg)
@@ -68,7 +69,7 @@ program dqmc_ggeom
 
   ! Warmup sweep
   do i = 1, Hub%nWarm
-     if (mod(i,10)==0) write(*,'(A,i6,1x,i3)')' Warmup Sweep, nwrap  : ', i, Hub%G_up%nwrap
+     if (mod(i, 10)==0) write(*,'(A,i6,1x,i3)')' Warmup Sweep, nwrap  : ', i, Hub%G_up%nwrap
      call DQMC_Hub_Sweep(Hub, NO_MEAS0)
      call DQMC_Hub_Sweep2(Hub, Hub%nTry)
   end do
@@ -103,7 +104,7 @@ program dqmc_ggeom
            endif
 
            !Write fields 
-           !if (nhist > 0) call DQMC_Hub_Output_HSF(Hub, .false., slice, FOP)
+           !if (nhist > 0) call DQMC_Hub_Output_HSF(Hub, .false., slice, HSF_output_file_unit)
         end do
 
         ! Accumulate results for each bin
@@ -221,7 +222,7 @@ program dqmc_ggeom
   call DQMC_MPI_Final(qmc_sim)
   write(STDOUT,*) "Running time:",  t2-t1, "(second)"
 
-  close(SOP)
+  close(symmetries_output_file_unit)
 
 end program dqmc_ggeom
 
