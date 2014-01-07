@@ -4,8 +4,6 @@ module DQMC_Phy0
   use DQMC_UTIL
   use DQMC_WSPACE
   use DQMC_STRUCT
-!  use LAPACK_MOD
-!  use BLAS_MOD
 
   implicit none 
   
@@ -366,7 +364,7 @@ contains
     idx = P0%idx
 
     ! compute the normalization factor = 1/cnt
-    if (P0%cnt .eq. 0) then
+    if (P0%cnt == 0) then
        call DQMC_Error("Phy0 normalize: cnt = 0", 0)
     end if
     factor = ONE/P0%cnt
@@ -374,9 +372,9 @@ contains
     ! total occupancy = nup + ndn
     P0%meas(P0_DENSITY, idx) = P0%meas(P0_NUP, idx)+&
          P0%meas(P0_NDN, idx)
-    ! total energy = kenitic energy + potential energy
+    ! total energy = kenitic energy + potential
     P0%meas(P0_ENERGY, idx) = P0%meas(P0_KE, idx)+&
-         P0%meas(P0_NUD, idx)
+         P0%meas(P0_NUD, idx) 
     ! average
     P0%meas(:, idx) = P0%meas(:, idx) * factor
     P0%sign(:, idx) = P0%sign(:, idx) * factor
@@ -434,7 +432,7 @@ contains
 
     ! ... Executable ...
 
-    if (qmc_sim%rank .ne. 0) return
+    if (qmc_sim%rank /= 0) return
 
     nClass = P0%nClass
     avg    = P0%avg
@@ -1200,7 +1198,7 @@ contains
     complex*16, pointer :: Nmptr(:,:,:) 
     character(len=30), pointer :: clabel(:) 
 
-    if (qmc_sim%rank .ne. 0) return
+    if (qmc_sim%rank /= 0) return
 
     avg    = P0%avg
     err    = P0%err
@@ -1215,7 +1213,7 @@ contains
        do ia = 0, na-1
           do ja = ia, na-1
              ii = ii + 1
-             if (ia+ja .eq. 0) then
+             if (ia+ja == 0) then
                 write(clabel(ii),'(3(i5))')i, ja, ia
              else
                 write(clabel(ii),'(5x,2(i5))')ja, ia
@@ -1240,7 +1238,7 @@ contains
        do ia = 0, na-1
           do ja = ia, na-1
              ii = ii + 1
-             if (ia+ja .eq. 0) then
+             if (ia+ja == 0) then
                 write(clabel(ii),'(3(i5))')i, ja, ia
              else
                 write(clabel(ii),'(5x,2(i5))')ja, ia
