@@ -352,6 +352,7 @@ contains
     G1%nblk = G2%nblk
 
     allocate(G1%G(G2%n,G2%n), G1%tmp(G2%n,G2%n))
+    G1%owns_G = .true.
 
     G1%G    = G2%G
     G1%tmp  = G2%tmp
