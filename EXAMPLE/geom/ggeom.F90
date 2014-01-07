@@ -40,9 +40,9 @@ program dqmc_ggeom
 
   !Save whether to use refinement for G used in measurements.
   call CFG_Get(cfg, "nhist", nhist)
-  if (nhist .gt. 0) then
-     call DQMC_open_file(adjustl(trim(ofile))//'.HSF.stream','unknown', FOP)
-  endif
+  !if (nhist > 0) then
+  !   call DQMC_open_file(adjustl(trim(ofile))//'.HSF.stream','unknown', FOP)
+  !endif
 
   call DQMC_open_file(adjustl(trim(ofile))//'.geometry','unknown', SOP)
   !Determins type of geometry file
@@ -58,9 +58,9 @@ program dqmc_ggeom
   ! Initialize the rest data
   call DQMC_Hub_Config(Hub, cfg)
 
-  ! Initialize time dependent properties if comp_tdm .gt. 0
+  ! Initialize time dependent properties if comp_tdm > 0
   call CFG_Get(cfg, "tdm", comp_tdm)
-  if (comp_tdm .gt. 0) then
+  if (comp_tdm > 0) then
      call DQMC_open_file(adjustl(trim(ofile))//'.tdm.out','unknown', TDM_UNIT)
      call DQMC_Gtau_Init(Hub, tau)
      call DQMC_TDM1_Init(Hub%L, Hub%dtau, tm, Hub%P0%nbin, Hub%S, Gwrap) 
@@ -90,7 +90,7 @@ program dqmc_ggeom
            slice = ceiling(randn(1)*Hub%L)
            write(*,'(a,3i6)') ' Measurement Sweep, bin, iter, slice : ', i, j, slice
 
-           if (comp_tdm .gt. 0) then
+           if (comp_tdm > 0) then
               ! Compute full Green's function 
               call DQMC_Gtau_LoadA(tau, TAU_UP, slice, Hub%G_up%sgn)
               call DQMC_Gtau_LoadA(tau, TAU_DN, slice, Hub%G_dn%sgn)
@@ -98,12 +98,12 @@ program dqmc_ggeom
               call DQMC_Hub_FullMeas(Hub, tau%nnb, tau%A_up, tau%A_dn, tau%sgnup, tau%sgndn)
               ! Measure time-dependent properties
               call DQMC_TDM1_Meas(tm, tau)
-           else if (comp_tdm .eq. 0) then
+           else if (comp_tdm == 0) then
               call DQMC_Hub_Meas(Hub, slice)
            endif
 
            !Write fields 
-           if (nhist .gt. 0) call DQMC_Hub_Output_HSF(Hub, .false., slice, FOP)
+           !if (nhist > 0) call DQMC_Hub_Output_HSF(Hub, .false., slice, FOP)
         end do
 
         ! Accumulate results for each bin
@@ -123,7 +123,7 @@ program dqmc_ggeom
   endif
 
   !Read configurations from file if no sweep was perfomed
-  if (Hub%nWarm + Hub%nPass .eq. 0) then
+  if (Hub%nWarm + Hub%nPass == 0) then
      Hub%nMeas = -1
      call DQMC_count_records(Hub%npass, FLD_UNIT)
      nIter = Hub%npass / nbin
@@ -131,7 +131,7 @@ program dqmc_ggeom
         do j = 1, nIter / qmc_sim%aggr_size
            call DQMC_Hub_Input_HSF(Hub, .false., slice, FLD_UNIT)
            call DQMC_Hub_Init_Vmat(Hub)
-           if (comp_tdm .gt. 0) then
+           if (comp_tdm > 0) then
               ! Compute full Green's function - if fullg is on -
               call DQMC_Gtau_LoadA(tau, TAU_UP, slice, Hub%G_up%sgn)
               call DQMC_Gtau_LoadA(tau, TAU_DN, slice, Hub%G_dn%sgn)
@@ -140,7 +140,7 @@ program dqmc_ggeom
                  tau%A_up, tau%A_dn, tau%sgnup, tau%sgndn)
               ! Measure time-dependent properties. Reuses fullg when possible. 
               call DQMC_TDM1_Meas(tm, tau)
-           else if (comp_tdm .eq. 0) then
+           else if (comp_tdm == 0) then
               call DQMC_Hub_Meas(Hub, slice)
            endif
         enddo
