@@ -2,9 +2,9 @@ QUEST_DIR = .
 
 include make.inc
 
-#all: example_mkl
+all: example_mkl
 
-all : example_
+#all : example_
 
 example_: liblapack libblas libdqmc
 	(cd EXAMPLE; $(MAKE))
