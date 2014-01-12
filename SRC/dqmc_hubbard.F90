@@ -235,7 +235,7 @@ contains
        call CFG_set(cfg, "nbin",  nBin)
     endif
 
-    if (HSF .eq. HSF_FROM_FILE .or. HSF .eq. HSF_RESTORE) then
+    if (HSF == HSF_FROM_FILE .or. HSF == HSF_RESTORE) then
        ! open input file
        if (DQMC_Config_isSet(cfg, "HSFin")) then
           call CFG_Get(cfg, "HSFin", HSF_ipt)
@@ -260,7 +260,7 @@ contains
     end if
 
     ! Deactivate measurements during sweep if tdm is on
-    nmeas = 1; if (tdm .gt. 0) nmeas = 0
+    nmeas = 1; if (tdm > 0) nmeas = 0
     
     ! call the function
     call DQMC_Hub_Init(Hub, U, t_up, t_dn, mu_up, mu_dn, L, n_t, n_U, n_mu, dtau, &
@@ -335,7 +335,7 @@ contains
 
     ! t parameter
     if (n_t .ne. Hub%S%n_t) then
-       if (n_t .eq. 1 .and. Hub%S%n_t .gt. 1) then
+       if (n_t == 1 .and. Hub%S%n_t > 1) then
           ! special case for checkerboard method
           Hub%n_t  = Hub%S%n_t
           allocate(Hub%t_up(Hub%S%n_t))
@@ -381,7 +381,7 @@ contains
           !Gup and Gdn are identical. Do not compute Gdn.
           Hub%comp_dn = .false.
        endif
-    elseif ( all(U.gt.ZERO-1.d-6))then
+    elseif ( all(U>ZERO-1.d-6))then
        !Positive U 
        Hub%neg_u   = .false.
        if ( all(abs(mu_up) < 1.d-6) .and. all(abs(mu_dn) < 1.d-6) .and. &
@@ -408,7 +408,7 @@ contains
 
     ! Initialize random seeds
     Hub%idum     = seed
-    if (Hub%idum .eq. 0) then
+    if (Hub%idum == 0) then
        call date_and_time(VALUES=val)
        Hub%idum = getpid()+val(8)*val(7)+val(6)**mod(val(5),5)
     end if
@@ -416,7 +416,7 @@ contains
     ! LAPACK random variable generation
     Hub%seed = Hub%idum * (/1,2,3,4/)
     Hub%seed = mod(abs(Hub%seed), 4095)
-    if (mod(Hub%seed(4),2) .eq. 0) then
+    if (mod(Hub%seed(4),2) == 0) then
        Hub%seed(4) = Hub%seed(4) + 1
     end if
 #   ifdef _QMC_MPI
@@ -434,10 +434,10 @@ contains
     ! Initialize Hubbard-Stratonovich Field
     HSF = HSF_IPT
     Hub%HSFtype = HSFtype
-    if (HSF .eq. HSF_FROM_MEMORY) then
+    if (HSF == HSF_FROM_MEMORY) then
        ilb = Hub%G_up%ilb
        ! discrete case
-       if (HSFtype .eq. HSF_DISC) then
+       if (HSFtype == HSF_DISC) then
           if (.not. associated(Hub%HSF)) then
              call DQMC_Warning("Cannot use current HSF. ", 0)
              HSF = HSF_RANDOM_GEN
@@ -455,14 +455,14 @@ contains
        end if
     end if
 
-    if (HSF .eq. HSF_FROM_FILE .or. HSF .eq. HSF_RESTORE) then
+    if (HSF == HSF_FROM_FILE .or. HSF == HSF_RESTORE) then
        inquire(UNIT=HSF_INPUT_UNIT, EXIST=lex)
        if (lex) then
           ! If a valid input file handle is provided,
           ! read HSF from the file
-          if (HSFtype .eq. HSF_DISC) then
+          if (HSFtype == HSF_DISC) then
              allocate(Hub%HSF(n,L))
-             call DQMC_Hub_Input_HSF(Hub, HSF.eq.HSF_RESTORE, ilb, HSF_INPUT_UNIT)
+             call DQMC_Hub_Input_HSF(Hub, HSF==HSF_RESTORE, ilb, HSF_INPUT_UNIT)
           else
              ! TODO: input continuous HSF from file
              call DQMC_Error("reading continuous HSF from file is not supported", HSF)
@@ -477,16 +477,16 @@ contains
     end if
 
     ! generate HSF randomly
-    if (HSF .eq. HSF_RANDOM_GEN) then
+    if (HSF == HSF_RANDOM_GEN) then
        ilb = 1
 
        ! discrete case
-       if (HSFtype .eq. HSF_DISC) then
+       if (HSFtype == HSF_DISC) then
           allocate(Hub%HSF(n,L))
           Hub%HSF = 1
           do i = 1, Hub%L   
              call ran0(n, Hub%WS%R5, Hub%seed)
-             where(Hub%WS%R5 .gt. HALF) Hub%HSF(:,i) = -1
+             where(Hub%WS%R5 > HALF) Hub%HSF(:,i) = -1
           end do
        else
           ! continuous case
@@ -499,7 +499,7 @@ contains
     end if
 
     ! Initialize lookup table
-    if  (HSFtype .eq. HSF_DISC) then
+    if  (HSFtype == HSF_DISC) then
        nullify(Hub%explook)
        allocate(Hub%explook(-2:2,1:n_U))
        do j = 1, n_U
@@ -585,7 +585,7 @@ contains
     if (.not.Hub%neg_u .and. associated(Hub%V_dn)) deallocate(Hub%V_dn)
     deallocate(Hub%t_up, Hub%t_dn, Hub%mu_up, Hub%mu_dn, Hub%U)
 
-    if (Hub%HSFtype .eq. HSF_DISC) then
+    if (Hub%HSFtype == HSF_DISC) then
        deallocate(Hub%HSF)
        deallocate(Hub%explook)
     else
@@ -638,7 +638,7 @@ contains
     nproc = qmc_sim%aggr_size
    
 
-    if (qmc_sim%rank .eq. qmc_sim%aggr_root) then
+    if (qmc_sim%rank == qmc_sim%aggr_root) then
        !loop over processors
        do j = 0, nproc-1
           ! Collect data from processor "j"
@@ -782,7 +782,7 @@ contains
     nproc = qmc_sim%size
 
     do ip = 0, nproc-1
-       if (qmc_sim%aggr_rank .eq. ip) then
+       if (qmc_sim%aggr_rank == ip) then
           k = 1
           do i = 1, Hub%L
              do j = 1, Hub%n
@@ -807,7 +807,7 @@ contains
     
     if (restore) then
        do ip = 0, nproc-1
-          if (qmc_sim%aggr_rank .eq. ip) then
+          if (qmc_sim%aggr_rank == ip) then
 #            ifdef _QMC_MPI
                 read(IPT,'(i8,1x)',advance='no') k
                 do j = 1, k
@@ -859,23 +859,23 @@ contains
 
     ! ... Executable ....
 
-    if (qmc_sim%rank .eq. qmc_sim%aggr_root) then
+    if (qmc_sim%rank == qmc_sim%aggr_root) then
 
        write(OPT,*)  Hub%S%Name(:)
-       if (Hub%n_U .eq. 1) then
+       if (Hub%n_U == 1) then
           FMT = FMT_STRDBL
        else
           write(FMT, "('(a30,f19.6,(',I3,'(f12.6)))')") Hub%n_U-1
        end if
        write(OPT,FMT)         "                          U : ", Hub%U
-       if (Hub%n_t .eq. 1) then
+       if (Hub%n_t == 1) then
           FMT = FMT_STRDBL
        else
           write(FMT, "('(a30,f19.6,(',I3,'(f12.6)))')") Hub%n_t-1
        end if
        write(OPT,FMT)         "                       t_up : ", Hub%t_up
        write(OPT,FMT)         "                       t_dn : ", Hub%t_dn
-       if (Hub%n_mu .eq. 1) then
+       if (Hub%n_mu == 1) then
           FMT = FMT_STRDBL
        else
           write(FMT, "('(a30,f19.6,(',I3,'(f12.6)))')") Hub%n_mu-1
@@ -897,15 +897,14 @@ contains
        write(OPT,FMT_STRDBL)  "    Approximate accept rate : ", &
             dble(Hub%naccept)/dble(Hub%naccept+Hub%nreject)
        write(OPT,FMT_STRDBL)  "                      gamma : ", Hub%gamma
-       if (Hub%nTry > 0) then
-         write(OPT,FMT_STRINT)  "Number of global move sites : ", Hub%nTry
+       if (Hub%nTry > 0) then         
          write(OPT,FMT_STRINT)  "   Global move accept count : ", Hub%nAcceptGlobal
          write(OPT,FMT_STRINT)  "   Global move reject count : ", Hub%nRejectGlobal
          write(OPT,FMT_STRDBL)  "    Global move accept rate : ", &
               dble(Hub%nAcceptGlobal)/dble(Hub%nAcceptGlobal + Hub%nRejectGlobal)
        end if
        write(OPT,*)           "          Type of matrix B : ", Hub%B_up%name
-       if (Hub%HSFtype .eq. HSF_DISC) then
+       if (Hub%HSFtype == HSF_DISC) then
           write(OPT,*)        "        Type of matrix HSF : discrete"
        else
           write(OPT,*)        "        Type of matrix HSF : continuous"
@@ -921,7 +920,7 @@ contains
        if (lex) then
           call DQMC_Hub_Output_HSF(Hub, restore, slice, HSF_OUTPUT_UNIT)
        else
-          if (qmc_sim%rank .eq. qmc_sim%aggr_root) &
+          if (qmc_sim%rank == qmc_sim%aggr_root) &
              call DQMC_Warning("HSF output file is not initialized.", 1)
        end if
     end if
@@ -1166,7 +1165,7 @@ contains
           randn = ranlist(j)
 
           ! Accept 
-          if (p .gt. randn) then
+          if (p > randn) then
              accept_cnt = accept_cnt + 1
 
              if(r_up .lt. ZERO) sgn_up = -sgn_up
@@ -1232,9 +1231,9 @@ contains
     !===========================!
     ! Step 4: Adjust parameters !
     !===========================!
-    if(Hub%naccept+Hub%nreject .gt. DQMC_CHECK_ITER) then
+    if(Hub%naccept+Hub%nreject > DQMC_CHECK_ITER) then
        accrat = dble(Hub%naccept)/dble(Hub%naccept+Hub%nreject)
-       if(accrat .gt. DQMC_ACC_UP .or. accrat .lt. DQMC_ACC_LO)then
+       if(accrat > DQMC_ACC_UP .or. accrat .lt. DQMC_ACC_LO)then
           Hub%gamma = Hub%gamma + (accrat - HALF)
           Hub%gamma = dmax1(ZERO,Hub%gamma)
           Hub%gamma = dmin1(ONE, Hub%gamma)
@@ -1403,7 +1402,7 @@ contains
           rat = rat - 2*Hub%explook(0, map(site(i))) * hs_sum
        end if
 
-       if (rat .gt. ZERO) then
+       if (rat > ZERO) then
           ratexp = ONE
        else
           ratexp = exp(rat)
@@ -1621,7 +1620,7 @@ contains
           randn = ranlist(j)
 
           ! Accept 
-          if (p .gt. randn) then
+          if (p > randn) then
              accept_cnt = accept_cnt + 1
 
              if(r_up .lt. ZERO) sgn_up = -sgn_up
@@ -1668,7 +1667,7 @@ contains
        Hub%nreject = Hub%nreject + (n - accept_cnt)
 
        cnt = cnt - 1
-       if (cnt .eq. 0) then
+       if (cnt == 0) then
           ! construct G_dn for mu = 0
           if (.not.Hub%neg_u .and. .not.Hub%comp_dn) then
              do k = 1,n
@@ -1698,9 +1697,9 @@ contains
     !===========================!
     ! Step 4: Adjust parameters !
     !===========================!
-    if(Hub%naccept+Hub%nreject .gt. DQMC_CHECK_ITER) then
+    if(Hub%naccept+Hub%nreject > DQMC_CHECK_ITER) then
        accrat = dble(Hub%naccept)/dble(Hub%naccept+Hub%nreject)
-       if(accrat .gt. DQMC_ACC_UP .or. accrat .lt. DQMC_ACC_LO)then
+       if(accrat > DQMC_ACC_UP .or. accrat .lt. DQMC_ACC_LO)then
           Hub%gamma = Hub%gamma + (accrat - HALF)
           Hub%gamma = dmax1(ZERO,Hub%gamma)
           Hub%gamma = dmin1(ONE, Hub%gamma)
@@ -1829,7 +1828,7 @@ contains
           Hub%V_up(si,sj) = exp(Hub%lambda(Hub%S%map(sj))*CHSF(si,sj))
           Hub%V_dn(si,sj) = exp(-Hub%lambda(Hub%S%map(sj))*CHSF(si,sj))
           sj = sj + 1
-          if (sj .gt. Hub%L) then
+          if (sj > Hub%L) then
              sj = 1
           end if
        end do
@@ -1869,7 +1868,7 @@ contains
        ! rat = abs((det_up*det_dn)/(new_up*new_dn)) 
        rat = det_up + det_dn - new_up - new_dn
 
-       if (rat .gt. ZERO) then
+       if (rat > ZERO) then
           ratexp = ONE
        else
           ratexp = exp(rat)
@@ -1909,7 +1908,7 @@ contains
              Hub%V_dn(si,sj) = exp(-Hub%lambda(Hub%S%map(sj))*CHSF(si,sj))
 
              sj = sj + 1
-             if (sj .gt. Hub%L) then
+             if (sj > Hub%L) then
                 sj = 1
              end if
           end do
@@ -2093,7 +2092,7 @@ contains
  
      ! 05/10/2012, CC
      ! Warning: if slice = 0, DQMC_Hub_Meas() would return meaningless results.
-     if (slice .le. 0 .or. slice .gt. Hub%L) then
+     if (slice .le. 0 .or. slice > Hub%L) then
        write(*,*) " In subroutine DQMC_Hub_Meas(Hub, slice), the argument 'slice' is out of bound."
        write(*,*) " It will now be reset randomly."
        call ran0(1, randn, Hub%seed)
@@ -2189,7 +2188,7 @@ contains
        allocate(Hub%V_up(Hub%n,Hub%L))
      end if
 
-     if (Hub%HSFtype .eq. HSF_DISC) then
+     if (Hub%HSFtype == HSF_DISC) then
 
         ! discrete case
         do i = 1, Hub%L
