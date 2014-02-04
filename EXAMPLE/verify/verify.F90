@@ -31,7 +31,7 @@ program dqmc_verify
   integer,      parameter  :: nx = 4, ny = 4, N = nx*ny
   real(wp),     parameter  :: t(4)  = (/0.3_wp, 0.6_wp, ONE, ZERO/)
   real(wp),     parameter  :: dtau  =0.125_wp  
-  real(wp),     parameter  :: U(4)  = (/ONE, TWO, TWO*TWO, ZERO/) 
+  real(wp),     parameter  :: U(7)  = (/ONE, TWO, TWO * TWO, ZERO, -1, -2, -4/) 
   real(wp),     parameter  :: mu(3) = (/HALF, ZERO, -HALF/) 
   integer,      parameter  :: L = 12, HSF_IPT = -1, n_t = 1
   integer,      parameter  :: nWarm = 1000, nPass = 5000, nTry = 0
@@ -92,12 +92,12 @@ program dqmc_verify
   write(STDOUT,*) "| CASE 1. Single site (t=0)  |"
   write(STDOUT,*) "=============================="
   do i = 1, 3
-     do j = 1, 3
+     do j = 1, 7
         ! Initialize the parameter of the simulation
         call DQMC_Hub_Init(Hub, U(j:j), t_up(4:4), t_dn(4:4), mu_up(i:i), mu_dn(i:i), L, n_t, 1, 1, &
              dtau, HSF_IPT, nWarm, nPass, nMeas, nTry, nBin, tausk, idum, &
              nOrth, nWrap, fixw, errrate, difflim, HALF, 0, 0, ZERO, ZERO, ssxx, HSF_DISC)
-        beta = L*dtau
+        beta = L * dtau
      
         ! Execute
         call DQMC_Hub_Run(Hub,0)
@@ -115,10 +115,10 @@ program dqmc_verify
         !     rho = ---------------------------------------
         !            1+2*exp((U/2+mu)*beta)+exp(2*mu*beta)
         !
-        tmp1 = exp((U(j)/TWO+mu(i))*beta)
-        tmp2 = exp(TWO*mu(i)*beta)
-        tmp3 = ONE/(ONE+TWO*tmp1+tmp2)
-        theo = TWO*(tmp1+tmp2)*tmp3
+        tmp1 = exp((U(j) / TWO + mu(i)) * beta)
+        tmp2 = exp(TWO * mu(i) * beta)
+        tmp3 = ONE / (ONE + TWO * tmp1 + tmp2)
+        theo = TWO * (tmp1 + tmp2) * tmp3
         call DQMC_Phy0_GetResult(Hub%P0, P0_DENSITY, name, avg, err)
         call Display("          Density : ", theo, avg, err)
      
@@ -129,7 +129,7 @@ program dqmc_verify
         !         1+2*exp((U/2+mu)*beta)+exp(2*mu*beta)
         !
         !    
-        theo  = U(j)*tmp2*tmp3 -mu(i)*theo 
+        theo  = U(j) * tmp2 * tmp3 - mu(i) * theo 
 
         call DQMC_Phy0_GetResult(Hub%P0, P0_ENERGY, name, avg, err)
         call Display("          Energy : ", theo, avg, err)
@@ -140,7 +140,7 @@ program dqmc_verify
         !    PE = --------------------------------------
         !          1+2*exp((U/2+mu)*beta)+exp(2*mu*beta)
         !
-        theo = tmp2*tmp3*Hub%U(1)
+        theo = tmp2 * tmp3 * Hub%U(1)
         call DQMC_Phy0_GetResult(Hub%P0, P0_NUD, name, avg, err)
         call Display(" Double occupancy : ", theo, avg, err)
 
@@ -248,15 +248,15 @@ contains
     real(wp) :: ratio
     
     ! Executable
-    if (err .ne. ZERO) then
+    if (err /= ZERO) then
        ratio = abs(theo-avg)/err
        write(STDOUT,FMT_CMP) name, theo, avg, err, ratio, ONE
        index = ceiling(ratio)
-       if (index .gt. 3) index = 3
+       if (index > 3) index = 3
     else
        ratio = abs(theo-avg)
        write(STDOUT,FMT_CMP) name, theo, avg, err, ratio, ZERO
-       if(ratio .le. 1.0D-10) then
+       if(ratio <= 1.0D-10) then
           index = 1
        else
           index = 3
