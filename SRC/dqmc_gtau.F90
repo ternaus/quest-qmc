@@ -2,8 +2,6 @@ module DQMC_GTAU
 #include "dqmc_include.h"
 
   use DQMC_UTIL
-!  use LAPACK_MOD
-!  use BLAS_MOD
   use DQMC_WSPACE
   use _DQMC_MATB
   use DQMC_SEQB
@@ -44,10 +42,10 @@ module DQMC_GTAU
      integer  :: L       ! number of imag-times
      integer  :: nb      ! number of imag-times in A_up, A_dn
      integer  :: nnb     ! size of A_up, A_dn
-     integer  :: it_up   ! time indeces for upt0, up0t, dnt0 and dn0t
-     integer  :: i0_up   ! time indeces for upt0, up0t, dnt0 and dn0t
-     integer  :: it_dn   ! time indeces for upt0, up0t, dnt0 and dn0t
-     integer  :: i0_dn   ! time indeces for upt0, up0t, dnt0 and dn0t
+     integer  :: it_up   ! time indices for upt0, up0t, dnt0 and dn0t
+     integer  :: i0_up   ! time indices for upt0, up0t, dnt0 and dn0t
+     integer  :: it_dn   ! time indices for upt0, up0t, dnt0 and dn0t
+     integer  :: i0_dn   ! time indices for upt0, up0t, dnt0 and dn0t
      integer  :: north   ! Number of imag-times
      integer  :: which   ! part of gtau to compute
      integer  :: sfc     ! safe count
@@ -149,7 +147,7 @@ contains
     tau%comp_dn = Hub%comp_dn
     tau%neg_u   = Hub%neg_u
 
-    if (mod(tau%L,tau%north) .ne. 0) &
+    if (mod(tau%L,tau%north) /= 0) &
        call dqmc_error("L must be an exact multiple of north. Stop.",1)
 
     tau%which = TAU_BOTH
@@ -158,17 +156,17 @@ contains
     tau%nnb = tau%n * tau%nb
     n   = tau%n
     nnb = tau%nnb
-    allocate(tau%upt0(n,n))
-    allocate(tau%up0t(n,n))
-    allocate(tau%up00(n,n))
-    allocate(tau%uptt(n,n))
-    allocate(tau%A_up(nnb,nnb))
+    allocate(tau%upt0(n, n))
+    allocate(tau%up0t(n, n))
+    allocate(tau%up00(n, n))
+    allocate(tau%uptt(n, n))
+    allocate(tau%A_up(nnb, nnb))
     if (tau%comp_dn .or. .not.tau%neg_u) then
-       allocate(tau%dnt0(n,n))
-       allocate(tau%dn0t(n,n))
-       allocate(tau%dn00(n,n))
-       allocate(tau%dntt(n,n))
-       allocate(tau%A_dn(nnb,nnb))
+       allocate(tau%dnt0(n, n))
+       allocate(tau%dn0t(n, n))
+       allocate(tau%dn00(n, n))
+       allocate(tau%dntt(n, n))
+       allocate(tau%A_dn(nnb, nnb))
     else
        tau%dnt0    => tau%upt0
        tau%dn0t    => tau%up0t
@@ -179,10 +177,10 @@ contains
 
     ! sgn and itaus are identical when .not.comp_dn
     allocate(tau%sgnup)
-    allocate(tau%itau_up(nnb))
+    allocate(tau%itau_up(tau%nb))
     if (tau%comp_dn) then
        allocate(tau%sgndn)
-       allocate(tau%itau_dn(nnb))
+       allocate(tau%itau_dn(tau%nb))
     else
        tau%sgndn   => tau%sgnup
        tau%itau_dn => tau%itau_up
@@ -283,7 +281,7 @@ contains
     L     = tau%L
     isl   = mod(slice-1,nor)+1
 
-    if (spin.eq.TAU_UP .or. tau%comp_dn) then
+    if (spin==TAU_UP .or. tau%comp_dn) then
 
        call dqmc_gtau_setAlias(spin, tau, A=A, V=V, B=B, sgn=s, itau=t)
        ! making A
@@ -306,7 +304,7 @@ contains
              call DQMC_MultB_Right(n, tau%W3, B, V(:,k), tau%W2)
           enddo
           ! Subdiagonal blocks need negative sign
-          if (i .gt. 0) tau%W3 = -tau%W3
+          if (i > 0) tau%W3 = -tau%W3
           j = mod(i+nb-1, nb) 
           A(i*n+1:(i+1)*n, j*n+1:(j+1)*n) = tau%W3
        end do
@@ -314,8 +312,8 @@ contains
        call lapack_dgetrf(nnb, nnb, A, nnb, tau%IW, info)
        s = ONE
        do i = 1, nnb
-         if (tau%IW(i).ne. i)  s = -s
-         if (A(i,i) .lt. ZERO) s = -s
+         if (tau%IW(i)/= i)  s = -s
+         if (A(i,i) < ZERO) s = -s
        enddo
        call lapack_dgetri(nnb, A, nnb, tau%IW, tau%W1, tau%lw, info)
 
@@ -323,13 +321,13 @@ contains
 
        ! Use p-h symmetry to fill A_dn
        s => tau%sgndn
-       do i = 0, nb-1
-          do j = 0, nb-1
-             gtau1  => tau%A_up(i*n+1:(i+1)*n, j*n+1:(j+1)*n)
-             gtau2 => tau%A_dn(j*n+1:(j+1)*n, i*n+1:(i+1)*n)
+       do i = 0, nb - 1
+          do j = 0, nb - 1
+             gtau1  => tau%A_up(i * n + 1: (i + 1) * n, j * n + 1:(j + 1) * n)
+             gtau2 => tau%A_dn(j * n + 1: (j + 1) * n, i * n + 1:(i + 1) * n)
              do h = 1, n
                 do k = 1, n
-                   gtau2(h,k) = -tau%P(k)*tau%P(h)*gtau1(k,h)
+                   gtau2(h,k) = -tau%P(k) * tau%P(h) * gtau1(k,h)
                 enddo
              enddo
           enddo
@@ -340,7 +338,7 @@ contains
        enddo
 
     else
-       ! Negative U case with identical non-intercating parts
+       ! Negative U case with identical non-interacting parts
        s => tau%sgndn
     endif
 
@@ -409,7 +407,7 @@ contains
     j0 = (i0-1) * n
     gt0 = A(jt+1:jt+n, j0+1:j0+n)
     g0t = A(j0+1:j0+n, jt+1:jt+n)
-    if (i0 .eq. it) then
+    if (i0 == it) then
        do i = 1, n
           g0t(i,i) = g0t(i,i) - ONE 
        enddo
@@ -450,9 +448,9 @@ contains
     
     ! Find increment
     d0 = i0 - tau%i0_up
-    if (abs(d0) .gt. L/2) d0 = d0 - sign(L, d0)
+    if (abs(d0) > L/2) d0 = d0 - sign(L, d0)
     dt = it - tau%it_up
-    if (abs(dt) .gt. L/2) dt = dt - sign(L, dt)
+    if (abs(dt) > L/2) dt = dt - sign(L, dt)
 
     if (abs(dt) + abs(d0) ==  1) then
        ! reduce safe count
@@ -473,7 +471,7 @@ contains
     end if
 
     ! compute Gtau
-    if (tau%sfc .ne. 0) then 
+    if (tau%sfc /= 0) then 
        ! Update Gtau 
        call DQMC_change_gtau_time(tau, idx, TAU_UP)
        call DQMC_change_gtau_time(tau, idx, TAU_DN)
@@ -634,7 +632,7 @@ contains
     !hat1  => tau%v3
     !hat2  => tau%v4
 
-    !if(spin .eq. TAU_UP) then
+    !if(spin == TAU_UP) then
     !   SB1 => tau%SB1_up
     !   SB2 => tau%SB2_up
     !   V   => tau%V_up
@@ -661,7 +659,7 @@ contains
 
     info = 0
 
-    if (it.lt.1 .or. it.gt.tau%L .or. i0.lt.1 .or. i0.gt.tau%L) then
+    if (it<1 .or. it>tau%L .or. i0<1 .or. i0>tau%L) then
       write(*,'(A)')"GetGtau can only work with indices in [1,L]. Stop."
       stop
     endif
@@ -684,7 +682,7 @@ contains
        which = TAU_T0
     endif
     
-    if (which .eq. TAU_T0 .or. which .eq. TAU_BOTH) then
+    if (which == TAU_T0 .or. which == TAU_BOTH) then
        !
        ! STEP 2.  D_1 = inv(barD_1)*hatD_1
        !          D_2 = inv(barD_2)*hatD_2
@@ -712,14 +710,14 @@ contains
        ! W_1 = inv(W_2')*W_1 = inv(T_1')*T_2'
        call lapack_dgetrf(n, n, W2, n, pvt1, info)
        call lapack_dgetrs('T', n, n, W2, n, pvt1, W1, n, info)
-       if (info .ne. 0) then
+       if (info /= 0) then
           call DQMC_Error("Error: dgetrs(1) in dqmc_getgtau.", info)
        end if
 
        ! T_2 = transpose(W_1) = transpose(inv(T_1')*T_2') = T_2*inv(T_1)
        call DQMC_trans(n, T2, W1)
        
-       if (tau%which.eq.TAU_T0) then
+       if (tau%which==TAU_T0) then
           ! if only Row is computed, then T1 is not reference, reuse it 
           call blas_dcopy(n*n,gt0(:,1),1,T1(:,1),1)
        end if
@@ -757,7 +755,7 @@ contains
        ! gt0 = inv(W_1)*inv(barD_2)*inv(U_2)
        call lapack_dgesv(n, n, W1, n, pvt2, gt0, n, info)
 
-       if (info .ne. 0) then
+       if (info /= 0) then
           call DQMC_Error("Error: dgesv(2) in dqmc_getgtau.", info)
        end if
        
@@ -767,7 +765,7 @@ contains
        ! gt0 = inv(T_1)*gt0
        !      = inv(T_1)*inv(barD_1)*inv(C)*inv(barD_2)*inv(U_2)
        call lapack_dgetrs('N', n, n, W2, n, pvt1, gt0, n, info)
-       if (info .ne. 0) then
+       if (info /= 0) then
           call DQMC_Error("Error: dgetrs(1) in dqmc_getgtau.", info)
        end if
 
@@ -777,21 +775,21 @@ contains
     ! Compute g0t, repeat step 2, 3, 4 for Gji
     ! ==========================================
 
-    if (which.eq.TAU_0T .or. which .eq. TAU_BOTH) then       
+    if (which==TAU_0T .or. which == TAU_BOTH) then       
        !
        ! STEP 5.  inv(D_1) = barD_1*hatD_1
        !          inv(D_2) = barD_2*hatD_2
        ! ======================================
        !
        do i = 1, n
-          if (D1(i) .eq. ZERO) then
+          if (D1(i) == ZERO) then
              call DQMC_Error("Error: in dqmc_getgtau, D1(i)=0.0, i=", i)
           end if
           D1(i) = ONE / D1(i)
           bar1i(i) = ONE / max(ONE, D1(i))
           hat1(i) = D1(i) * bar1i(i)
 
-          if (D2(i) .eq. ZERO) then
+          if (D2(i) == ZERO) then
              call DQMC_Error("Error: in dqmc_getgtau, D2(i)=0.0, i=", i)
           end if
           D2(i) = ONE / D2(i)
@@ -803,14 +801,14 @@ contains
        ! STEP 6. Compute g0t = hatD_1*inv(U_1)U_2*inv(barD_2)+
        !                        inv(barD_1)T_1*inv(T_2)hatD_2
        ! =======================================================   
-       if (tau%which .eq. TAU_BOTH) then
+       if (tau%which == TAU_BOTH) then
           ! Previously, T_2 = T_2*inv(T_1)
           !             U_1 = inv(U_2)*U_1
           ! Therefore, we only need to invert them.
           
           ! first, compute inv(barD_1)T_1*inv(T_2)hatD_2          
           call lapack_dgetrf(n, n, T2, n, pvt1, info)
-          if (info .ne. 0) then
+          if (info /= 0) then
              call DQMC_Error("Error: dgetrf(1) in dqmc_getgtau.", info)
           end if
           call lapack_dgetri(n, T2, n, pvt1, rw, lw(LA_GETRI), info)
@@ -828,7 +826,7 @@ contains
           !     W_1 = inv(T_2')*W_1 = inv(T_2')*T_1'
           call lapack_dgetrf(n, n, T2, n, pvt1, info)
           call lapack_dgetrs('T', n, n, T2, n, pvt1, W1, n, info)
-          if (info .ne. 0) then
+          if (info /= 0) then
              call DQMC_Error("Error: dgetrs(1) in dqmc_getgtau.", info)
           end if
           !     T_2 = W_1' = (inv(T_2')*T_1')' = T_1*inv(T_2)
@@ -857,7 +855,7 @@ contains
        !
        call DQMC_ScaleRow(n, T1, bar1i)
        call lapack_dgesv(n, n, W1, n, pvt1, T1, n, info)
-       if (info .ne. 0) then
+       if (info /= 0) then
           call DQMC_Error("Error: dgesv(3) in dqmc_getgtau.", info)
        end if
        
@@ -880,7 +878,7 @@ contains
       if ( tau%which > TAU_T0 ) g0t = -g0t
     endif
 
-    if (spin .eq. TAU_UP) then
+    if (spin == TAU_UP) then
        tau%it_up = it
        tau%i0_up = i0
     else
@@ -896,9 +894,9 @@ contains
     !
     ! Purpose
     ! =======
-    ! This subroutine computes a new Gtau which is adjecent 
+    ! This subroutine computes a new Gtau which is adjacent 
     ! to the one stored in tau using the recursion relations. 
-    ! idir specifies which one of the adjecent four G has to be 
+    ! idir specifies which one of the adjacent four G has to be 
     ! computed. 
     !
     ! tau contains (or may contain) two blocks : 
@@ -944,7 +942,7 @@ contains
 
     call dqmc_gtau_setAlias(spin, tau, B=B, V=V, gt0=gt0, g0t=g0t, g00=g00, gtt=gtt, it=it, i0=i0)
 
-    if(tau%which .le. TAU_BOTH) then
+    if(tau%which <= TAU_BOTH) then
 
        select case (idir)
 
@@ -1017,7 +1015,7 @@ contains
 
     endif
 
-    if(tau%which .ge. TAU_BOTH) then
+    if(tau%which >= TAU_BOTH) then
 
        select case (idir)
 
@@ -1036,7 +1034,7 @@ contains
           !Final G is equal time. Handle G(j,i) properly.
           if (i0 == i) then
              do id = 1, n
-                g0t(id,id) = -1.d0 + g0t(id,id)
+                g0t(id,id) = -1.d0 + g0t(id, id)
              enddo
           endif
 
@@ -1045,13 +1043,13 @@ contains
           !Initial G is equal time. Handle G(j,i) properly.
           if(i0 == i)then
              do id = 1, n
-                g0t(id,id) = 1.d0 + g0t(id,id)
+                g0t(id,id) = 1.d0 + g0t(id, id)
              enddo
           endif
-          call DQMC_MultB_Right(n, g0t, B, V(:,i), W)
+          call DQMC_MultB_Right(n, g0t, B, V(:, i), W)
           ! Update equal time G at t 
-          call DQMC_MultBi_Left  (n, gtt, B, V(:,i), W)
-          call DQMC_MultB_Right(n, gtt, B, V(:,i), W)
+          call DQMC_MultBi_Left  (n, gtt, B, V(:, i), W)
+          call DQMC_MultB_Right(n, gtt, B, V(:, i), W)
           !Time wrapped through zero. Need to change sign.
           if(i == 1)then
             g0t = -g0t
@@ -1192,8 +1190,8 @@ contains
 
        allocate(tau%e0up(n))
        allocate(tau%e0dn(n))
-       allocate(tau%U0up(n,n))
-       allocate(tau%U0dn(n,n))
+       allocate(tau%U0up(n, n))
+       allocate(tau%U0dn(n, n))
 
        tau%W1 = 1.0_wp
 
@@ -1206,21 +1204,21 @@ contains
 
     endif
 
-    if (spin .eq. TAU_UP .or. spin .eq. 0) then
+    if (spin == TAU_UP .or. spin == 0) then
        g = tau%e0up**slice / (1.0_wp + tau%e0up**L)
        call dcopy(n*n, tau%U0up(:,1), 1, tau%W2(:,1), 1)
        call dqmc_scaleCol(n, tau%W2, g)
        call dgemm('N','C', n, n, n, alpha, tau%W2, n, tau%U0up, n, beta, g0tau, n)
     endif
 
-    if (spin .eq. TAU_DN .or. spin .eq. 0) then
+    if (spin == TAU_DN .or. spin == 0) then
        g = tau%e0dn**slice / (1.0_wp + tau%e0dn**L)
-       call dcopy(n*n, tau%U0dn(:,1), 1, tau%W2(:,1), 1)
+       call dcopy(n * n, tau%U0dn(:, 1), 1, tau%W2(:, 1), 1)
        call dqmc_scaleCol(n, tau%W2, g)
        call dgemm('N','C', n, n, n, alpha, tau%W2, n, tau%U0dn, n, beta, g0tau, n)
     endif
 
-    if (spin .eq. 0) g0tau = g0tau / 2
+    if (spin == 0) g0tau = g0tau / 2
 
   end subroutine DQMC_Gtau_GetG0
 
