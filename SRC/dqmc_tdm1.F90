@@ -565,10 +565,14 @@ contains
           do j = 1, T1%properties(IDENS)%n
              ! k is the distance index of site i and site j
              k = T1%properties(IDENS)%D(i,j)
-             value1(k)  = value1(k) - (up0t(j,i)*upt0(i,j) &
-               + dn0t(j,i)*dnt0(i,j) - (uptt(i,i)+dntt(i,i))*(up00(j,j)+dn00(j,j)) )*0.5_wp
+             value1(k)  = value1(k) - ( up0t(j,i)*upt0(i,j) &
+               + dn0t(j,i)*dnt0(i,j) - (uptt(i,i)+dntt(i,i))*(up00(j,j)+dn00(j,j)) &
+               - 2.0_wp*(1.0_wp - uptt(i,i) - up00(j,j) ) &
+               - 2.0_wp*(1.0_wp - dntt(i,i) - dn00(j,j) ) )*0.5_wp
              value2(k)  = value2(k) - (dn0t(i,j)*dnt0(j,i) &
-               + up0t(i,j)*upt0(j,i) - (uptt(j,j)+dntt(j,j))*(up00(i,i)+dn00(i,i)) )*0.5_wp
+               + up0t(i,j)*upt0(j,i) - (uptt(j,j)+dntt(j,j))*(up00(i,i)+dn00(i,i)) &
+               - 2.0_wp*(1.0_wp - up00(i,i) - uptt(j,j) ) &
+               - 2.0_wp*(1.0_wp - dn00(i,i) - dntt(j,j) ) )*0.5_wp
           end do
        end do
 
@@ -585,7 +589,7 @@ contains
           end do
        end do
 
-       ! Uniform (q=0) current structure factor. Used to get approximated dc conductivity.
+       ! Uniform (q=0) current structure factor. This quantity can be used to get approximated dc conductivity.
        value1  => T1%properties(ICOND)%values(:, dt1, T1%tmp)
        value2  => T1%properties(ICOND)%values(:, dt2, T1%tmp)
 
@@ -714,8 +718,11 @@ contains
           do j = 1, T1%properties(IDENS)%n
              ! k is the distance index of site i and site j
              k = T1%properties(IDENS)%D(i,j)
-             value1(k)  = value1(k) - (up0t(j,i)*upt0(i,j) &
-               + dn0t(j,i)*dnt0(i,j) - (uptt(i,i)+dntt(i,i))*(up00(j,j)+dn00(j,j)) )
+             value1(k)  = value1(k) - ( up0t(j,i)*upt0(i,j) &
+               + dn0t(j,i)*dnt0(i,j) - (uptt(i,i)+dntt(i,i))*(up00(j,j)+dn00(j,j)) &
+               - 2.0_wp*(1.0_wp - uptt(i,i) - up00(j,j) ) &
+               - 2.0_wp*(1.0_wp - dntt(i,i) - dn00(j,j) ) )
+
           end do
        end do
 
