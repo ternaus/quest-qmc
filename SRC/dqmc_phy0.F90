@@ -749,10 +749,10 @@ contains
                t_dn(A(j))*G_dn(r(j),i)
        end do
        P0%meas(P0_KE, tmp)  = P0%meas(P0_KE, tmp)            - &
-            mu_up(S%Map(i)) * P0%up(i) - &
-            mu_dn(S%Map(i)) * P0%dn(i)
-            !(mu_up(S%Map(i)) + 0.5d0*U(S%map(i))) * P0%up(i) - &
-            !(mu_dn(S%Map(i)) + 0.5d0*U(S%map(i))) * P0%dn(i)
+            (mu_up(S%Map(i)) + 0.5d0*U(S%map(i))) * P0%up(i) - &
+            (mu_dn(S%Map(i)) + 0.5d0*U(S%map(i))) * P0%dn(i)
+            !mu_up(S%Map(i)) * P0%up(i) - &
+            !mu_dn(S%Map(i)) * P0%dn(i)
     end do
 
     !=========================================!
