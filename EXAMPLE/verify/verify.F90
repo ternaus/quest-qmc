@@ -250,12 +250,12 @@ contains
     ! Executable
     if (err /= ZERO) then
        ratio = abs(theo - avg) / err
-       write(STDOUT,FMT_CMP) name, theo, avg, err, ratio, ONE
+       write(STDOUT, FMT_CMP) name, theo, avg, err, ratio, ONE
        index = ceiling(ratio)
        if (index > 3) index = 3
     else
        ratio = abs(theo - avg)
-       write(STDOUT,FMT_CMP) name, theo, avg, err, ratio, ZERO
+       write(STDOUT, FMT_CMP) name, theo, avg, err, ratio, ZERO
        if(ratio <= 1.0D-10) then
           index = 1
        else

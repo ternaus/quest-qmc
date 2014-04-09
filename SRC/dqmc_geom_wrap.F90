@@ -22,7 +22,7 @@ module DQMC_GEOM_WRAP
 
   contains
 
-  subroutine DQMC_Geom_Fill(gwrap,gfile,cfg,SOP)
+  subroutine DQMC_Geom_Fill(gwrap, gfile, cfg, SOP)
 
     type(GeomWrap),    intent(inout)  :: gwrap
     type(config), intent(inout)       :: cfg
@@ -180,24 +180,24 @@ module DQMC_GEOM_WRAP
     allocate(S%F(S%nClass))
     allocate(S%clabel(S%nClass))
 
-    S%D(1:n,1:n) =  gwrap%Lattice%myclass(0:n-1,0:n-1)
+    S%D(1:n,1:n) =  gwrap%Lattice%myclass(0: n - 1, 0: n - 1)
     S%F(:)       =  gwrap%Lattice%class_size(:)
     clab         => gwrap%Lattice%class_label
-    do ic=1,S%nClass
-       ! 03/26/2013: added orbital index to clab(ic,4) and clab(ic,5)
-       write(S%clabel(ic),'(2(i3),3(f8.4))') (int(clab(ic,j)),j=4,5),(clab(ic,j),j=1,3)
+    do ic = 1, S%nClass       
+      !write(S%clabel(ic), '(2(i3), 3(f8.4))') (int(clab(ic, j)), j = 4, 5), (clab(ic, j), j = 1, 3)       
+      write(S%clabel(ic),'(3(i3),3(f7.4))') (int(clab(ic,j)),j=4,5),S%F(ic),(clab(ic,j),j=1,3)    
     enddo
 
     !store GF phase
     allocate(S%gf_phase(n,n))
-    do i=1,n
-       do j=1,n
+    do i = 1, n
+       do j = 1, n
           !if(abs(int(gwrap%lattice%gf_phase(i-1,j-1)))/=1)stop 'Problem with gf_phase'
           !S%gf_phase(i,j)=int(gwrap%Lattice%gf_phase(i-1,j-1))
-          S%gf_phase(i,j)=gwrap%Lattice%gf_phase(i-1,j-1)
+          S%gf_phase(i, j) = gwrap%Lattice%gf_phase(i - 1, j - 1)
        enddo
     enddo
-    allocate(S%chi_phase(n,n))
+    allocate(S%chi_phase(n, n))
     S%chi_phase = 1
     S%checklist(STRUCT_CLASS)=.true.    
 

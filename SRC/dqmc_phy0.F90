@@ -159,21 +159,21 @@ module DQMC_Phy0
      integer :: IARRFT(1:narrays+1)
      integer :: IARREV(1:narrays+1)
 
-     real(wp), pointer   :: AllProp(:,:)             ! Vector of all properties
-     real(wp), pointer   :: AllPropFT(:,:)           ! Matrix of FT 
-     real(wp), pointer   :: AllPropEigVal(:,:)       ! Vector of Fourier transforms
-     complex*16, pointer :: AllPropEigVec(:,:,:,:)   ! Vector with the normal modes
+     real(wp), pointer   :: AllProp(:, :)             ! Vector of all properties
+     real(wp), pointer   :: AllPropFT(:, :)           ! Matrix of FT 
+     real(wp), pointer   :: AllPropEigVal(:, :)       ! Vector of Fourier transforms
+     complex*16, pointer :: AllPropEigVec(:, :, :, :)   ! Vector with the normal modes
 
      !Pointers to AllProp
-     real(wp), pointer :: G_fun(:,:)    ! Green's function
-     real(wp), pointer :: Gf_up(:,:)    ! Green's function
-     real(wp), pointer :: Gf_dn(:,:)    ! Green's function
-     real(wp), pointer :: SpinXX(:,:)   ! XX Spin correlation function
-     real(wp), pointer :: SpinZZ(:,:)   ! ZZ Spin correlation function
-     real(wp), pointer :: AveSpin(:,:)  ! Ave Spin correlation function
-     real(wp), pointer :: Den0(:,:)     ! Density-density correlation 
-     real(wp), pointer :: Den1(:,:)     ! up-up (0) and up-dn (1) 
-     real(wp), pointer :: Pair(:,:)     ! on-site pairing
+     real(wp), pointer :: G_fun(:, :)    ! Green's function
+     real(wp), pointer :: Gf_up(:, :)    ! Green's function
+     real(wp), pointer :: Gf_dn(:, :)    ! Green's function
+     real(wp), pointer :: SpinXX(:, :)   ! XX Spin correlation function
+     real(wp), pointer :: SpinZZ(:, :)   ! ZZ Spin correlation function
+     real(wp), pointer :: AveSpin(:, :)  ! Ave Spin correlation function
+     real(wp), pointer :: Den0(:, :)     ! Density-density correlation 
+     real(wp), pointer :: Den1(:, :)     ! up-up (0) and up-dn (1) 
+     real(wp), pointer :: Pair(:, :)     ! on-site pairing
 
      ! working space
      real(wp), pointer :: up(:) 
@@ -242,16 +242,16 @@ contains
        P0%IARR(i) = P0%nmeas + 1 + (i-1)*P0%nClass 
     enddo
  
-    P0%meas    => P0%AllProp(P0%IARR(IMEAS):P0%IARR(IMEAS+1)-1,:)
-    P0%G_fun   => P0%AllProp(P0%IARR(IGFUN):P0%IARR(IGFUN+1)-1,:)
-    P0%Gf_up   => P0%AllProp(P0%IARR(IGFUP):P0%IARR(IGFUP+1)-1,:)
-    P0%Gf_dn   => P0%AllProp(P0%IARR(IGFDN):P0%IARR(IGFDN+1)-1,:)
-    P0%SpinXX  => P0%AllProp(P0%IARR(ISPXX):P0%IARR(ISPXX+1)-1,:)
-    P0%SpinZZ  => P0%AllProp(P0%IARR(ISPZZ):P0%IARR(ISPZZ+1)-1,:)
-    P0%AveSpin => P0%AllProp(P0%IARR(IAVSP):P0%IARR(IAVSP+1)-1,:)
-    P0%Den0    => P0%AllProp(P0%IARR(IDEN0):P0%IARR(IDEN0+1)-1,:)
-    P0%Den1    => P0%AllProp(P0%IARR(IDEN1):P0%IARR(IDEN1+1)-1,:)
-    P0%Pair    => P0%AllProp(P0%IARR(IPAIR):P0%IARR(IPAIR+1)-1,:)
+    P0%meas    => P0%AllProp(P0%IARR(IMEAS):P0%IARR(IMEAS + 1) - 1, :)
+    P0%G_fun   => P0%AllProp(P0%IARR(IGFUN):P0%IARR(IGFUN + 1) - 1, :)
+    P0%Gf_up   => P0%AllProp(P0%IARR(IGFUP):P0%IARR(IGFUP + 1) - 1, :)
+    P0%Gf_dn   => P0%AllProp(P0%IARR(IGFDN):P0%IARR(IGFDN + 1) - 1, :)
+    P0%SpinXX  => P0%AllProp(P0%IARR(ISPXX):P0%IARR(ISPXX + 1) - 1, :)
+    P0%SpinZZ  => P0%AllProp(P0%IARR(ISPZZ):P0%IARR(ISPZZ + 1) - 1, :)
+    P0%AveSpin => P0%AllProp(P0%IARR(IAVSP):P0%IARR(IAVSP + 1) - 1, :)
+    P0%Den0    => P0%AllProp(P0%IARR(IDEN0):P0%IARR(IDEN0 + 1) - 1, :)
+    P0%Den1    => P0%AllProp(P0%IARR(IDEN1):P0%IARR(IDEN1 + 1) - 1, :)
+    P0%Pair    => P0%AllProp(P0%IARR(IPAIR):P0%IARR(IPAIR + 1) - 1, :)
 
     !allocate(P0%meas(P0%nMeas, nBin+2))
     !allocate(P0%sign(3, nBin+2))
@@ -367,12 +367,12 @@ contains
     if (P0%cnt == 0) then
        call DQMC_Error("Phy0 normalize: cnt = 0", 0)
     end if
-    factor = ONE/P0%cnt
+    factor = ONE / P0%cnt
 
     ! total occupancy = nup + ndn
     P0%meas(P0_DENSITY, idx) = P0%meas(P0_NUP, idx)+&
          P0%meas(P0_NDN, idx)
-    ! total energy = kenitic energy + potential
+    ! total energy = kinetic energy + potential
     P0%meas(P0_ENERGY, idx) = P0%meas(P0_KE, idx)+&
          P0%meas(P0_NUD, idx) 
     ! average
@@ -381,20 +381,20 @@ contains
 
     if (P0%compSAF) then
        ! The sqaure terms
-       P0%meas(P0_SAFSQ, idx)=sqrt(abs(P0%meas(P0_SAFSQ, idx)))
-       P0%meas(P0_SAF2SQ,idx)=sqrt(abs(P0%meas(P0_SAF2SQ,idx)))
+       P0%meas(P0_SAFSQ, idx) = sqrt(abs(P0%meas(P0_SAFSQ, idx)))
+       P0%meas(P0_SAF2SQ, idx) = sqrt(abs(P0%meas(P0_SAF2SQ, idx)))
     end if
 
     ! This list terms
     n = P0%nClass
-    call blas_dscal(n, factor, P0%G_fun (1:n,idx), 1)
-    call blas_dscal(n, factor, P0%Gf_up (1:n,idx), 1)
-    call blas_dscal(n, factor, P0%Gf_dn (1:n,idx), 1)
-    call blas_dscal(n, factor, P0%SpinXX(1:n,idx), 1)
-    call blas_dscal(n, factor, P0%SpinZZ(1:n,idx), 1)
-    call blas_dscal(n, factor, P0%Den0  (1:n,idx), 1)
-    call blas_dscal(n, factor, P0%Den1  (1:n,idx), 1)
-    call blas_dscal(n, factor, P0%Pair  (1:n,idx), 1)
+    call blas_dscal(n, factor, P0%G_fun (1:n, idx), 1)
+    call blas_dscal(n, factor, P0%Gf_up (1:n, idx), 1)
+    call blas_dscal(n, factor, P0%Gf_dn (1:n, idx), 1)
+    call blas_dscal(n, factor, P0%SpinXX(1:n, idx), 1)
+    call blas_dscal(n, factor, P0%SpinZZ(1:n, idx), 1)
+    call blas_dscal(n, factor, P0%Den0  (1:n, idx), 1)
+    call blas_dscal(n, factor, P0%Den1  (1:n, idx), 1)
+    call blas_dscal(n, factor, P0%Pair  (1:n, idx), 1)
 
     ! Change bin
     P0%idx = P0%idx + 1
@@ -597,10 +597,10 @@ contains
        ! Deal with error and expectation values of cv and chi_thermal properly
        P0%meas(P0_CHIT,1:avg) = P0%meas(P0_CHIT,1:avg) - P0%n * P0%beta**2 * P0%meas(P0_ENERGY,1:avg) &
           * P0%meas(P0_DENSITY,1:avg)
-       P0%meas(P0_CV,1:avg) = P0%meas(P0_CV,1:avg) - P0%n * (P0%beta * P0%meas(P0_ENERGY,1:avg))**2
+       P0%meas(P0_CV, 1:avg) = P0%meas(P0_CV, 1:avg) - P0%n * (P0%beta * P0%meas(P0_ENERGY, 1:avg))**2       
 
-       P0%meas(P0_CV,err) = sqrt((n-1)*sum((P0%meas(P0_CV,1:n) - P0%meas(P0_CV,avg))**2))
-       P0%meas(P0_CHIT,err) = sqrt((n-1)*sum((P0%meas(P0_CHIT,1:n) - P0%meas(P0_CHIT,avg))**2))
+       P0%meas(P0_CV, err) = sqrt((n-1) * sum((P0%meas(P0_CV, 1:n) - P0%meas(P0_CV, avg))**2))
+       P0%meas(P0_CHIT, err) = sqrt((n-1) * sum((P0%meas(P0_CHIT, 1:n) - P0%meas(P0_CHIT, avg))**2))
 
     else
 
@@ -803,12 +803,12 @@ contains
     do i = 1, n
        un = ONE
        do k = 1, n 
-          un = un - G_up(i,k)*G_up(k,i)
+          un = un - G_up(i, k) * G_up(k, i)
        enddo
        P0%meas(P0_CHIT,tmp) = P0%meas(P0_CHIT,tmp) +  un*P0%dn(i)*U(S%Map(i))
        un = ONE
        do k = 1, n 
-          un = un - G_dn(i,k)*G_dn(k,i)
+          un = un - G_dn(i,k) * G_dn(k,i)
        enddo
        P0%meas(P0_CHIT,tmp) = P0%meas(P0_CHIT,tmp) + un*P0%up(i)*U(S%Map(i))
     enddo
@@ -822,11 +822,11 @@ contains
     !=========================================!
 
     !< T T >
-    P0%meas(P0_CV,tmp) = (Tbar - Cbar)**2 
+    P0%meas(P0_CV, tmp) = (Tbar - Cbar)**2 
     do i = 1, n
        do j = 1, n 
-          P0%meas(P0_CV,tmp) = P0%meas(P0_CV,tmp) + (h_up(i,j) - A_up(i,j)) * A_up(j,i) &
-             + (h_dn(i,j) - A_dn(i,j)) * A_dn(j,i)
+          P0%meas(P0_CV, tmp) = P0%meas(P0_CV, tmp) + (h_up(i, j) - A_up(i, j)) * A_up(j, i) &
+             + (h_dn(i, j) - A_dn(i, j)) * A_dn(j, i)
        enddo
     enddo
     
@@ -1210,10 +1210,10 @@ contains
     ! ... Executable ...
     ii = 0 
     do i = 1, nkt
-       do ia = 0, na-1
-          do ja = ia, na-1
+       do ia = 0, na - 1
+          do ja = ia, na - 1
              ii = ii + 1
-             if (ia+ja == 0) then
+             if (ia + ja == 0) then
                 write(clabel(ii),'(3(i5))')i, ja, ia
              else
                 write(clabel(ii),'(5x,2(i5))')ja, ia
