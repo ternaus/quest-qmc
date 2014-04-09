@@ -28,11 +28,11 @@ program dqmc_verify
   !  Parameters
   ! ============
 
-  integer,      parameter  :: nx = 4, ny = 4, N = nx*ny
-  real(wp),     parameter  :: t(4)  = (/0.3_wp, 0.6_wp, ONE, ZERO/)
+  integer,      parameter  :: nx = 4, ny = 4, N = nx * ny
+  real(wp),     parameter  :: t(4)  = [0.3_wp, 0.6_wp, ONE, ZERO]
   real(wp),     parameter  :: dtau  =0.125_wp  
-  real(wp),     parameter  :: U(7)  = (/ONE, TWO, TWO * TWO, ZERO, -1, -2, -4/) 
-  real(wp),     parameter  :: mu(3) = (/HALF, ZERO, -HALF/) 
+  real(wp),     parameter  :: U(7)  = [ONE, TWO, TWO * TWO, ZERO, -1_wp, -2_wp, -4_wp]
+  real(wp),     parameter  :: mu(3) = [HALF, ZERO, -HALF]
   integer,      parameter  :: L = 12, HSF_IPT = -1, n_t = 1
   integer,      parameter  :: nWarm = 1000, nPass = 5000, nTry = 0
   integer,      parameter  :: nmeas = 12, nBin = 10, tausk = 10
@@ -56,7 +56,7 @@ program dqmc_verify
   
   type(Hubbard)      :: Hub 
   integer            :: i, j, k
-  real(wp)           :: theo, avg, err
+  real(wp)           :: rho, energy_total, avg, err, one_site_occupancy
   real(wp)           :: tmp1, tmp2, tmp3, beta
   real(wp)           :: lambda(N), X(N)
   real               :: t1, t2
@@ -104,7 +104,7 @@ program dqmc_verify
      
         ! Check against theoretical results
         write(STDOUT, *)
-        write(STDOUT, FMT_CONFIG) "t",ZERO,"mu",mu_up(i),"U",U(j),"beta",beta
+        write(STDOUT, FMT_CONFIG) "t", ZERO, "mu", mu_up(i), "U", U(j), "beta", beta
         write(STDOUT, FMT_DBLINE)
         write(STDOUT, FMT_TITLE) 
         write(STDOUT, FMT_SGLINE) 
@@ -118,9 +118,9 @@ program dqmc_verify
         tmp1 = exp((U(j) / TWO + mu(i)) * beta)
         tmp2 = exp(TWO * mu(i) * beta)
         tmp3 = ONE / (ONE + TWO * tmp1 + tmp2)
-        theo = TWO * (tmp1 + tmp2) * tmp3
+        rho = TWO * (tmp1 + tmp2) * tmp3
         call DQMC_Phy0_GetResult(Hub%P0, P0_DENSITY, name, avg, err)
-        call Display("          Density : ", theo, avg, err)
+        call Display("          Density : ", rho, avg, err)
      
         ! 2. One-site energy 
         !
@@ -129,10 +129,10 @@ program dqmc_verify
         !         1+2*exp((U/2+mu)*beta)+exp(2*mu*beta)
         !
         !    
-        theo  = U(j) * tmp2 * tmp3 - (mu(i) + U(j) / 2) * theo 
+        energy_total  = U(j) * tmp2 * tmp3 - (mu(i) + U(j) / 2) * rho
 
         call DQMC_Phy0_GetResult(Hub%P0, P0_ENERGY, name, avg, err)
-        call Display("          Energy : ", theo, avg, err)
+        call Display("          Energy : ", energy_total, avg, err)
      
         ! 3. One-site occupancy
         !        
@@ -140,9 +140,9 @@ program dqmc_verify
         !    PE = --------------------------------------
         !          1+2*exp((U/2+mu)*beta)+exp(2*mu*beta)
         !
-        theo = tmp2 * tmp3 * Hub%U(1)
+        one_site_occupancy = tmp2 * tmp3 * Hub%U(1)
         call DQMC_Phy0_GetResult(Hub%P0, P0_NUD, name, avg, err)
-        call Display(" Double occupancy : ", theo, avg, err)
+        call Display(" Double occupancy : ", one_site_occupancy, avg, err)
 
         write(STDOUT, FMT_DBLINE) 
      end do
@@ -195,14 +195,14 @@ program dqmc_verify
         !           kx = 0, 1, ... N_x-1
         !           ky = 0, 1, ... N_y-1
         !
-        theo = ZERO
+        rho = ZERO
         do k = 1, N
            x(k) = ONE/(ONE+exp(beta*(-t(j)*lambda(k)-mu(i))))
-           theo = theo + TWO*x(k)
+           rho = rho + TWO*x(k)
         end do
-        theo = theo/N
+        rho = rho / N
         call DQMC_Phy0_GetResult(Hub%P0, P0_DENSITY, name, avg, err)
-        call Display("          Density : ", theo, avg, err)
+        call Display("          Density : ", rho, avg, err)
         
      
         ! 2. One-site energy (not including chemical energy)
@@ -211,9 +211,9 @@ program dqmc_verify
         !     E = 1/N * sum_k -------------------
         !                      exp(beta*x_k)+1
         !
-        theo = -t(j)*TWO*dot_product(lambda,x)/N - mu(i)*theo
+        one_site_occupancy = -t(j) * TWO * dot_product(lambda, x) / N - mu(i) * rho
         call DQMC_Phy0_GetResult(Hub%P0, P0_ENERGY, name, avg, err)
-        call Display("          Energy : ", theo, avg, err)
+        call Display("          Energy : ", one_site_occupancy, avg, err)
              
         write(STDOUT, FMT_DBLINE) 
      end do
@@ -249,12 +249,12 @@ contains
     
     ! Executable
     if (err /= ZERO) then
-       ratio = abs(theo-avg)/err
+       ratio = abs(theo - avg) / err
        write(STDOUT,FMT_CMP) name, theo, avg, err, ratio, ONE
        index = ceiling(ratio)
        if (index > 3) index = 3
     else
-       ratio = abs(theo-avg)
+       ratio = abs(theo - avg)
        write(STDOUT,FMT_CMP) name, theo, avg, err, ratio, ZERO
        if(ratio <= 1.0D-10) then
           index = 1
