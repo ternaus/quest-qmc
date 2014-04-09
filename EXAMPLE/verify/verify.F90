@@ -125,11 +125,11 @@ program dqmc_verify
         ! 2. One-site energy 
         !
         !               U*exp(2*mu*beta)                   
-        !     E = ------------------------------------- - mu*rho
+        !     E = ------------------------------------- - (mu + U/2)*rho
         !         1+2*exp((U/2+mu)*beta)+exp(2*mu*beta)
         !
         !    
-        theo  = U(j) * tmp2 * tmp3 - mu(i) * theo 
+        theo  = U(j) * tmp2 * tmp3 - (mu(i) + U(j) / 2) * theo 
 
         call DQMC_Phy0_GetResult(Hub%P0, P0_ENERGY, name, avg, err)
         call Display("          Energy : ", theo, avg, err)
