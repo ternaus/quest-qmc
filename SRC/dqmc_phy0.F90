@@ -369,12 +369,6 @@ contains
     end if
     factor = ONE / P0%cnt
 
-    ! total occupancy = nup + ndn
-    P0%meas(P0_DENSITY, idx) = P0%meas(P0_NUP, idx)+&
-         P0%meas(P0_NDN, idx)
-    ! total energy = kinetic energy + potential
-    P0%meas(P0_ENERGY, idx) = P0%meas(P0_KE, idx)+&
-         P0%meas(P0_NUD, idx) 
     ! average
     P0%meas(:, idx) = P0%meas(:, idx) * factor
     P0%sign(:, idx) = P0%sign(:, idx) * factor
@@ -755,6 +749,16 @@ contains
             !mu_dn(S%Map(i)) * P0%dn(i)
     end do
 
+    !=========================================!
+    ! Total occupancy = nup + ndn
+    !=========================================!
+    P0%meas(P0_DENSITY, tmp) = P0%meas(P0_NUP, tmp)+&                                                                  
+         P0%meas(P0_NDN, tmp)       
+    !=========================================!
+    ! Total energy = kinetic energy + potential
+    !=========================================!
+    P0%meas(P0_ENERGY, tmp) = P0%meas(P0_KE, tmp)+&                                                                    
+         P0%meas(P0_NUD, tmp)
     !=========================================!
     ! Chi_thermal 
     !=========================================!
