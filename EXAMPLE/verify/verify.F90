@@ -84,13 +84,13 @@ program dqmc_verify
 
   ! Case 1: t=0, run through mu = -0.5, 0.0, 0.5 and U = 1, 2, 4
   ! ==============================================================
-  write(STDOUT,*)
+  write(STDOUT, *)
   write(STDOUT,"(a,i3,a,f6.3)") "A 4x4 periodic lattice with L =", L, &
        ", dtau=", dtau
-  write(STDOUT,*)
-  write(STDOUT,*) "=============================="
-  write(STDOUT,*) "| CASE 1. Single site (t=0)  |"
-  write(STDOUT,*) "=============================="
+  write(STDOUT, *)
+  write(STDOUT, *) "=============================="
+  write(STDOUT, *) "| CASE 1. Single site (t=0)  |"
+  write(STDOUT, *) "=============================="
   do i = 1, 3
      do j = 1, 7
         ! Initialize the parameter of the simulation
@@ -129,7 +129,7 @@ program dqmc_verify
         !         1+2*exp((U/2+mu)*beta)+exp(2*mu*beta)
         !
         !    
-        energy_total  = U(j) * tmp2 * tmp3 - (mu(i) + U(j) / 2) * rho
+        energy_total  = U(j) * tmp2 * tmp3 - (mu(i) + U(j) / 2) * rho + U(j) / 4
 
         call DQMC_Phy0_GetResult(Hub%P0, P0_ENERGY, name, avg, err)
         call Display("          Energy : ", energy_total, avg, err)
