@@ -11,7 +11,7 @@ mu_dn = {mu}
 L = {nSlices}
 dtau = {dtau}
 HSF = -1
-bcond = 0.0, 0.0, 0.0
+bcond = {bx}, {by}, {bz}
 #=======================
 # Metropolis Algorithm
 #=======================

@@ -1146,9 +1146,9 @@ contains
     ! =========
 
      integer, intent(out) :: INP_UNIT, OUT_UNIT
-     character(len=30), intent(out) :: fname
+     character(len=60), intent(out) :: fname
 
-     character(len=30) :: outname
+     character(len=60) :: outname
 
      !Open input file
      call get_command_argument(1, fname)

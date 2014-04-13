@@ -99,17 +99,17 @@ module DQMC_Phy0
 
   integer, parameter :: P0_SFERRO    = 9
   integer, parameter :: P0_SFER2     = 10
-  integer, parameter :: P0_SAF       = 11
-  integer, parameter :: P0_SAFSQ     = 12
-  integer, parameter :: P0_SAF2      = 13
-  integer, parameter :: P0_SAF2SQ    = 14
+  integer, parameter :: P0_SAF       = 15
+  integer, parameter :: P0_SAFSQ     = 16
+  integer, parameter :: P0_SAF2      = 17
+  integer, parameter :: P0_SAF2SQ    = 18
 
-  integer, parameter :: P0_potential_energy    = 15
-  integer, parameter :: P0_hopping_energy    = 16
-  integer, parameter :: P0_double_occupancy    = 17
-  integer, parameter :: P0_magnetisation_squared    = 18
+  integer, parameter :: P0_potential_energy    = 11
+  integer, parameter :: P0_hopping_energy    = 12
+  integer, parameter :: P0_double_occupancy    = 13
+  integer, parameter :: P0_magnetization_squared    = 14
 
-  integer, parameter :: P0_N_NO_SAF  = 10
+  integer, parameter :: P0_N_NO_SAF  = 14
   integer, parameter :: P0_N         = 18
 
   integer, parameter :: P0_SGN       = 1
@@ -129,14 +129,15 @@ module DQMC_Phy0
        "              Specific heat : ", &
        "  XX Ferro structure factor : ", &
        "  ZZ Ferro structure factor : ", &
-       "     XX AF structure factor : ", &
-       "  Root Mean Square of XX AF : ", &
-       "     ZZ AF structure factor : ", &
-       "  Root Mean Square of ZZ AF : ", &
        "           Potential energy : ", &
        "             Hopping energy : ", &
        "           Double occupancy : ", &
-       "      Magnetisation squared : "/)
+       "      Magnetization squared : ", &
+       "     XX AF structure factor : ", &
+       "  Root Mean Square of XX AF : ", &
+       "     ZZ AF structure factor : ", &
+       "  Root Mean Square of ZZ AF : "/)
+
   character(len=*), parameter :: P0_SIGN_STR(3) = (/&
        "                   Avg sign : ", &
        "                Avg up sign : ", &
@@ -781,7 +782,7 @@ contains
     !=================================================================! 
     ! Magnetisation squared = 1/4 (rho - 2 double_occupancy)    
     !=================================================================! 
-    P0%meas(P0_magnetisation_squared, tmp) = 0.25d0 * (P0%meas(P0_density, tmp) -&
+    P0%meas(P0_magnetization_squared, tmp) = 0.25d0 * (P0%meas(P0_density, tmp) -&
      2 * P0%meas(P0_double_occupancy, tmp))
 
     !=================================================================!

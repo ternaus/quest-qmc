@@ -183,8 +183,7 @@ contains
     real(wp), pointer :: U(:) => null()   
     real(wp), pointer :: mu_up(:) => null() 
     real(wp), pointer :: mu_dn(:) => null() 
-    real(wp) :: dtau, errrate, difflim, gamma, delta1, delta2
-    !character(len=30) :: fname, outname
+    real(wp) :: dtau, errrate, difflim, gamma, delta1, delta2    
 
     ! ... Executable ...
 
@@ -247,7 +246,7 @@ contains
              HSF = HSF_RANDOM_GEN
           end if
        end if
-    elseif (HSF .ne. HSF_FROM_MEMORY .and. HSF .ne. HSF_RANDOM_GEN) then
+    elseif (HSF /= HSF_FROM_MEMORY .and. HSF /= HSF_RANDOM_GEN) then
        call DQMC_Warning("Invalid HSF input: Use default", HSF)
        HSF = HSF_RANDOM_GEN
     end if
@@ -334,7 +333,7 @@ contains
     Hub%delta2   = delta2
 
     ! t parameter
-    if (n_t .ne. Hub%S%n_t) then
+    if (n_t /= Hub%S%n_t) then
        if (n_t == 1 .and. Hub%S%n_t > 1) then
           ! special case for checkerboard method
           Hub%n_t  = Hub%S%n_t
@@ -374,7 +373,7 @@ contains
 
     Hub%comp_dn = .true.
 
-    if ( all(U.lt.ZERO+1.d-6) )then
+    if ( all(U<ZERO+1.d-6) )then
        !Negative U and U=0
        Hub%neg_u = .true.
        if( maxval(abs(t_up-t_dn))<1.d-6 .and. maxval(abs(mu_up-mu_dn))<1.d-6 ) then
@@ -629,7 +628,7 @@ contains
     integer :: HSF(Hub%n*Hub%L+1)
 #   ifdef _QMC_MPI
        character :: rndbuf(MAX_PACKED_LENGTH) 
-       character(len=30) :: fname
+       character(len=60) :: fname
        integer   :: stat
 #   endif
 
@@ -642,7 +641,7 @@ contains
        !loop over processors
        do j = 0, nproc-1
           ! Collect data from processor "j"
-          if (j .ne. qmc_sim%aggr_root) then
+          if (j /= qmc_sim%aggr_root) then
 #            ifdef _QMC_MPI
                 call mpi_recv(HSF, nL+1, MPI_INT, j, j, MPI_COMM_WORLD, stat, k)
 #            endif
@@ -697,7 +696,7 @@ contains
 !#      ifdef _QMC_MPI
 !          do j = 0, nproc - 1
 !             ! Collect data from processor "j"
-!             if (j .ne. qmc_sim%aggr_root) then
+!             if (j /= qmc_sim%aggr_root) then
 !                call mpi_recv(k, 1, MPI_INT, j, j, MPI_COMM_WORLD, stat, i)
 !                call mpi_recv(rndbuf, k, MPI_CHARACTER, j, j, MPI_COMM_WORLD, stat, i)
 !             else
@@ -740,7 +739,7 @@ contains
            enddo
         enddo
         !Last element is the time slice
-        if (slice .le. 0) then
+        if (slice <= 0) then
            HSF(k) = Hub%G_up%ilb
         else
            HSF(k) = slice
@@ -865,27 +864,27 @@ contains
        if (Hub%n_U == 1) then
           FMT = FMT_STRDBL
        else
-          write(FMT, "('(a30,f19.6,(',I3,'(f12.6)))')") Hub%n_U-1
+          write(FMT, "('(a30,f19.6,(',I3,'(f12.6)))')") Hub%n_U - 1
        end if
        write(OPT,FMT)         "                          U : ", Hub%U
        if (Hub%n_t == 1) then
           FMT = FMT_STRDBL
        else
-          write(FMT, "('(a30,f19.6,(',I3,'(f12.6)))')") Hub%n_t-1
+          write(FMT, "('(a30,f19.6,(',I3,'(f12.6)))')") Hub%n_t - 1
        end if
        write(OPT,FMT)         "                       t_up : ", Hub%t_up
        write(OPT,FMT)         "                       t_dn : ", Hub%t_dn
        if (Hub%n_mu == 1) then
           FMT = FMT_STRDBL
        else
-          write(FMT, "('(a30,f19.6,(',I3,'(f12.6)))')") Hub%n_mu-1
+          write(FMT, "('(a30,f19.6,(',I3,'(f12.6)))')") Hub%n_mu - 1
        end if
        write(OPT,FMT)         "                      mu_up : ", Hub%mu_up
        write(OPT,FMT)         "                      mu_dn : ", Hub%mu_dn
        write(OPT,FMT_STRINT)  "             Time slice - L : ", Hub%L
        write(OPT,FMT_STRINT)  "            Number of sites : ", Hub%n
        write(OPT,FMT_STRDBL)  "                       dtau : ", Hub%dtau
-       write(OPT,FMT_STRDBL)  "                       beta : ", Hub%dtau*Hub%L
+       write(OPT,FMT_STRDBL)  "                       beta : ", Hub%dtau * Hub%L
        write(OPT,FMT_STRINT)  "     Number of warmup sweep : ", Hub%nWarm
        write(OPT,FMT_STRINT)  "Number of measurement sweep : ", Hub%nPass
        write(OPT,FMT_STRINT)  "   Frequency of measurement : ", Hub%nMeas
@@ -1156,7 +1155,7 @@ contains
           end if
 
           ! Compute the probability
-          if(r .le. ONE) then
+          if(r <= ONE) then
              p = r/(ONE+gamma*r)
           else
              p = r/(gamma+r)
@@ -1168,8 +1167,8 @@ contains
           if (p > randn) then
              accept_cnt = accept_cnt + 1
 
-             if(r_up .lt. ZERO) sgn_up = -sgn_up
-             if(r_dn .lt. ZERO) sgn_dn = -sgn_dn
+             if(r_up < ZERO) sgn_up = -sgn_up
+             if(r_dn < ZERO) sgn_dn = -sgn_dn
              HSF(j,i) = -HSF(j,i)
 
              ! Update G_up
@@ -1182,7 +1181,7 @@ contains
              Hub%G_up%nModify = i
              Hub%G_up%det = Hub%G_up%det - log(abs(r_up))
 
-             ! If mu .ne. zero, then update G_dn as well.
+             ! If mu /= zero, then update G_dn as well.
              if (comp_dn) then
                 ! Update G_dn
                 call DQMC_UpdateG(j,  alpha_dn/r_dn, Hub%G_dn)
@@ -1233,7 +1232,7 @@ contains
     !===========================!
     if(Hub%naccept+Hub%nreject > DQMC_CHECK_ITER) then
        accrat = dble(Hub%naccept)/dble(Hub%naccept+Hub%nreject)
-       if(accrat > DQMC_ACC_UP .or. accrat .lt. DQMC_ACC_LO)then
+       if(accrat > DQMC_ACC_UP .or. accrat < DQMC_ACC_LO)then
           Hub%gamma = Hub%gamma + (accrat - HALF)
           Hub%gamma = dmax1(ZERO,Hub%gamma)
           Hub%gamma = dmin1(ONE, Hub%gamma)
@@ -1295,7 +1294,7 @@ contains
     n = Hub%n
     L = Hub%L
     accept = 0
-    if (numTry .le. 0) return
+    if (numTry <= 0) return
     Map=> Hub%S%Map
 
     call ran0(1, ranSlice, Hub%seed)
@@ -1409,7 +1408,7 @@ contains
        end if
 
        ! Compare the ratio to a random number
-       if (ratexp .ge. ranList(i)) then
+       if (ratexp >= ranList(i)) then
           ! accept
           det_up = new_up
           det_dn = new_dn
@@ -1611,7 +1610,7 @@ contains
           r  = abs(r_up * r_dn)*exp(dE)
 
           ! Compute the probability
-          if(r .le. ONE) then
+          if(r <= ONE) then
              p = r/(ONE+gamma*r)
           else
              p = r/(gamma+r)
@@ -1623,8 +1622,8 @@ contains
           if (p > randn) then
              accept_cnt = accept_cnt + 1
 
-             if(r_up .lt. ZERO) sgn_up = -sgn_up
-             if(r_dn .lt. ZERO) sgn_dn = -sgn_dn
+             if(r_up < ZERO) sgn_up = -sgn_up
+             if(r_dn < ZERO) sgn_dn = -sgn_dn
 
              CHSF(j,i) = CHSF(j,i) + dx
 
@@ -1636,7 +1635,7 @@ contains
              V_up(j,i) = V_up(j,i) * (alpha_up + ONE)
              Hub%G_up%nModify = i
 
-             ! If mu .ne. zero, then update G_dn as well.
+             ! If mu /= zero, then update G_dn as well.
              if (comp_dn) then
                 ! Update G_dn
                 call DQMC_UpdateG(j,  alpha_dn/r_dn, Hub%G_dn)
@@ -1699,7 +1698,7 @@ contains
     !===========================!
     if(Hub%naccept+Hub%nreject > DQMC_CHECK_ITER) then
        accrat = dble(Hub%naccept)/dble(Hub%naccept+Hub%nreject)
-       if(accrat > DQMC_ACC_UP .or. accrat .lt. DQMC_ACC_LO)then
+       if(accrat > DQMC_ACC_UP .or. accrat < DQMC_ACC_LO)then
           Hub%gamma = Hub%gamma + (accrat - HALF)
           Hub%gamma = dmax1(ZERO,Hub%gamma)
           Hub%gamma = dmin1(ONE, Hub%gamma)
@@ -1757,7 +1756,7 @@ contains
     L = Hub%L
     accept = 0
     delta = Hub%delta2
-    if (numTry .le. 0) return
+    if (numTry <= 0) return
     Map  => Hub%S%Map
     CHSF => Hub%CHSF
     compute_dn = Hub%comp_dn .or. .not.Hub%neg_u
@@ -1877,7 +1876,7 @@ contains
        ! Compare the ratio to a random number
        ! add random number
        
-       if (ratexp .ge. ranList(i)) then    
+       if (ratexp >= ranList(i)) then    
           ! accept
           det_up = new_up
           det_dn = new_dn
@@ -2092,7 +2091,7 @@ contains
  
      ! 05/10/2012, CC
      ! Warning: if slice = 0, DQMC_Hub_Meas() would return meaningless results.
-     if (slice .le. 0 .or. slice > Hub%L) then
+     if (slice <= 0 .or. slice > Hub%L) then
        write(*,*) " In subroutine DQMC_Hub_Meas(Hub, slice), the argument 'slice' is out of bound."
        write(*,*) " It will now be reset randomly."
        call ran0(1, randn, Hub%seed)
@@ -2184,7 +2183,7 @@ contains
      ! Without the fix, the array size of Hub%V_up and Hub%V_dn would be 1 rather then n * L.
      ! This causes segmentation fault when running the test program. I'm not clear why this 
      ! happens ONLY to test, but not, say, verify and ggeom.
-     if (size(Hub%V_up) .ne. Hub%n*Hub%L) then
+     if (size(Hub%V_up) /= Hub%n*Hub%L) then
        allocate(Hub%V_up(Hub%n,Hub%L))
      end if
 
@@ -2210,7 +2209,7 @@ contains
            ! Without the fix, the array size of Hub%V_up and Hub%V_dn would be 1 rather then n * L.
            ! This causes segmentation fault when running the test program. I'm not clear why this 
            ! happens ONLY to test, but not, say, verify and gggeom.
-           if (size(Hub%V_dn) .ne. Hub%n*Hub%L) then
+           if (size(Hub%V_dn) /= Hub%n*Hub%L) then
              allocate(Hub%V_dn(Hub%n,Hub%L))
            end if
 
@@ -2242,7 +2241,7 @@ contains
            ! Without the fix, the array size of Hub%V_up and Hub%V_dn would be 1 rather then n * L.
            ! This causes segmentation fault when running the test program. I'm not clear why this 
            ! happens ONLY to test, but not, say, verify and gggeom.
-           if (size(Hub%V_dn) .ne. Hub%n*Hub%L) then
+           if (size(Hub%V_dn) /= Hub%n*Hub%L) then
              allocate(Hub%V_dn(Hub%n,Hub%L))
            end if
 

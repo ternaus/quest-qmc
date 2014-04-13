@@ -18,7 +18,7 @@ program dqmc_ggeom
   logical             :: tformat
   integer             :: na, nt, nkt, nkg, i, j, k, slice, nhist, comp_tdm
   integer             :: nBin, nIter  
-  character(len=30)   :: ofile  
+  character(len=60)   :: ofile  
   integer             :: OPT
   !integer             :: HSF_output_file_unit
   integer             :: symmetries_output_file_unit
