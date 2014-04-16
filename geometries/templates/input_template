@@ -33,4 +33,4 @@ north = {north}
 nwrap = 15
 fixwrap = 1
 errrate = 0.01
-difflim = 0.000001
+difflim = 0.01
