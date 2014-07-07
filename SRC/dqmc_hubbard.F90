@@ -292,8 +292,11 @@ contains
     !
     use dqmc_mpi
 #ifdef __INTEL_COMPILER
-    use IFPORT, only : getpid
+  use IFPORT, only : getpid
+#else if __PGI
+  integer :: getpid  
 #endif
+
 #   ifdef _QMC_MPI
 #      define SIMPLE_SPRNG
 #      define USE_MPI
