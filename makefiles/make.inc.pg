@@ -6,7 +6,8 @@
 # PGI Fortran compiler
 # --------------------
 FC = pgfortran
-FC_FLAGS   = -fast –Minform=inform
+FC_FLAGS   = -fast –Minform=inform -Mipa=fast,inline
+#FC_FLAGS = -Mbounds -gopt -fast
 NOOPT_FLAGS = -O0 –Minform=inform
 
 # MAGMA library path
@@ -33,7 +34,8 @@ NOOPT_FLAGS = -O0 –Minform=inform
 # PGI C++ compiler
 # ----------------
 CXX = pgc++
-CXX_FLAGS = -fast –Minform=inform # $(CUDAINC) $(MAGMAINC)
+#CXX_FLAGS = -Mbounds -gopt -fast
+CXX_FLAGS = -fast –Minform=inform -Mipa=fast,inline # $(CUDAINC) $(MAGMAINC)
 
 
 # C++ libraries

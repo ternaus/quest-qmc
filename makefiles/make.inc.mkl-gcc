@@ -46,7 +46,7 @@ CXXLIB = -lstdc++ -ldl -lrt
 MKLPATH   = $(MKLROOT)/lib/intel64
 
 
-LAPACKLIB = -lm -lgomp -L$(MKLPATH) -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lmkl_gnu_thread -lpthread
+LAPACKLIB = -lm -L$(MKLPATH) -Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_core -lmkl_sequential -lpthread
 
 # DQMC library
 # ------------
