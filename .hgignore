@@ -18,3 +18,4 @@ EXAMPLE/geom/test.HSF.stream
 EXAMPLE/test/test
 ADEPT/*
 utils/benchmark/logl*
+EXAMPLE/geom/test.geometry
