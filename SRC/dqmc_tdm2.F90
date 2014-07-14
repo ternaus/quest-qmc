@@ -37,7 +37,7 @@ module DQMC_TDM2
      real(wp), pointer :: T(:,:)        ! working space for getting wave
      integer  :: ldt
 
-     character(30), pointer :: label(:) 
+     character(label_len), pointer :: label(:) 
   end type TDM2
   
 contains
