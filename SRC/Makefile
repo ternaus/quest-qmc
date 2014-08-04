@@ -1,6 +1,6 @@
-QUEST_DIR = ..
+#QUEST_DIR = ..
 
-include $(QUEST_DIR)/make.inc
+#include $(QUEST_DIR)/make.inc
 
 .SUFFIXES : .mod .o .F90
 
