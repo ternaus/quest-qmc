@@ -1,6 +1,3 @@
-#QUEST_DIR  = ../..
-#include $(QUEST_DIR)/make.inc
-
 FLAGS=$(FC_FLAGS) $(PRG_FLAGS) -I$(QUEST_DIR)/SRC
 
 .SUFFIXES : .mod .o .F90

@@ -1,6 +1,3 @@
-#QUEST_DIR = ../..
-#include $(QUEST_DIR)/make.inc
-
 .SUFFIXES : .mod .o .F90
 
 test:    $(QUEST_DIR)/$(DQMCLIB) test.F90
