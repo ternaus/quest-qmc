@@ -24,7 +24,7 @@ CUDAPATH  =
 FLAG_CKB  = #-DDQMC_CKB
 
 # GPU version equal-time Green's function kernel
-FLAG_ASQRD = #-DDQMC_ASQRD
+FLAG_ASQRD = -DDQMC_ASQRD
 
 # GPU version time-dependent Green's function kernel
 FLAG_BSOFI = #-DDQMC_BSOFI
@@ -45,14 +45,14 @@ endif
 ifeq ($(COMPILER), intel)
   FC        = ifort
   CXX       = icpc
-  FC_FLAGS  = -m64 -warn all -O3 -fast -warn all -unroll
-  CXX_FLAGS = -m64 -O3 -Wall -unroll $(CUDAINC) $(MAGMAINC)
+  FC_FLAGS  = -m64 -warn all -O3 -unroll
+  CXX_FLAGS = -m64 -Wall -O3 -unroll $(CUDAINC) $(MAGMAINC)
 endif
 ifeq ($(COMPILER), gnu)
-  FC        = gfortran-mp-4.8
+  FC        = gfortran
   CXX       = g++
-  FC_FLAGS  = -m64 -O3 -Wall
-  CXX_FLAGS = -m64 -Wall -O3 $(CUDAINC) $(MAGMAINC)
+  FC_FLAGS  = -m64 -Wall -O3 -funroll-loops
+  CXX_FLAGS = -m64 -Wall -O3 -funroll-loops $(CUDAINC) $(MAGMAINC)
 endif
 
 
@@ -88,7 +88,7 @@ endif
 
 ifeq ($(LAPACK), mkl_seq)
   ifdef MKLPATH
-    LAPACKLIB = -L$(MKLPATH) -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
+    LAPACKLIB = -L$(MKLPATH) -Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
   else
     $(error "MKLPATH" is not defined in the Makefile.)
   endif
@@ -169,7 +169,7 @@ all : libdqmc example
 
 libdqmc :
 	(cd SRC; $(MAKE))
-example :
+example : libdqmc
 	(cd EXAMPLE; $(MAKE))
 
 lapack : libopenblas
