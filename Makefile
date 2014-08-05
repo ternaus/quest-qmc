@@ -6,7 +6,7 @@
 QUEST_DIR = $(shell pwd)
 
 # 1) gnu, 2) intel
-COMPILER  = intel
+COMPILER  = gnu
 
 # 1) default, 2) mkl_seq, 3) mkl_par
 LAPACK    = default
@@ -21,10 +21,10 @@ MAGMAPATH =
 CUDAPATH  = 
 
 # Checkboard decomposition
-FLAG_CKB  = #-DDQMC_CKB
+FLAG_CKB  = -D_CKB
 
 # GPU version equal-time Green's function kernel
-FLAG_ASQRD = -DDQMC_ASQRD
+FLAG_ASQRD = #-DDQMC_ASQRD
 
 # GPU version time-dependent Green's function kernel
 FLAG_BSOFI = #-DDQMC_BSOFI

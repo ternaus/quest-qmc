@@ -24,7 +24,7 @@ nwarm  = 10
 npass  = 40 
 ntry   = 0
 tausk  = 1
-tdm    = 0
+tdm    = 1
 
 # ==========================
 # Measurements

@@ -183,9 +183,8 @@ module DQMC_GEOM_WRAP
     S%D(1:n,1:n) =  gwrap%Lattice%myclass(0: n - 1, 0: n - 1)
     S%F(:)       =  gwrap%Lattice%class_size(:)
     clab         => gwrap%Lattice%class_label
-    do ic=1,S%nClass
-       ! 03/26/2013: added orbital index to clab(ic,4) and clab(ic,5)
-       write(S%clabel(ic),'(2(i6),3(f11.4))') (int(clab(ic,j)),j=4,5),(clab(ic,j),j=1,3)
+    do ic = 1, S%nClass
+       write(S%clabel(ic),'(2(i5),3(f10.4), i6.3)') (int(clab(ic,j)),j=4,5),(clab(ic,j),j=1,3), S%F(ic)
     enddo
 
     !store GF phase
