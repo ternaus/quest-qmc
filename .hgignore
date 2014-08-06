@@ -19,3 +19,15 @@ EXAMPLE/test/test
 ADEPT/*
 utils/benchmark/logl*
 EXAMPLE/geom/test.geometry
+OpenBLAS/benchmark
+OpenBLAS/ctest
+OpenBLAS/driver
+OpenBLAS/exports
+OpenBLAS/interface
+OpenBLAS/kernel
+OpenBLAS/lapack
+OpenBLAS/lapack-netlib
+OpenBLAS/reference
+OpenBLAS/test
+OpenBLAS/utest
+OpenBLAS/*
