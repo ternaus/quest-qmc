@@ -6,10 +6,10 @@
 QUEST_DIR = $(shell pwd)
 
 # 1) gnu, 2) intel
-COMPILER  = intel
+COMPILER  = gnu
 
 # 1) default, 2) mkl_seq, 3) mkl_par
-LAPACK    = mkl_seq
+LAPACK    = default
 
 # intel MKL library path
 MKLPATH   = $(MKLROOT)/lib/intel64
@@ -32,6 +32,17 @@ FLAG_BSOFI = #-DDQMC_BSOFI
 # Enabling nVidia CUDA support in DQMC
 FLAG_CUDA = #-DDQMC_CUDA
 
+
+
+# --------------------------------------------------------------------------
+#  Check ASQRD and CKB compatibility
+# --------------------------------------------------------------------------
+ifdef FLAG_ASQRD
+  ifdef FLAG_CKB
+    $(error ASQRD method does not support checkerboard decomposition at the moment. \
+      Please turn off the flag FLAG_CKB or FLAG_ASQRD)
+  endif
+endif
 
 
 
