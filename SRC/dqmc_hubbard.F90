@@ -5,7 +5,11 @@ module DQMC_Hubbard
   use DQMC_CFG
   use DQMC_PHY0
   use DQMC_PHY2
-  use _DQMC_MATB
+#ifdef DQMC_CKB
+  use DQMC_CheckerBoard
+#else
+  use DQMC_MATB
+#endif
   use DQMC_SEQB
   use DQMC_GFUN
   use DQMC_STRUCT
