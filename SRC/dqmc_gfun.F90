@@ -3,8 +3,8 @@ module DQMC_GFun
 
   use DQMC_UTIL
   use DQMC_WSPACE
-#ifdef _CKB
-  use DQMC_CKB
+#ifdef DQMC_CKB
+  use DQMC_CheckerBoard
 #else
   use DQMC_MATB
 #endif
