@@ -6,10 +6,10 @@
 QUEST_DIR = $(shell pwd)
 
 # 1) gnu, 2) intel
-COMPILER  = gnu
+COMPILER  = intel
 
 # 1) default, 2) mkl_seq, 3) mkl_par
-LAPACK    = default
+LAPACK    = mkl_seq
 
 # intel MKL library path
 MKLPATH   = $(MKLROOT)/lib/intel64
@@ -21,10 +21,10 @@ MAGMAPATH =
 CUDAPATH  = 
 
 # Checkboard decomposition
-FLAG_CKB  = -D_CKB
+FLAG_CKB  = -DDQMC_CKB
 
 # GPU version equal-time Green's function kernel
-FLAG_ASQRD = #-DDQMC_ASQRD
+FLAG_ASQRD = -DDQMC_ASQRD
 
 # GPU version time-dependent Green's function kernel
 FLAG_BSOFI = #-DDQMC_BSOFI
@@ -74,7 +74,7 @@ endif
 ifeq ($(LAPACK), default)
   libOpenBLAS   = $(QUEST_DIR)/OpenBLAS/libopenblas.a
 
-  # Pass if the targer is 'clean' or 'lapack'
+  # Pass if the target is 'clean' or 'lapack'
   ifneq ($(MAKECMDGOALS), clean)
   ifneq ($(MAKECMDGOALS), lapack)
     ifeq ($(wildcard $(libOpenBLAS)),)
