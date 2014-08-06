@@ -3,7 +3,11 @@ module DQMC_GTAU
 
   use DQMC_UTIL
   use DQMC_WSPACE
-  use _DQMC_MATB
+#ifdef DQMC_CKB
+  use DQMC_CheckerBoard
+#else
+  use DQMC_MATB
+#endif
   use DQMC_SEQB
   use DQMC_GFUN
 
