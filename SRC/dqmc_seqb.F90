@@ -1,8 +1,8 @@
 module DQMC_SEQB
 #include "dqmc_include.h"
 
-#ifdef _CKB
-  use DQMC_CKB
+#ifdef DQMC_CKB
+  use DQMC_CheckerBoard
 #else 
   use DQMC_MATB
 #endif
