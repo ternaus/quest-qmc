@@ -506,7 +506,7 @@ enddo
 write(SOP,*)'Number of symmetry operations in input: ',ntotsymm
 write(SOP,*)'Number of valid symmetry operations   : ',msymm
 do i = 1, msymm
-  write(SOP,*)'Mapping of Simmetry :',valid_symm(i),Symmlabel(valid_symm(i))
+  write(SOP,*)'Mapping of Symmetry :',valid_symm(i),Symmlabel(valid_symm(i))
   do iat = 0, nsites-1
     write(SOP,*)iat,'->',SymmOp%map_symm(iat,i)
   enddo
