@@ -66,7 +66,7 @@ program dqmc_ggeom
     write(*,"('  number of lattice sites =',i5)") Gwrap%Lattice%nSites
     write(*,"('  ntry =',i5)") Hub%nTry
     write(*,*) " Input 'ntry' exceeds the number of lattice sites."
-    write(*,*) " Please reset 'ntry' such that it is less than or equal to"
+    write(*,*) " Please reset 'ntry' such that it is less than"
     write(*,*) " the number of lattice sites."
     write(*,*) " Program stopped."
     stop
