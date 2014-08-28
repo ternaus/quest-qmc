@@ -17,7 +17,7 @@ program dqmc_ggeom
   character(len=slen) :: gfile
   logical             :: tformat
   integer             :: na, nt, nkt, nkg, i, j, k, slice, nhist, comp_tdm
-  integer             :: nBin, nIter  
+  integer             :: nBin, nIter
   character(len=60)   :: ofile  
   integer             :: OPT
   !integer             :: HSF_output_file_unit
@@ -56,8 +56,21 @@ program dqmc_ggeom
   endif
   call DQMC_Geom_Print(Hub%S, symmetries_output_file_unit)
 
+
   ! Initialize the rest data
   call DQMC_Hub_Config(Hub, cfg)
+
+  ! Perform input parameter checks
+  if (Hub%nTry >= Gwrap%Lattice%nSites) then
+    write(*,*)
+    write(*,"('  number of lattice sites =',i5)") Gwrap%Lattice%nSites
+    write(*,"('  ntry =',i5)") Hub%nTry
+    write(*,*) " Input 'ntry' exceeds the number of lattice sites."
+    write(*,*) " Please reset 'ntry' such that it is less than or equal to"
+    write(*,*) " the number of lattice sites."
+    write(*,*) " Program stopped."
+    stop
+  end if
 
   ! Initialize time dependent properties if comp_tdm > 0
   call CFG_Get(cfg, "tdm", comp_tdm)
