@@ -6,10 +6,10 @@
 QUEST_DIR = $(shell pwd)
 
 # 1) gnu, 2) intel
-COMPILER  = gnu
+COMPILER  = intel
 
 # 1) default, 2) mkl_seq, 3) mkl_par
-LAPACK    = default
+LAPACK    = mkl_seq
 
 # intel MKL library path
 MKLPATH   = $(MKLROOT)/lib/intel64
@@ -24,7 +24,7 @@ CUDAPATH  =
 FLAG_CKB  = -DDQMC_CKB
 
 # GPU version equal-time Green's function kernel
-FLAG_ASQRD = -DDQMC_ASQRD
+#FLAG_ASQRD = -DDQMC_ASQRD
 
 # GPU version time-dependent Green's function kernel
 FLAG_BSOFI = #-DDQMC_BSOFI
@@ -57,6 +57,8 @@ ifeq ($(COMPILER), intel)
   FC        = ifort
   CXX       = icpc
   FC_FLAGS  = -m64 -warn all -O3 -unroll
+  #FC_FLAGS = -m64 -g -traceback -check all -O0 -ftrapuv -debug all
+  #CXX_FLAGS = -m64 -g -traceback -O0 -check-uninit -ftrapuv -debug all
   CXX_FLAGS = -m64 -Wall -O3 -unroll $(CUDAINC) $(MAGMAINC)
 endif
 ifeq ($(COMPILER), gnu)
