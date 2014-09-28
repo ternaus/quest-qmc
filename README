@@ -2,32 +2,11 @@
 QUEST readme file
 =====================
 
-
-* To install QUEST modify make.inc file to indicate where necessary libraries are installed in the system.
-Makefiles are stored in the folder /quest-qmc/makefiles
-
-make.inc.gcc:
-	Compilers: GNU C++ compiler(g++), GNU fortran compiler(gfortran)
-	Libraries: LAPACK, BLAS
-
-make.inc.icc:
-	Compilers: Intel C++(icc), Intel fortran(ifort)
-	Libraries: LAPACK, BLAS
-
-make.inc.mkl-gcc:
-	Compilers: GNU C++ compiler(g++), GNU fortran compiler(gfortran)
-	Libraries: Intel MKL
-
-make.inc.mkl-icc:
-	Compilers: Intel C++(icc), Intel fortran(ifort)
-	Libraries: Intel MKL
-
-
 Folders:
-	BLAS ......... Sourcecode of BLAS library.
 	EXAMPLE ...... Examples of the code.
-	LAPACK ....... Source code of the LAPACK library.
+	OpenBLAS ..... Source code of the OpenBLAS library.
 	SRC .......... QUEST source code.
+	doc .......... Old documentation.
 	geometries ... Examples of the different geometries.
 	makefiles .... A collection of sample makefiles.
                     
