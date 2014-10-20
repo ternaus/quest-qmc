@@ -32,7 +32,8 @@ FLAG_BSOFI = #-DDQMC_BSOFI
 # Enabling nVidia CUDA support in DQMC
 FLAG_CUDA = #-DDQMC_CUDA
 
-
+# OpenMP version time-depentdent measurement
+OMPTDM = TRUE
 
 # --------------------------------------------------------------------------
 #  Check ASQRD and CKB compatibility
@@ -56,7 +57,11 @@ endif
 ifeq ($(COMPILER), intel)
   FC        = ifort
   CXX       = icpc
-  FC_FLAGS  = -m64 -warn all -O3 -unroll
+  ifndef OMPTDM
+    FC_FLAGS  = -m64 -warn all -O3 -unroll
+  else
+    FC_FLAGS  = -openmp -m64 -warn all -O3 -unroll
+  endif
   #FC_FLAGS = -m64 -g -traceback -check all -O0 -ftrapuv -debug all
   #CXX_FLAGS = -m64 -g -traceback -O0 -check-uninit -ftrapuv -debug all
   CXX_FLAGS = -m64 -Wall -O3 -unroll $(CUDAINC) $(MAGMAINC)
@@ -64,7 +69,11 @@ endif
 ifeq ($(COMPILER), gnu)
   FC        = gfortran
   CXX       = g++
-  FC_FLAGS  = -m64 -Wall -O3 -funroll-loops
+  ifndef OMPTDM
+    FC_FLAGS  = -m64 -Wall -O3 -funroll-loops
+  else
+    FC_FLAGS  = -fopenmp -m64 -Wall -O3 -funroll-loops
+  endif
   CXX_FLAGS = -m64 -Wall -O3 -funroll-loops $(CUDAINC) $(MAGMAINC)
 endif
 
