@@ -448,6 +448,115 @@ contains
     T1%cnt = T1%cnt + 1
 
   end subroutine DQMC_TDM1_Meas
+  
+  subroutine DQMC_TDM1_Meas_Para(T1, pT1, tau, ptau)
+    !
+    ! Purpose
+    ! =======
+    !    This subroutine fills the bin. It assumes that tau%A_up and,
+    !    when necessary, tau%A_dn have been filled.
+    !
+    ! Arguments
+    ! =========
+    !
+    type(TDM1), intent(inout)   :: t1
+    type(TDM1), intent(inout)   :: pT1(:)
+    type(Gtau), intent(inout)   :: tau
+    type(Gtau), intent(inout)   :: ptau(:)
+    
+    ! ... Local var ...
+    integer  :: i, k, m, n, L, cnt, dt, i0, it, j0, jt, iprop
+    real(wp) :: sgn, factor
+
+    real(wp), pointer :: values(:,:,:)
+
+    if (.not.T1%compute) return
+    ! ... executable ...
+    cnt = 0
+    L   = tau%L
+    k   = mod(tau%north,2)
+    m   = (tau%north-k) / 2
+
+    !$omp parallel private(it, i0, jt, j0)
+    !$omp do
+    do i = 1, tau%nb * tau%nb
+       it = mod(i,tau%nb)+ 1
+       i0 = (i-1)/tau%nb + 1
+          ! Stored value
+          call DQMC_Gtau_DumpA(ptau(i), TAU_UP, it, i0)
+          if (tau%comp_dn .or. .not.tau%neg_u) &
+             call DQMC_Gtau_DumpA(ptau(i), TAU_DN, it, i0)          
+          jt = ptau(i)%it_up; j0 = ptau(i)%i0_up
+          call DQMC_TDM1_Compute(pT1(i), ptau(i)%upt0, ptau(i)%up0t, ptau(i)%dnt0, &
+             ptau(i)%dn0t, ptau(i)%up00, ptau(i)%uptt, ptau(i)%dn00, ptau(i)%dntt, jt, j0)
+
+          ! Decrement index tau%it. If north is even do only north/2-1 decrements.
+          do dt = 1, m-1+k
+             call DQMC_change_gtau_time(ptau(i), TPLUS, TAU_UP)
+             if (tau%comp_dn) then
+                call DQMC_change_gtau_time(ptau(i), TPLUS, TAU_DN)
+             elseif (.not.tau%neg_u) then
+                call DQMC_Gtau_CopyUp(ptau(i))
+             endif
+             jt = ptau(i)%it_up; j0 = ptau(i)%i0_up
+             call DQMC_TDM1_Compute(pT1(i), ptau(i)%upt0, ptau(i)%up0t, ptau(i)%dnt0, &
+                ptau(i)%dn0t, ptau(i)%up00, ptau(i)%uptt, ptau(i)%dn00, ptau(i)%dntt, jt, j0)
+          enddo
+
+          if (m .gt. 0) then
+             call DQMC_Gtau_DumpA(ptau(i), TAU_UP, it, i0)
+             if (tau%comp_dn .or. .not.tau%neg_u) &
+                call DQMC_Gtau_DumpA(ptau(i), TAU_DN, it, i0)
+          endif
+          ! Increment index tau%it
+          do dt = 1, m
+             call DQMC_change_gtau_time(ptau(i), TMINUS, TAU_UP)
+             if (tau%comp_dn) then
+                call DQMC_change_gtau_time(ptau(i), TMINUS, TAU_DN)
+             elseif (.not.tau%neg_u) then
+                call DQMC_Gtau_CopyUp(ptau(i))
+             endif
+             jt = ptau(i)%it_up; j0 = ptau(i)%i0_up
+             call DQMC_TDM1_Compute(pT1(i), ptau(i)%upt0, ptau(i)%up0t, ptau(i)%dnt0, &
+                ptau(i)%dn0t, ptau(i)%up00, ptau(i)%uptt, ptau(i)%dn00, ptau(i)%dntt, jt, j0)
+          enddo
+    enddo
+    !$omp end do
+    !$omp end parallel
+    cnt = cnt + tau%nb
+
+    ! Sum up the multi-threads value
+    do n = 1, tau%nb * tau%nb
+       do iprop = 1, NTDMARRAY
+          do i = 1, T1%properties(iprop)%nclass
+             do it = 0, L-1
+                   T1%properties(iprop)%values(i,it,T1%tmp) = T1%properties(iprop)%values(i,it,T1%tmp)+&
+                      pT1(n)%properties(iprop)%values(i,it,T1%tmp)
+             enddo
+          enddo
+       enddo
+    enddo
+ 
+    sgn = tau%sgnup * tau%sgndn
+    do iprop = 1, NTDMARRAY
+       values => T1%properties(iprop)%values
+       do it = 0, L-1
+          do i = 1, T1%properties(iprop)%nClass
+             factor = sgn/(T1%properties(iprop)%F(i)*cnt)
+             values(i,it,T1%idx)   = values(i,it,T1%idx)   + factor*values(i,it,T1%tmp)
+          end do
+       end do
+       values(:,:,T1%tmp)   = ZERO
+       do n = 1, tau%nb*tau%nb
+          values => pT1(n)%properties(iprop)%values
+          values(:,:,T1%tmp) = ZERO
+       enddo
+    enddo
+
+    T1%sgn(T1%idx) =  T1%sgn(T1%idx) + sgn
+    T1%cnt = T1%cnt + 1
+
+  end subroutine DQMC_TDM1_Meas_Para
 
   !--------------------------------------------------------------------!
 
