@@ -202,8 +202,8 @@ contains
     call lapack_dgetri(nnb, tau%A_up, nnb, tau%IW, query, -1, info)
     tau%lw = nint(query(1))
     allocate(tau%W1(tau%lw))
-    tau%W2 => Hub%WS%R1
-    tau%W3 => Hub%WS%R2
+    allocate(tau%W2(n,n))
+    allocate(tau%W3(n,n))
 
     tau%g0_stored = .false.
 
