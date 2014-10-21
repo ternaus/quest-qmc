@@ -1,0 +1,83 @@
+
+#
+#  Compiler and flags
+#
+
+# PGI Fortran compiler
+# --------------------
+FC = pgfortran
+FC_FLAGS   = -fast –Minform=inform -Mipa=fast,inline
+#FC_FLAGS = -Mbounds -gopt -fast
+NOOPT_FLAGS = -O0 –Minform=inform
+
+# MAGMA library path
+# ------------------
+#MAGMAPATH = ./magma-1.4.0
+#MAGMALIB = -L$(MAGMAPATH)/lib -lmagma -lmagmablas -lmagma 
+#MAGMAINC = -I$(MAGMAPATH)/include
+
+
+# CUDA installation path
+# ----------------------
+#CUDAPATH = /usr/local/cuda
+#CUDAPATH = /usr/lib/nvidia-cuda-toolkit/
+
+
+# CUDA compiler and libraries
+# ---------------------------
+#NVCC = $(CUDAPATH)/bin/nvcc
+#CU_FLAGS = -O3 -Xptxas -v -m 64 -arch sm_20 $(MAGMAINC)
+#CUDALIB = -L$(CUDAPATH)/lib64 -lcublas -lcudart -lcuda
+#CUDAINC = -I$(CUDAPATH)/include
+
+
+# PGI C++ compiler
+# ----------------
+CXX = pgc++
+#CXX_FLAGS = -Mbounds -gopt -fast
+CXX_FLAGS = -fast –Minform=inform -Mipa=fast,inline # $(CUDAINC) $(MAGMAINC)
+
+
+# C++ libraries
+# -------------
+CXXLIB = -lstdc++ -lrt -lgcc_s
+
+# Path to system's default BLAS and LAPACK libraries
+# This should work on most Linux and MacOS X. If not,
+# use the BLAS/LAPACK included in the QUEST package.
+# --------------------------------------------------
+#LAPACKLIB = -llapack -lblas
+
+
+# Path to BLAS and LAPACK libraries shipped with QUEST
+# Note: they are not optimized
+# ----------------------------------------------------
+LAPACKLIB = $(QUEST_DIR)/liblapack.a $(QUEST_DIR)/libblas.a
+
+# DQMC library
+# ------------
+DQMCLIB    = libdqmc.a
+
+
+# Library linking
+# ---------------
+LIB        = $(CXXLIB) $(LAPACKLIB) # $(CUDALIB) $(MAGMALIB) 
+
+
+# Archiver and flags
+# ------------------
+ARCH       = ar
+ARFLAG     = cr
+RANLIB     = ranlib
+
+
+# Program dependent flags
+# -----------------------
+#    -D_CKB    : use checkboard method for matrix B
+#    -D_PREFIX : using prefix matrix multiplication
+#    -D_OpenBC : use open boundary condition
+#
+
+PRG_FLAGS = -DDQMC_ASQRD  # -DDQMC_PROFILE -DDQMC_CUDA -D_CKBP -D_SXX -D_QMC_MPI
+
+FLAGS = $(FC_FLAGS) $(PRG_FLAGS)

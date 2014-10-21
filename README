@@ -1,0 +1,12 @@
+=====================
+QUEST readme file
+=====================
+
+Folders:
+	EXAMPLE ...... Examples of the code.
+	OpenBLAS ..... Source code of the OpenBLAS library.
+	SRC .......... QUEST source code.
+	doc .......... Old documentation.
+	geometries ... Examples of the different geometries.
+	makefiles .... A collection of sample makefiles.
+                    

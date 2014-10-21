@@ -1,0 +1,643 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath}
+\usepackage{hyperref}
+\title{QUEST Users' Guide \\  
+Version 1.4 (Updated draft)}
+\date{\today}
+\begin{document}
+\maketitle
+\newpage
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+\section{Introduction}
+   QUantum Electron Simulation Toolbox (QUEST) is a Fortran
+   90/95 package that implements the Determinant Quantum Monte Carlo (DQMC) methods for
+   quantum electron simulations.
+   The original version of DQMC programs (legacy codes) have been
+   developed and used for years,\footnote{The codes mentioned here were developed and maintained by Professor Richard Scalettar.} and produced fruitful results.
+   QUEST, the new version of DQMC simulations, serves three important purposes.
+   \begin{enumerate}
+     \item To improve simulation performance: QUEST has improved the performance of simulations by using new algorithms, like delayed update, and by integrating modern numerical kernels, BLAS/LAPACK. A six to eight times speedup had been observed for medium sized simulations.
+     \item To integrate existing programs: QUEST has integrated many legacy codes by modularizing their computational components, which makes QUEST not only a single program, but a toolbox. The advantages of modularization also include the ease of maintenance and the convenience of program interfacing.
+     \item To assist new simulations development: QUEST has several desired properties for developing new simulations, such as the ability of creating new lattice geometries. Several novel simulations had been done by using QUEST.
+   \end{enumerate}
+
+    Currently, QUEST is still under development and debug.
+    The latest version can be downloaded from the following link
+    \begin{center}
+    \url{http://www.quest-googlecode.com}
+    \end{center}
+
+\subsection{Problems that QUEST can solve}
+    QUEST uses a two-dimensional periodic rectangular lattice as
+    the default geometry in the simulation. The lattice size and physical parameters are configurable through an input file.
+    Several physical measurements for the Hubbard model can be calculated by the program, as will be introduced in Section~\ref{sec output}.
+
+    QUEST is stable for interaction strength from
+    $U=0$ to $U=16t$ and inverse temperatures $\beta=0$ to $20/t$.
+    Here $U$ is the onsite repulsion and $t$ is the coefficient of the kinetic energy term,
+    see Section~\ref{sec config}.
+    However, away from half-filling,
+    $\mu=0$, error bars are large for large $\beta$ (sign problem).
+
+    The current implementation allows hundreds of sites to be simulated on commodity computers within a reasonable time. Appendix~\ref{sec exp} provides performance benchmark for some example problems.
+
+%------------------------------------------------------------------------------
+
+\subsection{Organization of the package}
+The top level files and directories of QUEST include
+\begin{itemize}
+  \item \verb"README": installation guide.
+  \item \verb"make.inc": configuration file for system dependent parameters.
+  \item \verb"Makefile": instruction file for make program.
+  \item \verb"SRC": directory for source code
+  \item \verb"EXAMPLE": directory for executable programs.
+  \item \verb"DOC": directory for documentation.
+\end{itemize}
+
+Under \verb"EXAMPLE" directory, several example programs are contained.
+\begin{itemize}
+  \item \verb"test": A simple test program for 2 dimensional square lattice.
+  \item \verb"verify": A program verifying the correctness of QUEST by examining its results against theoretical values of two special cases, $U=0$ and $t=0$.
+  \item \verb"tdm": A test program for time dependent measurements.
+  \item \verb"parallel": A test program for MPI type parallelization.
+  \item \verb"wrap": Programs for different input and output formats.
+  \item \verb"sheet": Programs for multilayer geometry.
+  \item \verb"DCA": Programs for using DQMC as DCA solver.
+  \item \verb"gemo": Programs for general geometry.
+\end{itemize}
+The details for each program will be illustrated in Appendix \ref{sec exp}.
+
+\subsection{Compilation and execution}
+The compilation of QUEST can be done through the following steps, following guide at the 
+\url{https://code.google.com/p/quest-qmc/wiki/Download}.
+
+\section{Basic usages}
+In this section we will introduce the basic input parameters and output formats of QUEST.
+Those parameters and formats are not universal, since QUEST allows each program to define its own input parameters and output results, as introduced in section 3. However, by walking through those basic parameters and formats, one can understand what QUEST needs and what QUEST can do, and the input/output styles of QUEST.
+
+%------------------------------------------------------------------------------
+\subsection{Input file}\label{sec config}
+An input file of QUEST is consisted of a list of parameter assignments,
+\begin{quote}
+parameter\_name = parameter\_value
+\end{quote}
+and arbitrary single line comments, starting with symbol \verb"#".
+Each parameter is associated with one of the following types: \emph{integer}, \emph{real}, \emph{real array}, and \emph{string}.
+%\footnote{Type \emph{real} is type double in Fortran. Type \emph{real array} and \emph{string} have length constraints. The maximum number of elements of \emph{real array} is 10; and the maximum number of characters of a \emph{string} is 30.}
+The basic parameters include
+\begin{enumerate}
+  \item \verb"fname" (string): file name for output files.
+  \item \verb"n" (integer): total number of sites.
+  \item \verb"nx" (integer): number of sites in the x-direction.
+  \item \verb"ny" (integer): number of sites in the y-direction.
+  \item \verb"nz" (integer): number of sites in the z-direction.
+  \item \verb"U" (real array): Hubbard parameters.
+  \item \verb"t" (real array): Hubbard parameters.
+  \item \verb"mu" (real array): Hubbard parameters.
+  \item \verb"L" (integer): number of time slice.
+  \item \verb"dtau" (real): discretization parameter.
+  \item \verb"HSF" (integer): indicator of how Hubbard Stratonovich field is input.
+  \item \verb"HSFin" (string): file name of input file of HSF.
+  \item \verb"HSFout" (string): file name of output file of HSF.
+  \item \verb"nwarm" (integer): number of warmup sweeps.
+  \item \verb"npass" (integer): number of measurement (sample) sweeps.
+  \item \verb"nmeas" (integer): frequency of performing equal time measurements.
+  \item \verb"tausk" (integer): frequency of performing unequal time measurements.
+  \item \verb"nbin" (integer): number of bins for measurement results.
+  \item \verb"seed" (integer): random number seed.
+  \item \verb"north" (integer): frequency of performing orthogonalization in matrix product.
+  \item \verb"nwrap" (integer): frequency of performing recomputing in Green's function calculation.
+  \item \verb"difflim" (real): tolerable difference of the matrices computed from different methods.
+  \item \verb"errrate" (real): tolerable error rate of recomputing.
+  \item \verb"ntry" (integer): number of sites to be flipped in the global sweep. UPD: This parameter controls the frequency of
+  a type of Monte Carlo move which is needed for $U \geq 8$.
+\end{enumerate}
+
+The parameters can be roughly divided into three groups:
+\begin{enumerate}
+\item Parameters for Hubbard model:
+
+parameters \verb|nx| and \verb|ny|
+specify the $x$-dimension and $y$-dimension of the 2-D rectangular lattice to
+be simulated. Note that parameter $n$, the number of total sites,
+is equivalent to \verb|nx|$\times$\verb|ny|.
+Parameter \verb|t|, \verb|mu|, and \verb|U| are used in the Hubbard Hamiltonian
+$$\mathcal{H}=-t \sum_{\langle i,j\rangle, \sigma} \left(c^{\dag}_{i\sigma}c_{j\sigma}+c^{\dag}_{j\sigma}c_{i\sigma}\right)
+             -\mu \sum_{i, \sigma}n_{i\sigma}
+             +U \sum_{i} \left(n_{i\uparrow}-\frac{1}{2}\right) \left(n_{i\downarrow}-\frac{1}{2}\right),$$
+for kinetic energy, chemical energy and potential energy respectively.
+Parameter \verb|L| and \verb|dtau| are for inverse temperature $\beta$.
+$$\beta = L \Delta\tau.$$
+Parameter \verb"HSF" indicates how the Hubbard-Stratonovich Field (HSF) is initialized.
+$$
+\mbox{HSF} = \left\{
+                      \begin{array}{ll}
+                        -1, & \hbox{randomly generating HSF;} \\
+                        0, & \hbox{use HSF in the memory;} \\
+                        1, & \hbox{read HSF from a file.}
+                      \end{array}
+                    \right.
+$$
+If \verb"HSF=1", then \verb"HSFin" is the input file name. The generated HSF can be also output to a file by specifying the file name in \verb"HSFout".
+
+\item Parameters for Monte Carlo simulation and physical measurements:
+Parameter \verb|nWarm| and \verb|nPass| in the second group decide how many Monte Carlo loops
+need be executed for warm up and measurement sweep. Parameter \verb|nMeas| and \verb|tausk| specify the frequency
+of performing physical measurements. Parameter \verb|nBin|
+determine how the computed data is divided into bins. Parameter \verb"ntry" is used to specify how many global flipping should be performed per sweep for the large $U$.
+
+\item Parameters regarding numerical concerns.
+
+Parameter \verb|seed| is used for random number generator.
+If it is 0, a new seed will be generated from system time.
+Parameter \verb|nOrth| specifies how often the stabilization algorithm
+should be performed in the calculation of Green's function.
+Parameter \verb|nWrap| provides the initial frequency of recomputing Green's function.
+In QUEST, \verb|nWrap| will be dynamically adjusted according to the errors
+of updating. Parameters \verb|difflim| and \verb|errrate| are used for the adjusting
+algorithm, which specify the tolerable matrix difference and the acceptable error rate.
+\end{enumerate}
+
+%------------------------------------------------------------------------------
+\subsection{Output Results}\label{sec output}
+The output of QUEST varies in different programs. The goal for this section is to introduce what QUEST can output, and their formats. The output of QUEST can be classified into three types
+\begin{itemize}
+ \item Input/condifuration parameters.
+ \item Equal time measurements.
+ \item Unequal time measurements.
+\end{itemize}
+
+The input/configuration parameters are as introduced in the previous section. Some of them may be created or changed during the simulation, like \verb"seed" and \verb"nWrap". Those configuration parameters can help identifying the output results.
+
+In terms of formats, concerned only with measurements, there are three kinds
+\begin{itemize}
+ \item Single real number.
+ \item Array of real numbers.
+ \item Array of complex numbers.
+\end{itemize}
+
+If a measurement is a single real number, it will be shown with three terms: name, average, and error. For example,
+\begin{verbatim}
+     Density :     1.000000 +-     0.000000
+\end{verbatim}
+
+The measurement formatted in an array of real numbers (or complex numbers) is a \emph{function}, whose arguments can be anything, like the distances between sites.
+The output of this type enumerates all its function arguments and values. For example, the equal time Green's function of a $4\times 4$ periodic lattice is output like
+\begin{verbatim}
+Equal time Green's function:
+          dx =  0, dy =  0        0.500000 +-     0.000000
+          dx =  1, dy =  0       -0.119358 +-     0.000754
+          dx =  2, dy =  0        0.000000 +-     0.000000
+          dx =  0, dy =  1       -0.118936 +-     0.000414
+          dx =  1, dy =  1        0.000000 +-     0.000000
+          dx =  2, dy =  1        0.020050 +-     0.000307
+          dx =  0, dy =  2        0.000000 +-     0.000000
+          dx =  1, dy =  2        0.019829 +-     0.000184
+          dx =  2, dy =  2        0.000000 +-     0.000000
+\end{verbatim}
+The first line is the name of measurements. Below that,
+the first column is the arguments of the function. The second and the third columns are the averages and errors.
+
+Complex results will be defined similarly with separated error bars for the real part and imaginary part.
+
+For the detail formula of each measurements, please referee the working notes.
+
+\subsubsection{Equal time measurements}
+There are three groups of equal time measurements. The first group is the measurements that aggregate values from entire lattice. The second group is the autocorrelation functions that average pair of sites within the same distance class. The third group measures the pair susceptibilities.
+\begin{enumerate}
+   \item Up spin occupancy
+   \item Down spin occupancy
+   \item Potential energy
+   \item Kinetic energy
+   \item Total energy
+   \item Density
+   \item XX Ferromagnetic structure factor
+   \item ZZ Ferromagnetic structure factor
+   \item XX Antiferromagnetic structure factor
+   \item ZZ Antiferromagnetic structure factor
+   \item Equal time Green's function
+   \item Density-density correlation function (up-up)
+   \item Density-density correlation function (up-dn)
+   \item XX Spin correlation function
+   \item ZZ Spin correlation function
+   \item S-wave pair structure factor
+   \item SX-wave pair structure factor
+   \item D-wave pair structure factor
+   \item SXX-wave pair structure factor
+   \item DXX-wave pair structure factor
+   \item PX-wave pair structure factor
+   \item PY-wave pair structure factor
+   \item PXY-wave pair structure factor
+   \item PYX-wave pair structure factor
+\end{enumerate}
+
+\subsubsection{Unequal time measurements}
+Every unequal time measurement is a function of imaginary time.
+The format of array typed measurement with two arguments, space and time, is like
+\begin{verbatim}
+ G(nx,ny,ti)
+ dx =  0, dy =  0
+           0   0.50000 +-   0.00000
+           1   0.36076 +-   0.00311
+           2   0.27942 +-   0.00328
+	       ...
+ dx =  1, dy =  0
+           0  -0.12042 +-   0.00162
+           1  -0.07183 +-   0.00097
+           2  -0.04248 +-   0.00133
+	       ...
+ dx =  2, dy =  0
+	       ...
+\end{verbatim}
+where \verb| dx =  0, dy =  0 | are labels of space and followed by a list of
+time label and corresponding values.
+
+Some measurements are from Fourier transformation, which are complex. Their format will be
+like
+\begin{verbatim}
+  0(   0.05179 +-   0.00270)  +i(   0.00000 +-   0.00000)
+  1(   0.05085 +-   0.00248)  +i(  -0.00061 +-   0.00055)
+  2(   0.04343 +-   0.00190)  +i(  -0.00067 +-   0.00078)
+  3(   0.03755 +-   0.00144)  +i(  -0.00080 +-   0.00051)
+  4(   0.03004 +-   0.00099)  +i(  -0.00090 +-   0.00076)
+  5(   0.02512 +-   0.00092)  +i(  -0.00100 +-   0.00048)
+  6(   0.02152 +-   0.00074)  +i(  -0.00134 +-   0.00031)
+  7(   0.01829 +-   0.00072)  +i(  -0.00087 +-   0.00055)
+  8(   0.01499 +-   0.00066)  +i(  -0.00051 +-   0.00055)
+  9(   0.01332 +-   0.00065)  +i(  -0.00042 +-   0.00035)
+\end{verbatim}
+The numbers inside the first parenthesis are the average and error of the real part
+and the numbers in the second parenthesis are for imaginary part.
+
+\begin{enumerate}
+   \item Unequal time Green's function: $G(dx,dy,t)$
+   \item Discrete cosine transformed  $G(dx,dy,t)$:$G(qx,qy,t)$
+   \item Fourier Transformed $G(dx,dy,t)$: $G(dx,dy,w)$
+   \item Fourier Transformed $G(qx,qy,t)$: $G(qx,qy,w)$
+   \item chi function: $\chi(dx,dy,t)$
+   \item Discrete cosine transformed $\chi(dx,dy,t)$: $\chi(qx,qy,t)$
+   \item Fourier Transformed $\chi(dx,dy,t)$: $\chi(dx,dy,w)$
+   \item Fourier Transformed $\chi(qx,qy,t)$: $\chi(qx,qy,w)$
+   \item S-Wave   pair structure factor, vertex and nonvertex
+   \item SX-Wave  pair structure factor, vertex and nonvertex
+   \item D-Wave   pair structure factor, vertex and nonvertex
+   \item SXX-Wave pair structure factor, vertex and nonvertex
+   \item DXX-Wave pair structure factor, vertex and nonvertex
+   \item PX-Wave  pair structure factor, vertex and nonvertex
+   \item PY-Wave  pair structure factor, vertex and nonvertex
+   \item PXY-Wave pair structure factor, vertex and nonvertex
+   \item PYX-Wave pair structure factor, vertex and nonvertex
+   \item FTed S-Wave   pair structure factor, vertex and nonvertex
+   \item FTed SX-Wave  pair structure factor, vertex and nonvertex
+   \item FTed D-Wave   pair structure factor, vertex and nonvertex
+   \item FTed SXX-Wave pair structure factor, vertex and nonvertex
+   \item FTed DXX-Wave pair structure factor, vertex and nonvertex
+   \item FTed PX-Wave  pair structure factor, vertex and nonvertex
+   \item FTed PY-Wave  pair structure factor, vertex and nonvertex
+   \item FTed PXY-Wave pair structure factor, vertex and nonvertex
+   \item FTed PYX-Wave pair structure factor, vertex and nonvertex
+\end{enumerate}
+%------------------------------------------------------------------------------
+\section{Advanced usages}\label{sec adv}
+To assist in creating new simulations,\footnote{The new simulations do not include creating new models. Currently, QUEST is pretty much limited in Hubbard's model.} QUEST provides several simple mechanisms to
+\begin{enumerate}
+ \item Add new configuration parameters,
+ \item Create new lattice geometries,
+ \item Add new measurements.
+\end{enumerate}
+This section will introduce how to apply them.
+
+\subsection{Add new configuration parameters}
+Section \ref{sec config} lists the basic input parameters, which are enough for current programs. However, for new simulations, additional parameters may be required. QUEST allows new parameters to be specified through current configuration system. For example, in the diluted lattice, in which some sites are randomly removed, the percentage of removal sites can be specified in the input file
+\begin{verbatim}
+    rmv_ratio = 0.1
+\end{verbatim}
+just like the other parameters.
+
+To add new configuration parameters, user/developer need to edit a file called \verb"config.def".  When the subroutine \verb"DQMC_Config_Read" is called, it will first searches \verb"config.def" for the definition of parameters. If the file exists, then the program will use the parameter defined in the file. Otherwise, it uses default parameter set, as described in section\ref{sec config}.
+
+A parameter in \verb"config.def" is defined by a quintuple:
+\begin{quote}
+    \{name, type, isArray, printed, default\}
+\end{quote}
+where
+\begin{description}
+  \item[name:] a string, maximum characters 30, specifying the name of the parameter.
+  \item[type:] an integer specifying the data type of the parameter.
+  $$
+  \left\{
+    \begin{array}{ll}
+      \hbox{type=1}, & \hbox{real;} \\
+      \hbox{type=2}, & \hbox{integer;} \\
+      \hbox{type=3}, & \hbox{string.}
+    \end{array}
+  \right.
+  $$
+  \item[isArray:] a boolean \{T,F\} specifying whether the parameter is an array.
+  Note, when type is a string, isArray cannot be T.
+  \item[printed:] a boolean \{T,F\} specifying whether the parameter will be printed in the output.
+  \item[default:] a string, maximum characters 30,  specifying the default value of the parameter.\footnote{Note, even a parameter is an array, its default value can be only set by one number.}  QUEST will convert it to a proper data type based on the "type" tuple.
+\end{description}
+Each tuple is separated by spaces.
+For example, the parameter \verb"rmv_ratio" can be defined in the \verb"config.def" as
+\begin{verbatim}
+    rmv_ratio  1 F T 0.1
+\end{verbatim}
+
+The file \verb"config.def" should be placed in the directory where the executable is.
+
+
+\subsection{Square lattice geometry file with comments.}
+\begin{verbatim}
+#NDIM
+2
+\end{verbatim}
+Dimension of the lattice. 3 for cubic, 2 for square, triangular, etc
+
+\begin{verbatim}
+#PRIM
+1.0 0.0
+0.0 1.0
+\end{verbatim}
+Primitive lattice vectors.  One can give a full $3 \times 3$ matrix for \#PRIM even if \#NDIM < 3. If you do that, QUEST only reads the upper left \#NDIM $\times$ \#NDIM block.
+
+\begin{verbatim}
+#ORB 
+s0 0.0 0.0 0.0 #0
+\end{verbatim}
+This is what alllows QUEST to do geometries like the honeycomb lattice which requires a basis. \#ORB has one line for each atom in the basis. The first entry is a string which serves as a label for the atom. The next three entries in the line are the position of the atom in the unit cell. QUEST authomatically assignes a number to each atom (ie to each line in the \#ORB section of the .geom file) beginning with zero. In the \#ORB section QUEST demands three dimensional objects.
+
+\#HAMILT block of the code defines the hoppings, on-site energies, and interaction strenghts. The convebtion for the lines in \#HAMILT is following: Each line begins with two entries which are the (automatically assigned) atom numbers from \#ORB. For problems without a basis these will just be '0.0'. To include a hopping, the next three entries in the line should be the direction to the neighboring site. QUEST authomatically makes $\hat{H}$ Hermitian, so each pair of connected sites requires only one line. The next two entries are the hopping values for the up and down electrons, which are allowed to be different in QUEST. The final entry is $U$, which should be set to zero for lines defining hopping. To include a $U$ value, use '0.0 0.0 0.0' for the neighboring site inputs and insert a value in the last (eighth) entry.
+
+If you have a geometry with a basis (more than one line in \#ORB) the different atoms can be assigned different site energies and interactions.
+
+Here is example for the rectangular geometry:
+\begin{verbatim}
+#HAMILT
+0 0 1.0 0.0 0.0 1.0 1.0 0.0
+0 0 0.0 1.0 0.0 2.2 2.2 0.0
+0.0 0.0 0.0 0.0 0.5 0.5 4.0
+\end{verbatim}
+The first two lines are the hoppings in the $x$ and $y$ directions. The third line is an on-site energu 0.5, and is the same for th eup and down species. (the sign convebtion for the site energies is $+\epsilon n_i$, so that 0,5 in \#HAMILT corresponds to -0.5 in the Chemical potential. The third line also sets $U = 4$. (If you want, you can separate this into two distinct lines)). We again note that in \#HAMILT it is required to supply a three component vector as the pointer to the site, even if \#NDIM is two.
+
+Note: The chemical potential defined in input is a \textbf{global} chemical potential which applies to all sites in the lattice. The on-site energies in \#HAMILT allow for different chemical potentials on different atoms. Thus there is a slight redundancy in the code. Rather than having a global chemical potential one could shift all the site energies. If you do not specify chemical potentials in input, they are set, by default, equal to zero.
+
+There is some redundancy in the way QUEST knows the geometry is rectangular. If the defined supercell in \#SUPER has different diagonal entries, then QUEST knows not to assume $x$ and $y$ directions are equivalent. Likewise, a different entry for $t_x$ and $t_y$ will automatically be flagged by QUEST (Finally, the strange string label in \#ORB about which we have been so silent can also be used to distinguish different types of atoms and can break symmetries. If you had a three band Cu-O model of the cuprates you could, for example, make the oxygen atoms along the $x$ and $y$ bonds have distinct labels and hence different entries in \#HAMILT)
+
+But more fundamentally, QUEST knows about the symmetries of the lattice from the \#SYMM block in the .geom file, which is the last one we shall discuss. In square.geom this looks like,
+\begin{verbatim}
+#SYMM
+d  0.0 0.0 0.0 1.0 0.0 0.0
+d  0.0 0.0 0.0 0.0 1.0 0.0
+c4 0.0 0.0 0.0 0.0 0.0 1.0
+\end{verbatim}
+QUEST supports 3 types of symmetry definitions. 'cn', where 'n' is an integer, tells QUEST the lattice is symmetric under rotations by $2 \pi / n$. The six numbers following by 'cn' specify the three cartesian coordinates of a point belonging to the axis, following by the axis direction in the cartesian coordinates. In this case 'c4' is $\pi / 2$ and indicates the $x$ and $y$ directions are equivalent. the point belonging to the axis is the origin '0.0 0.0 0.0' and the axis is the $z$ direction '0.0 0.0 1.0'.
+
+The symmetry 'd' is a mirror plane symmetry. It too is followed by six numbers. The first three are the cartesian coordinates of a point in the plane, and the final three are the cartesian cordinates of the normal to the plane.
+
+Finally, 'I' is used for inversion symmetry. It is followed by three numbers, the cartesian coordinates of the inversion point.
+
+In specifying \#SYMM you must list all three components of teh vectors even if the lattice is two dimensional.
+
+
+%------------------------------------------------------------------------------
+\subsection{Create new lattice geometries}
+In QUEST, geometry dependent variables are placed together in a derived data type \verb"Struct". To create a new lattice geometry, one needs to fill out the data fields in \verb"Struct". There are several ways to achieve this; each has its advantages and drawbacks.
+\begin{enumerate}
+  \item Write a program to fill out the data fields: most efficient way in execution, but need to write programs for different geometries.
+  \item Use primitive cell definition as input: \footnote{This feature is still underdevelopment.} Most compact representations of general geometry, but needs to understand the definitions of primitive cell.
+  \item Input data for each data field from files: Most easy way to create a new lattice geometry, but less flexibilities and less efficient.
+\end{enumerate}
+
+In this section, we will illustrate the data fields in \verb"Struct" and the file formats for method 3. Note not all the data fields are essential for simulations. Some of them are just for a particular measurements. When lacking one or some of the fields, QUEST will skip the corresponding measurements.
+
+\subsubsection{\tt Struct}
+Derived data type \verb"Struct" is defined as
+\begin{verbatim}
+type Struct
+   integer  :: nSite               ! number of sites
+   character(gname_len):: name     ! name of the structure
+   integer, pointer    :: dim(:)   ! dim of the geometry
+
+   integer  :: n_t                 ! number of hopping types
+   type(CCS):: T                   ! hopping matrix
+
+   integer  :: n_b                 ! number of neighbors types
+   type(CCS):: N                   ! neighborhood matrix
+
+   integer  :: nClass              ! number of distance classes.
+   integer, pointer  :: D(:,:)     ! distance classes
+   integer, pointer  :: F(:)       ! counts for each dist class.
+   character(label_len), pointer :: &
+                          label(:) ! label for distant class.
+   integer  :: nGroup              ! number of diff singletons.
+   integer, pointer  :: map(:)     ! site classification
+
+   real(wp), pointer :: W(:,:)     ! wave functions
+   integer  :: nWave
+   character(label_len), pointer :: &
+                          wlabel(:)! label for wave functions.
+   real(wp), pointer :: P(:)       ! phase assignment
+
+   real(wp), pointer :: FT(:,:)    ! Fourier Transform matrix
+
+   logical::checklist(N_CHECKLIST) ! flags
+end type Struct
+\end{verbatim}
+
+Here are the detail comments for each field.
+\begin{itemize}
+ \item Sites must be numbered from 1, with continuous numbering.
+ \item String \verb"name" is of length 80 characters, used in display.
+ \item Vector \verb"dim" is used to hold dimension parameters. For example, for a two dimensional square lattice, \verb"dim=(nx,ny)", where \verb"nx" and \verb"ny" are the number of sites in x direction and in y direction. This field can be of arbitrary length. QUEST does not use this field directly.
+ \item Hopping matrix \verb|T| stores the indices of hopping parameter \verb"t" for adjacent sites.\footnote{Two sites $i,j$ are called adjacent if electrons can hop from site $i$ to site $j$.} It is normally a sparse matrix; and therefore is represented in the Compressed Column Storage (CCS) format.\footnote{The detail of CCS format can be found in {\tt http://www.netlib.org}.} Field \verb"n_t" is the number of different hopping parameters.
+ \item Neighboring matrix \verb|N| is similar to \verb|T|, and is also represented in the CCS format. It is used in pair measurements, for which the link indices should be consistent with the wave function \verb"W". Field \verb"n_b" is the number of different links.
+ \item The distance classification is represented by \verb|D|, \verb|F| and \verb|label|. Two pairs of sites are in the same class if they are translation/rotation invariant.
+     The number of classes is specified by \verb|nClass|. The class index is also started from 1. The number of pairs in each class is stored in \verb|F|.
+     String array \verb|label| gives a label for each class, used in output.
+     Matrix \verb|D| records the classification for each pair of site.
+     Number in \verb|D(i,j)| denotes the class index for site $i$ and $j$.
+ \item The vector \verb"map" classifies sites. Site $i$ and site $j$ are in the same class if they have the same physical parameters, like $U$ and $\mu$. The number \verb"nGroup" denotes the number of site classes.
+ \item Matrix \verb|W| defines wave functions for the pair measurements, which are related to various spherical harmonic functions. The number of functions is specified by \verb|nWave|. Each function has \verb|n_b| elements, and is stored in a column of \verb|W| matrix.
+ \item  The phase assignment vector \verb|P| gives each site $\{+1,-1\}$ so that adjacent sites have opposite phases. This is used in spin correlation measurements, and in Green's function calculation when $\mu=0$.
+ \item Matrix \verb|FT| is the Fourier transformation matrix for distance classes, which is used in time dependent measurements.
+ \item Vector \verb"checklist" is a set of flags that indicate which data fields are assigned. The flags include
+     \begin{verbatim}
+  STRUCT_INIT   = 1
+  STRUCT_DIM    = 2
+  STRUCT_ADJ    = 3
+  STRUCT_CLASS  = 4
+  STRUCT_WAVE   = 5
+  STRUCT_NEIG   = 6
+  STRUCT_PHASE  = 7
+  STRUCT_FT     = 8
+     \end{verbatim}
+\end{itemize}
+
+\subsubsection{Files for geometry definition}
+The file name of geometry definition is specified in the configuration file with parameter name \verb"gfile". For example,
+\begin{verbatim}
+    gfile = strip.def
+\end{verbatim}
+tells QUEST to use the file \verb"strip.def" as geometry definition.
+
+The format of the geometry definition is similar to the configuration file.
+\begin{enumerate}
+  \item The symbol \verb"#" is used to start a comment.
+  \item The data fields are set by the assignment
+\begin{verbatim}
+    data_field_name = data_field_value
+\end{verbatim}
+  \item Some fields depend on the other. Depended fields should be declared first.
+
+    \begin{center}
+    \begin{tabular}{r@{ $\rightarrow$ }l}
+      \verb"T"  & \verb"nSite" \\
+      \verb"B"  & \verb"nSite"\\
+      \verb"D"  & \verb"nSite" \\
+      \verb"FT" & \verb"nClass" \\
+      \verb"W"  & \verb"n_b" and \verb"nWave" \\
+    \end{tabular}
+    \end{center}
+  \item Not every field in \verb"Struct" need be defined in the file. For example, vector \verb"F" and \verb"map" will be derived from matrix \verb"D".
+  \item Array type assignment, including matrix or vector, is different from that in a configuration file. The right-hand-side of assignment should be the number of how many lines to read. For example
+\begin{verbatim}
+    D = 64
+\end{verbatim}
+      means there are 64 immediate lines to read for matrix \verb"D". Those lines are called \emph{content lines}. Note NO empty lines are allowed between content lines.
+  \item The format for a content line of a matrix is
+\begin{verbatim}
+    i j value
+\end{verbatim}
+       where $i$ is the row index, $j$ is the column index, and \verb"value" is the $(i,j)$ element of the matrix.
+  \item Format for a content line of a vector is
+\begin{verbatim}
+    value
+\end{verbatim}
+       Those values should be ordered sequentially, since indices are assumed to be implicitly embedded.
+\end{enumerate}
+
+An example of how to create new geometry using method 3 can be found in the example program in \verb"EXAMPLE\gemo".
+
+%------------------------------------------------------------------------------
+\subsection{Add new measurements}
+New measurements need be made through programming in QUEST.
+Several subroutines can be used to create new measurements.
+The standard procedure to add a new measurement includes three steps.
+\begin{enumerate}
+  \item Measuring.
+  \item Binning.
+  \item Postprocessing. (Statistics,  Fourier transformation, output.)
+\end{enumerate}
+
+\subsubsection{Measuring}
+Several components may be needed to create a new measurements.
+\begin{enumerate}
+  \item {\bf Equal time Green's function}: Equal time Green's function is defined in the module \verb"dqmc_gfun", which will be initialized automatically when the subroutine \verb"DQMC_Hub_Init" is called. Suppose \verb"Hub" is typed \verb"Hubbard", the major data type of entire simulation. The Green's function matrices, spin-up and spin-down, can be obtained from
+\begin{verbatim}
+    Hub%G_up%G
+    Hub%G_dn%G
+\end{verbatim}
+      And the signs of their determinants are recorded in
+\begin{verbatim}
+    Hub%G_up%sgn
+    Hub%G_dn%sgn
+\end{verbatim}
+  \item {\bf Unequal time Green's function}: Unequal time Green's function, denoted $G^{\tau}_{\rho}$, $\rho\in\{\uparrow,\downarrow\}$, is defined in the module \verb"dqmc_gtau". Unlike equal time Green's functions, $G^{\tau}$ are not essential in the simulation. Therefore, user needs to initialize it by calling \verb"DQMC_Gtau_Init" explicitly. The construction of $G^{\tau}$ can be made in two ways. The first way is to call \verb"DQMC_Gtau_Big", which returns entire $G^{\tau}_{\rho}$. The second method is to invoke \verb"DQMC_MakeGtau", which returns block submatrices of $G^{\tau}$. Since the signs of unequal time Green's functions are the same as the equal times, one can obtain the signs from \verb"Hub%G_up%sgn, Hub%G_dn%sgn".
+  \item {\bf Parameters of Hamiltonian}: Parameters, such as $t$, $\mu$ and $U$, are stored in the data type \verb"Hubbard". The access is straightforward.
+  \item {\bf Geometry related information}: Geometry information, such as hopping matrix, can be obtained from the data type \verb"struct", which is introduced in section 3.2.
+\end{enumerate}
+
+\subsubsection{Binning}
+In order to reduce correlation and bias, measurements in QUEST need be grouped into bins. Currently, equal divided binning strategy is used, which means the measurements are evenly divided by the total number of bins. Measurements in the same bin are averaged. The total number of bins are stored in the variable \verb"nbin".
+
+\subsubsection{Statistics}
+There are two special properties for the physical measurements produced by DQMC method.
+\begin{enumerate}
+  \item The distribution is not normal.
+  \item Measurements are weighted with signs of the determinants of Green's functions, for which the average needs be normalized by the average of signs.
+\end{enumerate}
+
+QUEST uses \emph{Jackknife} resampling technique in error estimation. Two subroutines are provided to perform the statistics: \verb"DQMC_JackKnife" and \verb"DQMC_SignJackKnife".
+The former is for error estimation of signs; the latter is used for other measurements. Those subroutines are defined in module \verb"dqmc_util".
+
+\subsubsection{Fourier transformation}
+For unequal time measurements, there are two possible Fourier transformations to be applied: transformation on the real space and transformation on the time domain. For the transformation on real space, since it is geometry dependent, a transformation matrix \verb"FT", defined in \verb"Struct", is required.\footnote{see section 3.2 for more details.} Once the matrix is available, the transformation is just a matrix-matrix multiplication. In the module \verb"dqmc_tdm", QUEST provides a subroutine \verb"DQMC_DCT_Space" for the space transformation.
+
+The Fourier transformation on the time domain is an integration. The numerical procedure is
+\begin{enumerate}
+  \item Refine the time grid.
+  \item Interpolate the refined data points.
+  \item Integrate on the interpolated data with Fourier coefficients.
+\end{enumerate}
+In step 1, QUEST evenly subdivides the time domain by the given parameter \verb"nitvl".
+In step 2, QUEST uses spline interpolation, which is supported by the subroutine \verb"DQMC_Spline". Step 3 requires an additional Fourier matrix, which can be generated from the subroutine \verb"DQMC_Make_FTM".  The entire procedure is coded in the subroutine \verb"DQMC_FT_Time".
+
+\subsubsection{Printing}
+QUEST has two subroutines that prints out arrays of numbers. Subroutine \verb"DQMC_Print_RealArry" prints out an array of real numbers; \verb"DQMC_Print_ComplexArray" prints out an array of complex numbers. The title of the measurements and the labels of each array items are required for those two functions.
+
+%==========================================================================================
+\appendix
+\section{Example programs}\label{sec exp}
+Eight example programs are included in the \verb|EXAMPLE| directory. Here is an short introduction for each of them.
+
+\subsection{\tt test}
+Program \verb|test| demonstrates the simplest usage of the QUEST. Besides the timing commands, there is only one line in the program, which runs DQMC simulation on a two dimensional periodic rectangular lattice. In spite of its simplicity, this program can be configured dynamically for different lattice size, Hubbard parameters and execution iterations.
+Four sample configurations are accompanied within this program, as showing below.
+	\begin{center}
+	\begin{tabular}{|l|c|c|rl|}
+	\hline
+	Configuration   &  Lattice size & Time slice& \multicolumn{2}{|c|}{Running time}\\
+	\hline
+	\verb|small.in|  & $4\times 4$ & 12 & 2 & second\\
+	\verb|median.in|  & $8\times 8$ & 48 & 198 & second\\
+	\verb|large.in|  & $16\times 16$ & 96 & 15,629 & second\\
+	\verb|extra_large.in|  & $32\times 32$ & 192 & \multicolumn{2}{|c|}{unknown}\\
+	\hline	
+	 \end{tabular}
+	\end{center}
+
+Their execution time also presented. This result is obtained by using checkerboard method, 1000 warmup steps and 5000 measurement steps, with Intel MKL BLAS/LAPACK library, on Intel Core 2 Duo 2.4G processors (but only run in one core).
+	
+\subsection{\tt verify}
+The \verb|verify| program examines the correctness of the execution results of two special cases, single site ($t=0$) and no Coulomb interaction ($U=0$).
+Each test case runs through 9 configurations.
+		
+The correctness of those results are checked against the theoretical results. Statistically, 63.2 percent of the computed results are expected to have errors smaller than one standard error, and 86.5 percent of results should be within two standard errors. The verification program runs 1000 warm-up sweep and 5000 measurement sweep for $t=0$ cases, which gives error bars of $0.33\%$ on the energy and less than $0.22\%$ on the spin correlation \verb|SpinXX|.
+
+
+\subsection{\tt tdm}
+This example program demonstrates how unequal time measurements can be performed.  This program also shows the flexibility of using the subroutines in QUEST.  Four sample configurations, the same those in \verb|test|, are available for this program.
+The time dependent measurements are made every 10 measurement sweeps.
+Their execution time are summarized in Table \ref{tbl tdm}.
+
+	\begin{center}
+	\begin{tabular}{|l|c|c|rl|}
+	\hline
+	Configuration   &  Lattice size & Time slice& \multicolumn{2}{|c|}{Running time}\\
+	\hline
+	\verb|small.in|  & $4\times 4$ & 12 & 3 & second\\
+	\verb|median.in|  & $8\times 8$ & 48 & 266 & second\\
+	\verb|large.in|  & $16\times 16$ & 96 & 19446.18 & second\\
+	\verb|extra_large.in|  & $32\times 32$ & 192 & \multicolumn{2}{|c|}{unknown}\\
+	\hline	
+	 \end{tabular}
+   \label{tbl tdm}
+	\end{center}
+
+\subsection{Others}
+\begin{itemize}
+  \item \verb"parallel": This program uses MPI to parallelize the measurement steps. The compilation of this program requires \verb|mpif90|. The base compiler of \verb|mpif90| should be the same as the one used in compiling library.
+  \item \verb"wrap": This directory contains a module \verb|dqmc_wrapper| and a program \verb|tw|. The module wraps all computation components of QUEST into several simpler functions. The program \verb"tw", test wrapper, can perform equal time and unequal time measurements.
+  \item \verb"sheet": This directory contains a module and programs for the multilayer lattice. Module \verb"dqmc_sheet" defines the multilayer geometry. Program \verb"meas1" and \verb"meas2" provides new measurements for the multilayer structure.
+  \item \verb"geom": The program inside this directory tests the general geometry method 3 mentioned in section 3.2.
+  \item \verb"DCA": This is a project that interfacing QUEST with other programs. Basically, the entire project uses DQMC as a DCA solver. This demonstrates how to use QUEST as a library in other programs.
+\end{itemize}
+
+%------------------------------------------------------------------------------
+%\bibliographystyle{plain}
+%\bibliography{note}
+
+\end{document}

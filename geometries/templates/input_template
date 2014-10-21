@@ -1,0 +1,36 @@
+# ==========================
+# files
+# ==========================
+ofile = {ofile}
+gfile = {gfile}
+#=======================
+# Hubbard Model
+#=======================
+mu_up = {mu}
+mu_dn = {mu}
+L = {nSlices}
+dtau = {dtau}
+HSF = -1
+bcond = {bx}, {by}, {bz}
+#=======================
+# Metropolis Algorithm
+#=======================
+nwarm = {nwarm}
+npass = {npass}
+ntry = {ntry}
+tausk = 1
+tdm = {tdm}
+#=======================
+# Measurements
+#=======================
+nbin = 5
+nhist = 1
+seed = {seed}
+#=======================
+# Numerical
+#=======================
+north = {north}
+nwrap = 15
+fixwrap = 1
+errrate = 0.01
+difflim = 0.01
