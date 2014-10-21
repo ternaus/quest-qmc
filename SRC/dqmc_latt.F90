@@ -61,7 +61,8 @@ end subroutine free_lattice
 ! Read and fill most of the variables that define the lattices in
 ! real and reciprocal space.
 !---------------------------------------------------------------------
-subroutine init_lattice(lattice) 
+subroutine init_lattice(lattice, SOP)
+ integer, intent(in) :: SOP 
  integer          :: ndim,nsites,natom,ncell,ios,i,j
  real*8           :: ainv(rdim,rdim)
  real*8, pointer  :: ac(:,:) 
@@ -146,22 +147,22 @@ subroutine init_lattice(lattice)
  lattice%initialized=.true.
  
  !write to stdout
- write(*,*)'================================================================'
- write(*,*)'Basic real space geometry info'
- write(*,*)
- write(*,*)'Crystal atomic basis'
- write(*,'(i3,3f14.7)')(j, lattice%xat(1:rdim,j),j=0,natom-1)
- write(*,*)
- write(*,*)'Basis cell vectors'
- write(*,'(3f14.7)')((ac(i,j),i=1,rdim),j=1,rdim)
- write(*,*)
- write(*,'(/,A)')' Supercell vectors (fractionary unit)'
- write(*,'(3i5)')((sc(i,j),i=1,rdim),j=1,rdim)
- write(*,*)
- write(*,*)'Super-Lattice vectors (cartesian)'
- write(*,'(3f14.7)')((scc(i,j),i=1,rdim),j=1,rdim)
- write(*,*)
- write(*,*)'================================================================'
+ write(SOP,*)'================================================================'
+ write(SOP,*)'Basic real space geometry info'
+ write(SOP,*)
+ write(SOP,*)'Crystal atomic basis'
+ write(SOP,'(i3,3f14.7)')(j, lattice%xat(1:rdim,j),j=0,natom-1)
+ write(SOP,*)
+ write(SOP,*)'Basis cell vectors'
+ write(SOP,'(3f14.7)')((ac(i,j),i=1,rdim),j=1,rdim)
+ write(SOP,*)
+ write(SOP,'(/,A)')' Supercell vectors (fractionary unit)'
+ write(SOP,'(3i5)')((sc(i,j),i=1,rdim),j=1,rdim)
+ write(SOP,*)
+ write(SOP,*)'Super-Lattice vectors (cartesian)'
+ write(SOP,'(3f14.7)')((scc(i,j),i=1,rdim),j=1,rdim)
+ write(SOP,*)
+ write(SOP,*)'================================================================'
  
 end subroutine init_lattice
 
@@ -171,8 +172,9 @@ end subroutine init_lattice
 !-----------------------------------------------------------------------
 ! Construct the real space lattice.
 !-----------------------------------------------------------------------
-subroutine construct_lattice(lattice)
+subroutine construct_lattice(lattice, SOP)
  type(lattice_t),intent(inout),target         :: lattice
+ integer, intent(in)     :: SOP
  integer                 :: natom,nsites,iat,jat,xxmax(rdim),xxmin(rdim),ix,iy,iz,icount,j,jcount,ndim,it
  real*8, pointer         :: ac(:,:)  
  real*8, pointer         :: pos(:,:) 
@@ -259,16 +261,16 @@ subroutine construct_lattice(lattice)
  enddo
 
  !Printing out
-  write(*,*)'Real space lattice'
-  write(*,*)
-  write(*,*)'Number of orbitals in primitive cell: ',natom
-  write(*,*)'Total number of orbitals:             ',nsites
-  write(*,*)'index  label   type       X           Y         Z   '
+  write(SOP,*)'Real space lattice'
+  write(SOP,*)
+  write(SOP,*)'Number of orbitals in primitive cell: ',natom
+  write(SOP,*)'Total number of orbitals:             ',nsites
+  write(SOP,*)'index  label   type       X           Y         Z   '
   do iat=0,nsites-1
    icount=mod(iat,natom)
-   write(*,'(i3,1x,A,1x,i3,3f14.5)')iat,lattice%olabel(icount),icount,(cartpos(j,iat),j=1,3)
+   write(SOP,'(i3,1x,A,1x,i3,3f14.5)')iat,lattice%olabel(icount),icount,(cartpos(j,iat),j=1,3)
   enddo
-  write(*,*)'================================================================'
+  write(SOP,*)'================================================================'
 
  lattice%pos => pos
  lattice%cartpos => cartpos
