@@ -91,8 +91,9 @@ end subroutine free_pairs
 ! xxbond(1:3,ibond) are the cartesian coordinate describing the bond. When
 ! bond_label(jbond)=-bond_label(ibond) => xxbond(1:3,jbond)=-xxbond(1:3,ibond)
 !-------------------------------------------------------------------------------------
-subroutine read_bonds(Bonds)
+subroutine read_bonds(Bonds, SOP)
 type(bonds_t) :: Bonds
+integer, intent(in) :: SOP
 integer :: nrecord,iat,jat,ibond,irec,ios,i,ntotbond
 integer, pointer :: bond_label(:) 
 integer, pointer :: bond_origin(:) 
@@ -144,9 +145,9 @@ if(move_to_record(INPUT_FIELDS(BONDS_F),inpunit))then
  enddo 
 
  !Print out
- write(*,*)'Bonds (from input)'
+ write(SOP,*)'Bonds (from input)'
  do ibond=1,ntotbond
-  write(*,'(3i4,3f12.7)')ibond,bond_label(ibond),bond_origin(ibond),xxbond(1:rdim,ibond)
+  write(SOP,'(3i4,3f12.7)')ibond,bond_label(ibond),bond_origin(ibond),xxbond(1:rdim,ibond)
  enddo
 
  !Save info in Bonds
@@ -173,10 +174,11 @@ end subroutine read_bonds
 ! coeffiecients (pair_bond_wgt) with which the pairing susceptibility have to be
 ! combined to obtain pair state with a given angular momentum.
 !------------------------------------------------------------------------------------------
-subroutine construct_pairs(Bonds,Pairs,lattice)
+subroutine construct_pairs(Bonds,Pairs,lattice, SOP)
 type(bonds_t) :: Bonds
 type(pairing) :: Pairs
 type(lattice_t) :: lattice
+integer, intent(in) :: SOP
 integer :: ios,idum,ibond,iwave,iat,jat,icell,isite,jbond,nwave,npairbond,natom,nsites,ncell
 integer, allocatable :: pair_bond_label(:)
 integer, pointer     :: pair_bond_origin(:,:) 
@@ -244,12 +246,12 @@ if(move_to_record(INPUT_FIELDS(PAIRS_F),inpunit))then
    enddo
   
    !Print
-   write(*,'(1x,A)')'Wave coefficients'
-   write(*,'(11x,20(5x,i2,3x))')(pair_bond_map(ibond),ibond=1,npairbond)
+   write(SOP,'(1x,A)')'Wave coefficients'
+   write(SOP,'(11x,20(5x,i2,3x))')(pair_bond_map(ibond),ibond=1,npairbond)
    do iwave = 1, nwave
-      write(*,'(1x,A10,20f10.5)')wave_label(iwave),(pair_bond_wgt(iwave,ibond),ibond=1,npairbond)
+      write(SOP,'(1x,A10,20f10.5)')wave_label(iwave),(pair_bond_wgt(iwave,ibond),ibond=1,npairbond)
    enddo
-   write(*,'(76(''=''))')
+   write(SOP,'(76(''=''))')
    deallocate(pair_bond_label)
    donullify = .false.
 else
