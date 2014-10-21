@@ -112,8 +112,8 @@ program dqmc_ggeom
   ! Warmup sweep
   do i = 1, Hub%nWarm
      if (mod(i, 10)==0) write(*,'(A,i6,1x,i3)')' Warmup Sweep, nwrap  : ', i, Hub%G_up%nwrap
-     !call DQMC_Hub_Sweep(Hub, NO_MEAS0)
-     !call DQMC_Hub_Sweep2(Hub, Hub%nTry)
+     call DQMC_Hub_Sweep(Hub, NO_MEAS0)
+     call DQMC_Hub_Sweep2(Hub, Hub%nTry)
   end do
 
   ! We divide all the measurement into nBin,
