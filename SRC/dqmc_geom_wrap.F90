@@ -56,10 +56,10 @@ module DQMC_GEOM_WRAP
     call analyze_input
   
     !Initialize basic info about real space cluster
-    call init_lattice(gwrap%Lattice)
+    call init_lattice(gwrap%Lattice, SOP)
 
     !Construct full lattice 
-    call construct_lattice(gwrap%Lattice)
+    call construct_lattice(gwrap%Lattice, SOP)
  
     !Initialize basic info about reciprocal lattice
     call init_recip_latt(gwrap%Lattice,gwrap%RecipLattice,.true.,cfg)
@@ -105,7 +105,7 @@ module DQMC_GEOM_WRAP
     call assign_gf_phase(gwrap%Lattice,gwrap%RecipLattice%ktwist)
 
     !Read Bonds (optional input)   
-    call read_bonds(gwrap%Bonds)
+    call read_bonds(gwrap%Bonds, SOP)
 
     if(gwrap%Bonds%initialized)then
        !bond-to-bond map of action of symmetry on bonds
@@ -115,7 +115,7 @@ module DQMC_GEOM_WRAP
        call construct_bond_classes(gwrap%Bonds,gwrap%SymmOp)
 
        !Map bonds throughout the entire lattice
-       call construct_pairs(gwrap%Bonds,gwrap%Pairs,gwrap%Lattice)
+       call construct_pairs(gwrap%Bonds,gwrap%Pairs,gwrap%Lattice, SOP)
 
        !pair-to-pair map of action of symmetry on bonds
        call map_symm_pairs(gwrap%Pairs, gwrap%SymmOp)
