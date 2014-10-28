@@ -1,6 +1,4 @@
 program dqmc_ggeom
-! enabling OpenMP to parallelize TDM
-!#include "dqmc_omp.h"
 
   use dqmc_cfg
   use dqmc_geom_wrap
@@ -16,10 +14,8 @@ program dqmc_ggeom
   type(GeomWrap)      :: Gwrap
   type(tdm1)          :: tm
   type(Gtau)          :: tau
-#ifdef _OMPTDM
   type(tdm1),pointer  :: ptm(:)
   type(Gtau),pointer  :: ptau(:)
-#endif
   character(len=slen) :: gfile
   logical             :: tformat
   integer             :: na, nt, nkt, nkg, i, j, k, slice, nhist, comp_tdm
@@ -30,7 +26,14 @@ program dqmc_ggeom
   integer             :: symmetries_output_file_unit
   integer             :: FLD_UNIT, TDM_UNIT
   real(wp)            :: randn(1)
-
+  character(len=32)   :: argv
+  integer             :: omp
+  call getarg(2, argv)
+  if(argv == '-p') then
+     omp = 1
+  else
+     omp = 0
+  endif
   call system_clock(t1)  
 
   !Count the number of processors
@@ -84,29 +87,29 @@ program dqmc_ggeom
      call DQMC_open_file(adjustl(trim(ofile))//'.tdm.out','unknown', TDM_UNIT)
      call DQMC_Gtau_Init(Hub, tau)
      call DQMC_TDM1_Init(Hub%L, Hub%dtau, tm, Hub%P0%nbin, Hub%S, Gwrap)
-#ifdef _OMPTDM
-     write(*,*) "Initialize multi-core working space."
-     allocate(ptau(tau%nb*tau%nb))
-     do i = 1, tau%nb*tau%nb
-        call DQMC_Gtau_Init(Hub, ptau(i))
-     enddo
-     do i = 1, tau%nb * tau%nb
-        ptau(i)%A_up => tau%A_up
-        ptau(i)%A_dn => tau%A_dn
-        ptau(i)%itau_up => tau%itau_up
-        ptau(i)%itau_dn => tau%itau_dn
-        ptau(i)%sgnup => tau%sgnup
-        ptau(i)%sgndn => tau%sgndn
-        ptau(i)%V_up  => tau%V_up
-        ptau(i)%V_dn  => tau%V_dn
-        ptau(i)%B_up  => tau%B_up
-        ptau(i)%B_dn  => tau%B_dn
-     enddo
-     allocate(ptm(tau%nb*tau%nb))
-     do i = 1, tau%nb*tau%nb
-        call DQMC_TDM1_Init(Hub%L, Hub%dtau, ptm(i), Hub%P0%nbin, Hub%S, Gwrap)
-     enddo  
-#endif
+     if (omp > 0) then
+        write(*,*) "Initialize multi-core working space."
+        allocate(ptau(tau%nb*tau%nb))
+        do i = 1, tau%nb*tau%nb
+           call DQMC_Gtau_Init(Hub, ptau(i))
+        enddo
+        do i = 1, tau%nb * tau%nb
+           ptau(i)%A_up => tau%A_up
+           ptau(i)%A_dn => tau%A_dn
+           ptau(i)%itau_up => tau%itau_up
+           ptau(i)%itau_dn => tau%itau_dn
+           ptau(i)%sgnup => tau%sgnup
+           ptau(i)%sgndn => tau%sgndn
+           ptau(i)%V_up  => tau%V_up
+           ptau(i)%V_dn  => tau%V_dn
+           ptau(i)%B_up  => tau%B_up
+           ptau(i)%B_dn  => tau%B_dn
+        enddo
+        allocate(ptm(tau%nb*tau%nb))
+        do i = 1, tau%nb*tau%nb
+           call DQMC_TDM1_Init(Hub%L, Hub%dtau, ptm(i), Hub%P0%nbin, Hub%S, Gwrap)
+        enddo  
+     endif  
   endif
 
   ! Warmup sweep
@@ -140,11 +143,11 @@ program dqmc_ggeom
               ! Measure equal-time properties
               call DQMC_Hub_FullMeas(Hub, tau%nnb, tau%A_up, tau%A_dn, tau%sgnup, tau%sgndn)
               ! Measure time-dependent properties
-#ifndef _OMPTDM
-              call DQMC_TDM1_Meas(tm, tau)
-#else
-              call DQMC_TDM1_Meas_Para(tm, ptm, tau, ptau)
-#endif
+              if (omp > 0) then    
+                 call DQMC_TDM1_Meas_Para(tm, ptm, tau, ptau)
+              else
+                 call DQMC_TDM1_Meas(tm, tau)
+              endif
            else if (comp_tdm == 0) then
               call DQMC_Hub_Meas(Hub, slice)
            endif
@@ -263,10 +266,10 @@ program dqmc_ggeom
   call DQMC_TDM1_Free(tm)
   call DQMC_Hub_Free(Hub)
   call DQMC_Config_Free(cfg)
-#ifdef _OMPTDM
-  deallocate(ptm)
-  deallocate(ptau)
-#endif  
+  if (omp > 0) then
+     deallocate(ptm)
+     deallocate(ptau)
+  endif
   call system_clock(t2,rate)
   call DQMC_MPI_Final(qmc_sim)
   write(STDOUT,*) "Running time:",  (t2-t1)/REAL(rate), "(second)"
