@@ -2,7 +2,7 @@ module DQMC_OMP
   implicit none
 contains
   subroutine DQMC_OMP_Init(nproc)
-    ！ Read in the number of OpenMP threads to execute TDM
+    ! Read in the number of OpenMP threads to execute TDM
     integer, intent(inout)  :: nproc
     
     character(len=32)       :: argv
