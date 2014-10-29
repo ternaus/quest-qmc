@@ -5,6 +5,7 @@ program dqmc_ggeom
   use dqmc_hubbard
   use dqmc_mpi
   use dqmc_tdm1
+  use dqmc_omp
 
   implicit none
 
@@ -26,21 +27,15 @@ program dqmc_ggeom
   integer             :: symmetries_output_file_unit
   integer             :: FLD_UNIT, TDM_UNIT
   real(wp)            :: randn(1)
-  character(len=32)   :: argv
-  integer             :: nproc, OMP_GET_NUM_PROCS
-  call getarg(2, argv)
-  if(argv == '-p') then
-     nproc =  OMP_GET_NUM_PROCS()
-     call OMP_SET_NUM_THREADS(nproc)
-     write(*,*) "Running the program in ",nproc," threads."
-  else
-     nproc = 1
-  endif
+  integer             :: nproc
   call system_clock(t1)  
+
+  !Setup OpenMP environment
+  call DQMC_OMP_Init(nproc)
 
   !Count the number of processors
   call DQMC_MPI_Init(qmc_sim, PLEVEL_1)
- 
+   
   !Read input
   call DQMC_Read_Config(cfg)
 
@@ -90,7 +85,7 @@ program dqmc_ggeom
      call DQMC_Gtau_Init(Hub, tau)
      call DQMC_TDM1_Init(Hub%L, Hub%dtau, tm, Hub%P0%nbin, Hub%S, Gwrap)
      if (nproc > 1) then
-        write(*,*) "Initialize multi-core working space."
+        write(*,*) "Initializing multi-core working space."
         allocate(ptau(tau%nb*tau%nb))
         do i = 1, tau%nb*tau%nb
            call DQMC_Gtau_Init(Hub, ptau(i))
@@ -279,4 +274,6 @@ program dqmc_ggeom
   close(symmetries_output_file_unit)
 
 end program dqmc_ggeom
+
+
 
