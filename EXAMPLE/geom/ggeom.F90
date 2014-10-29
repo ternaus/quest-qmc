@@ -27,15 +27,14 @@ program dqmc_ggeom
   integer             :: FLD_UNIT, TDM_UNIT
   real(wp)            :: randn(1)
   character(len=32)   :: argv
-  integer             :: omp, nproc, OMP_GET_NUM_PROCS
+  integer             :: nproc, OMP_GET_NUM_PROCS
   call getarg(2, argv)
   if(argv == '-p') then
-     omp = 1
      nproc =  OMP_GET_NUM_PROCS()
      call OMP_SET_NUM_THREADS(nproc)
      write(*,*) "Running the program in ",nproc," threads."
   else
-     omp = 0
+     nproc = 1
   endif
   call system_clock(t1)  
 
@@ -90,7 +89,7 @@ program dqmc_ggeom
      call DQMC_open_file(adjustl(trim(ofile))//'.tdm.out','unknown', TDM_UNIT)
      call DQMC_Gtau_Init(Hub, tau)
      call DQMC_TDM1_Init(Hub%L, Hub%dtau, tm, Hub%P0%nbin, Hub%S, Gwrap)
-     if (omp > 0) then
+     if (nproc > 1) then
         write(*,*) "Initialize multi-core working space."
         allocate(ptau(tau%nb*tau%nb))
         do i = 1, tau%nb*tau%nb
@@ -146,7 +145,7 @@ program dqmc_ggeom
               ! Measure equal-time properties
               call DQMC_Hub_FullMeas(Hub, tau%nnb, tau%A_up, tau%A_dn, tau%sgnup, tau%sgndn)
               ! Measure time-dependent properties
-              if (omp > 0) then    
+              if (nproc > 1) then    
                  call DQMC_TDM1_Meas_Para(tm, ptm, tau, ptau)
               else
                  call DQMC_TDM1_Meas(tm, tau)
@@ -269,7 +268,7 @@ program dqmc_ggeom
   call DQMC_TDM1_Free(tm)
   call DQMC_Hub_Free(Hub)
   call DQMC_Config_Free(cfg)
-  if (omp > 0) then
+  if (nproc > 0) then
      deallocate(ptm)
      deallocate(ptau)
   endif
