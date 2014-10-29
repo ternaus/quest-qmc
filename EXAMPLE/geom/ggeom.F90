@@ -268,7 +268,7 @@ program dqmc_ggeom
   call DQMC_TDM1_Free(tm)
   call DQMC_Hub_Free(Hub)
   call DQMC_Config_Free(cfg)
-  if (nproc > 0) then
+  if (nproc > 1) then
      deallocate(ptm)
      deallocate(ptau)
   endif
