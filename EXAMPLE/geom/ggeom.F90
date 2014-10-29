@@ -27,10 +27,13 @@ program dqmc_ggeom
   integer             :: FLD_UNIT, TDM_UNIT
   real(wp)            :: randn(1)
   character(len=32)   :: argv
-  integer             :: omp
+  integer             :: omp, nproc, OMP_GET_NUM_PROCS
   call getarg(2, argv)
   if(argv == '-p') then
      omp = 1
+     nproc =  OMP_GET_NUM_PROCS()
+     call OMP_SET_NUM_THREADS(nproc)
+     write(*,*) "Running the program in ",nproc," threads."
   else
      omp = 0
   endif
