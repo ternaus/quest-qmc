@@ -55,7 +55,6 @@ ifeq ($(COMPILER), intel)
   FC        = ifort
   CXX       = icpc
   FC_FLAGS  = -openmp -m64 -warn all -O3 -unroll
-  endif
   #FC_FLAGS = -m64 -g -traceback -check all -O0 -ftrapuv -debug all
   #CXX_FLAGS = -m64 -g -traceback -O0 -check-uninit -ftrapuv -debug all
   CXX_FLAGS = -m64 -Wall -O3 -unroll $(CUDAINC) $(MAGMAINC)
@@ -64,7 +63,6 @@ ifeq ($(COMPILER), gnu)
   FC        = gfortran
   CXX       = g++
   FC_FLAGS  = -fopenmp -m64 -Wall -O3 -funroll-loops
-  endif
   CXX_FLAGS = -m64 -Wall -O3 -funroll-loops $(CUDAINC) $(MAGMAINC)
 endif
 
