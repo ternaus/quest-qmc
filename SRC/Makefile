@@ -14,7 +14,7 @@ else
 OBJ = 	$(SRC:.F90=.o) computeg.o blaslapack.o profile.o kernel_cpu.o
 endif
 
-SRC =	dqmc_mpi.F90 dqmc_util.F90 dqmc_cfg.F90 \
+SRC =	dqmc_omp.F90 dqmc_mpi.F90 dqmc_util.F90 dqmc_cfg.F90 \
 	dqmc_geom_param.F90 dqmc_latt.F90 dqmc_bonds.F90 dqmc_reclatt.F90 \
 	dqmc_hamilt.F90 dqmc_symm.F90 \
 	dqmc_wspace.F90 dqmc_struct.F90 dqmc_geom_wrap.F90 $(InitB) \
