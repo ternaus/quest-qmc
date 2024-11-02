@@ -5,6 +5,7 @@ QUEST is a scientific computing package designed for quantum electron simulation
 ## Prerequisites for MacOS
 
 Install the required compilers using Homebrew:
+
 ```bash
 brew install gcc
 brew install gfortran
@@ -13,12 +14,14 @@ brew install gfortran
 ## Installation
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/ternaus/quest-qmc.git
 cd quest-qmc
 ```
 
-2. Build the project:
+1. Build the project:
+
 ```bash
 # This will automatically:
 # 1. Build OpenBLAS if needed
@@ -44,6 +47,7 @@ make clean  # Clean all built files
 ## Running Examples
 
 After building, you can run the examples from the EXAMPLE directory:
+
 ```bash
 cd EXAMPLE
 ./example1  # Replace with actual example name
@@ -67,11 +71,12 @@ If you use this software in your research, please cite:
 Common issues and solutions:
 
 1. OpenMP issues on MacOS:
+
 ```bash
 # If you see OpenMP-related errors, install:
 brew install libomp
 ```
 
-2. Compilation errors:
+1. Compilation errors:
    - Make sure you have the latest versions of gcc and gfortran
    - Check that all paths in the Makefile are correct

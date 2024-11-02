@@ -1,18 +1,17 @@
 ############################################################################
-#  QUEST Makefile - Simplified for MacOS
+#  QUEST Makefile - Using Apple Accelerate Framework
 ############################################################################
 QUEST_DIR = $(shell pwd)
 
 # Compiler settings
 FC        = gfortran
 CXX       = g++
-FC_FLAGS  = -fopenmp -Wall -O3 -funroll-loops
+FC_FLAGS  = -fopenmp -Wall -O3 -funroll-loops -fexternal-blas
 CXX_FLAGS = -Wall -O3 -funroll-loops
 
 # Libraries
 CXXLIB    = -lstdc++
-libOpenBLAS = $(QUEST_DIR)/OpenBLAS/libopenblas.a
-LAPACKLIB = $(libOpenBLAS)
+LAPACKLIB = -framework Accelerate
 
 # Archiver
 ARCH    = ar
@@ -25,31 +24,20 @@ DQMCLIB = libdqmc.a
 # Required libraries for driver routines
 LIB = $(CXXLIB) $(LAPACKLIB)
 
-.PHONY: all libdqmc example lapack clean
+.PHONY: all libdqmc example clean
 
 # Default target
 all: libdqmc example
 
-# Check if OpenBLAS exists before building main targets
-libdqmc: check_openblas
+# Build main library
+libdqmc:
 	$(MAKE) -C SRC
 
 example: libdqmc
 	$(MAKE) -C EXAMPLE
 
-# OpenBLAS handling
-lapack:
-	$(MAKE) -C $(QUEST_DIR)/OpenBLAS
-
-check_openblas:
-	@if [ ! -f $(libOpenBLAS) ]; then \
-		echo "OpenBLAS not found. Building it first..." ; \
-		$(MAKE) lapack ; \
-	fi
-
 # Cleanup
 clean:
-	$(MAKE) -C $(QUEST_DIR)/OpenBLAS clean
 	$(MAKE) -C $(QUEST_DIR)/SRC clean
 	$(MAKE) -C $(QUEST_DIR)/EXAMPLE clean
 	$(RM) $(QUEST_DIR)/$(DQMCLIB)
@@ -60,7 +48,6 @@ help:
 	@echo "  all     - Build everything (default)"
 	@echo "  libdqmc - Build DQMC library"
 	@echo "  example - Build examples"
-	@echo "  lapack  - Build OpenBLAS"
 	@echo "  clean   - Clean all built files"
 	@echo "  help    - Show this help message"
 
