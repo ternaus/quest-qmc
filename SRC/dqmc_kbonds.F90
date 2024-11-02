@@ -9,16 +9,16 @@ type :: kbonds_t
    integer :: nbonds
    integer :: nmomenta
 
-   integer,  pointer  :: map_symm_ak(:,:)    
-   integer,  pointer  :: map_symm_bak(:,:,:) 
-   integer,  pointer  :: class_size(:,:)     
-   integer,  pointer  :: myclass(:,:,:) 
-   integer,  pointer  :: nclass(:) 
-   integer,  pointer  :: bond_origin(:, :) 
-   integer,  pointer  :: bond_target(:, :) 
-   integer,  pointer  :: bmap(:, :, :)    
+   integer,  pointer  :: map_symm_ak(:,:)
+   integer,  pointer  :: map_symm_bak(:,:,:)
+   integer,  pointer  :: class_size(:,:)
+   integer,  pointer  :: myclass(:,:,:)
+   integer,  pointer  :: nclass(:)
+   integer,  pointer  :: bond_origin(:, :)
+   integer,  pointer  :: bond_target(:, :)
+   integer,  pointer  :: bmap(:, :, :)
 
-   real(wp), pointer  :: ksum(:,:) 
+   real(wp), pointer  :: ksum(:,:)
 
 end type
 
@@ -57,7 +57,7 @@ contains
    kbonds%nbonds = na * na * nk
    kbonds%nmomenta = nm
    allocate(kbonds%map_symm_ak(na*nk, ns))
-   
+
    !Loop over atom types
    do ia = 0, na-1
       !Loop over k-points
@@ -87,7 +87,7 @@ contains
 
    write(snd,'(i1)')nd
    write(sfmt,'(5A)')'(i2,1x,',snd,'f9.5,1x,"->",1x,i2,1x,',snd,'f9.5)'
-    
+
    open(unit=25, file='symmetry_map.info', status='unknown',position='append')
    do is = 1, ns
       id = symm%valid_symm(is)
@@ -118,11 +118,11 @@ contains
  subroutine construct_kbonds(reclatt, kbonds)
 
    ! Given the total number of momenta for the pair,
-   ! construct bonds amongst states (iat,k) and (jat,k') 
-   ! that have a total momentum k+k' that sums up to the 
+   ! construct bonds amongst states (iat,k) and (jat,k')
+   ! that have a total momentum k+k' that sums up to the
    ! requested one. Note that a bond has a direction:
    ! it goes from (iat,k), where an up spin particle is
-   ! created, to (jat,k), where a down one is created. 
+   ! created, to (jat,k), where a down one is created.
    ! It is possible for some of the pairs to be identical
    ! (overcounting). This, however, does not pose any major
    ! problem apart from a small overhead during the computation
@@ -141,8 +141,8 @@ contains
    nmom   = reclatt%nmomenta
    nk     = reclatt%nkpts
    nat    = nak / nk
-   
- 
+
+
    allocate(kbonds%bmap(nak,nak,nmom))
    allocate(kbonds%bond_origin(nb,nmom))
    allocate(kbonds%bond_target(nb,nmom))
@@ -192,25 +192,25 @@ contains
          stop
       endif
    enddo
- 
+
  end subroutine construct_kbonds
 
 !-----------------------------------------------------------------!
 
  subroutine map_symm_kbond(kbonds)
- 
+
  ! Given a pair (iat,k),(jat,k') this routines set up a matrix
  ! that map the action of all symmetry operations into the
  ! label of the final pair.
- 
+
    type(kbonds_t), intent(inout) :: kbonds
    integer :: im, ib, jb, iak, jak, isymm, inew, jnew, nsymm, nb, nm
- 
+
    nsymm = size(kbonds%map_symm_ak, 2)
    nb = kbonds%nbonds
    nm = kbonds%nmomenta
    allocate(kbonds%map_symm_bak(nb, nsymm, nm))
-   
+
    !Loop over all pair momenta
    do im = 1, kbonds%nmomenta
    !Loop over all pairs with momenta im
@@ -225,47 +225,47 @@ contains
             jnew = kbonds%map_symm_ak(jak, isymm)
             !and their pair number
             jb   = kbonds%bmap(inew, jnew, im)
-            if (jb < 0) stop'Symmetry map is wrong'
+            if (jb < 0) stop 'Symmetry map is wrong'
             !Store the mapping
             kbonds%map_symm_bak(ib, isymm, im) = jb
          enddo
       enddo
    enddo
- 
+
  end subroutine map_symm_kbond
 
 !-----------------------------------------------------------------!
 
  subroutine construct_kbond_classes(kbonds)
- 
+
  ! This routine construct my_class_b(ib,jb) where ib and jb are two bonds.
  ! my_class contains the symmetry class of the pair (ib,jb)
- 
- 
+
+
    type(kbonds_t),intent(inout)      :: kbonds
    integer :: nclass, ntotbond
    integer :: ib, isymm, iclass, istart, im, ak1 ,ak2
    integer :: csize, csizenew, maxclass, nsymm
    integer :: id, bx, by, jclass, jstart, idj, mclass, jb, i, j
-   integer,pointer :: myclass(:,:) 
+   integer,pointer :: myclass(:,:)
    integer, allocatable :: bond1(:,:), bond2(:,:), csizev(:)
-   integer, pointer :: map_symm_b(:,:) 
-   
+   integer, pointer :: map_symm_b(:,:)
+
    ntotbond   = kbonds%nbonds
    nsymm      = size(kbonds%map_symm_ak, 2)
    allocate(myclass(ntotbond,ntotbond))
    allocate(kbonds%myclass(ntotbond,ntotbond,kbonds%nmomenta))
    allocate(kbonds%nclass(kbonds%nmomenta))
-      
+
    do im = 1, kbonds%nmomenta
-   
+
       nclass = (ntotbond**2+ntotbond) / 2
       allocate(csizev(nclass))
       allocate(bond1(2,nclass))
       allocate(bond2(2,nclass))
-      
+
       map_symm_b => kbonds%map_symm_bak(:,:,im)
-      
+
       !Initially Define classes as if all bonds were different
       !the pair (bond1(ix,iclass) , bond2(ix,iclass)) is the ix-th member
       !of class "iclass"
@@ -279,7 +279,7 @@ contains
          bond2(1,nclass) = ib
          csizev(nclass)  = 1
       enddo
-   
+
       !Classes made up by distinct bonds
       do ib = 1, ntotbond
          do jb = ib+1, ntotbond
@@ -293,7 +293,7 @@ contains
             csizev(nclass)  = 2
          enddo
       enddo
-      
+
       !Try all symmetry operations. The "+1" operation corresponds to
       !the symmetry between up-dn-dn-up and dn-up-up-dn.
       do isymm = 1, nsymm + 1
@@ -302,11 +302,11 @@ contains
             istart = 1
             !we now loop over the elements of a class.
             !This number is increased as we found new equivalent
-            !elements. 
-            do  
+            !elements.
+            do
                csize    = csizev(iclass)
                csizenew = csize
-               do id = istart, csize 
+               do id = istart, csize
                   !map the two bonds
                   if (isymm == nsymm + 1) then
                      ak1 = kbonds%bond_origin(bond1(id,iclass),im)
@@ -329,7 +329,7 @@ contains
                      call resize_class()
                      !transfer jclass member to iclass
                      do idj=1,csizev(jclass)
-                        bx = bond1(idj, jclass) 
+                        bx = bond1(idj, jclass)
                         by = bond2(idj, jclass)
                         myclass(bx,by) = iclass
                         bond1(jstart+idj,iclass) = bx
@@ -347,7 +347,7 @@ contains
             enddo
          enddo
       enddo
-      
+
       !Exclude empty classes
       mclass = 0
       do i = 1, nclass
@@ -358,13 +358,13 @@ contains
             myclass(bx,by) = mclass
          enddo
       enddo
-      
+
       !Save classes in Bonds and determine class size
       kBonds%nclass(im) = mclass
       kBonds%myclass(:,:,im) = myclass(:,:)
 
       deallocate(bond1, bond2, csizev)
-   
+
    enddo ! npairk
 
    deallocate(myclass)
@@ -382,13 +382,13 @@ contains
    enddo
 
    contains
-   
+
      subroutine resize_class()
        implicit none
        ! ... Local vars ...
        integer :: curr_csize
        integer, allocatable :: tmpbond(:,:)
-   
+
        ! ... Executable ...
        curr_csize = size(bond1,1)
        if (csizenew > curr_csize) then
@@ -407,7 +407,7 @@ contains
           deallocate(tmpbond)
        end if
      end subroutine resize_class
-   
+
    end subroutine construct_kbond_classes
 
 end module DQMC_KBONDS

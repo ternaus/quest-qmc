@@ -10,13 +10,13 @@ type :: symm_operations
  integer               :: nsymm                 !number of symmetries compatible with supercell
  integer               :: ntransl               !number of translations
  integer, pointer      :: map_symm(:,:)         !action of symmetry on site (0:nsites-1, nsymm)
-                                                !map_symm(i,j) returns the site where site "i" is mapped 
+                                                !map_symm(i,j) returns the site where site "i" is mapped
                                                 !by symmetry operation 'j"
  integer, pointer      :: map_symm_k(:,:)       !action of symmetry on k-point (nkpts, msymm)
-                                                !map_symm_k(i,j) returns the k-point where k-point "i" is mapped 
+                                                !map_symm_k(i,j) returns the k-point where k-point "i" is mapped
                                                 !by symmetry operation 'j"
  integer, pointer      :: map_symm_g(:,:)       !action of symmetry on k-point (nkpts, msymm)
-                                                !map_symm_k(i,j) returns the k-point where k-point "i" is mapped 
+                                                !map_symm_k(i,j) returns the k-point where k-point "i" is mapped
                                                 !by symmetry operation 'j"
                                                 !msymm is equal to nsymm if addTimeRev==false. Otherwise msymm=nsymm+1
  integer, pointer      :: map_symm_b(:,:)       !action of symmetry on bond (ntotbond, nsymm)
@@ -24,8 +24,8 @@ type :: symm_operations
  integer, pointer      :: map_symm_p(:,:)       !action of symmetry on pair (nbond, nsymm)
                                                 !Pairs are a subset of bonds used to describe pairing properties.
                                                 !Their symmetry property are derived from those of bonds.
- integer, pointer      :: translback(:)         !number of the translation mapping a site into its untranslated 
-                                                !image inside the primitive cell (0:nsites-1) 
+ integer, pointer      :: translback(:)         !number of the translation mapping a site into its untranslated
+                                                !image inside the primitive cell (0:nsites-1)
  integer, pointer      :: translate(:,:)        !action of translations on site (0:nsites-1,0:ntransl-1)
  integer, pointer      :: valid_symm(:)         !label of valid symmetry operation(nsymm)
                                                 !It returns a number between 1 and ntotsymm
@@ -37,7 +37,7 @@ type :: symm_operations
                                                 !rotations and reflections
  character*1, pointer  :: symmlabel(:)          !label of operation: C, D, I ,S (ntotsymm)
                                                 !rotation, mirror plane, inversion center, rotoreflection
- 
+
  logical               :: initialized
  logical               :: lattice_mapped
  logical               :: recip_lattice_mapped
@@ -95,10 +95,10 @@ real*8 xpoint(3),xaxis(3),xnorm
 character*50 string
 character*1 label
 logical dum
-character*1, pointer :: symmlabel(:)  
-real*8, pointer      :: symmangle(:)  
+character*1, pointer :: symmlabel(:)
+real*8, pointer      :: symmangle(:)
 real*8, pointer      :: symmpoint(:,:)
-real*8, pointer      :: symmaxis(:,:) 
+real*8, pointer      :: symmaxis(:,:)
 type(symm_operations),intent(out) :: SymmOp
 
 !Count the symmetry operation specified in input
@@ -240,7 +240,7 @@ real*8 trans_set(3,nset),d,a1,a2,rot1(3,3),rot2(3,3),rot3(3,3),globrot(3,3), &
 character*1 label
 
 !If transformation is in k-space symmetry operation necessarily goes through 0.d0
-!dpoint is the "origin" 
+!dpoint is the "origin"
 if(reciprocal)then
  dpoint(:)=0.d0
  dset=reshape(set,shape=(/3,nset/),order=(/2,1/))
@@ -256,7 +256,7 @@ if(label=='i'.or.label=='I')then
  enddo
 else
  !Deal with rotations, reflections or rotoreflections
- if(label=='c'.or.label=='C')then 
+ if(label=='c'.or.label=='C')then
   irefl=1
  else
   irefl=-1
@@ -334,7 +334,7 @@ end subroutine apply_point_symm
 !supercell are discarded. msymm is the number of compatible point
 !symmetries.
 ! Construct translate(ifrom,itrans). Analogous to map_symm but returns
-!the orbital to which ifrom is mapped by translation itrans. 
+!the orbital to which ifrom is mapped by translation itrans.
 ! Construct translback(ifrom). It returns the translation that applied
 !to ifrom reduces the latter to the equivalent orbital inside the
 !primitive cell.
@@ -351,13 +351,13 @@ integer, intent(in)            :: SOP
 integer :: i, istart, ipat, jpat, iat, jat, ii, it, itl, is
 integer :: nsites, ntotsymm, ndim, msymm, nsymm, ntransl, natom
 integer :: valid_symm(SymmOp%ntotsymm)
-integer :: tmp_symm(0:lattice%nsites-1,SymmOp%ntotsymm) 
+integer :: tmp_symm(0:lattice%nsites-1,SymmOp%ntotsymm)
 
 real*8  :: diff(rdim), projsc(rdim), invscc(rdim,rdim)
 real*8  :: newpos(rdim,0:lattice%nsites-1)
-real*8, pointer  :: symmangle(:)  
+real*8, pointer  :: symmangle(:)
 real*8, pointer  :: symmpoint(:,:)
-real*8, pointer  :: symmaxis(:,:) 
+real*8, pointer  :: symmaxis(:,:)
 
 logical :: mapped(0:lattice%nsites-1,SymmOp%ntotsymm)
 logical :: mappedt(0:lattice%nsites-1,0:lattice%ncell-1)
@@ -366,9 +366,9 @@ logical :: equal
 character*1, pointer :: symmlabel(:)
 
 !Assign pointers
-symmlabel => SymmOp%symmlabel 
+symmlabel => SymmOp%symmlabel
 symmangle => SymmOp%symmangle
-symmpoint => SymmOp%symmpoint 
+symmpoint => SymmOp%symmpoint
 symmaxis  => SymmOp%symmaxis
 
 !Initializa local variables
@@ -408,7 +408,7 @@ do i = 1, ntotsymm
    enddo
 enddo
 
-!Check whether symmetry is compatible with supercell 
+!Check whether symmetry is compatible with supercell
 msymm=0
 do i = 1, ntotsymm
   do iat = 0, nsites-1
@@ -541,19 +541,19 @@ integer                            :: i,j,ii,nsymm,ndim,ik,jk
 real*8                             :: diff(rdim),projsc(rdim),invkc(rdim,rdim), &
                                       newklist(recip_lattice%nkpts,rdim),zerovec(rdim)
 logical                            :: mapped(recip_lattice%nkpts), includesymm
-character*1, pointer               :: symmlabel(:)  
-real*8, pointer                    :: symmangle(:)  
+character*1, pointer               :: symmlabel(:)
+real*8, pointer                    :: symmangle(:)
 real*8, pointer                    :: symmpoint(:,:)
-real*8, pointer                    :: symmaxis(:,:) 
+real*8, pointer                    :: symmaxis(:,:)
 integer :: msymm, nsites, valid_symm(SymmOp%nsymm)
-integer, pointer :: tmp_symm(:,:)  
+integer, pointer :: tmp_symm(:,:)
 integer, pointer :: tmp_symm_k(:,:)
-integer, pointer :: tmp_valid(:)   
+integer, pointer :: tmp_valid(:)
 
-if(.not.SymmOp%lattice_mapped)stop'Need to map lattice symmetries before recip lattice ones'
+if(.not.SymmOp%lattice_mapped) stop 'Need to map lattice symmetries before recip lattice ones'
 
 !Assign pointers
-symmlabel => SymmOp%symmlabel 
+symmlabel => SymmOp%symmlabel
 symmangle => SymmOp%symmangle
 symmpoint => SymmOp%symmpoint
 symmaxis  => SymmOp%symmaxis
@@ -591,7 +591,7 @@ do j = 1, SymmOp%nsymm
    call apply_point_symm(symmlabel(i),symmpoint(:,i),symmaxis(:,i),symmangle(i),&
     recip_lattice%klist,newklist,recip_lattice%nkpts,.true.)
    do ik = 1, recip_lattice%nkpts
-      !Find which k-point, "jk", "ik" is mapped onto by symmetry "j" 
+      !Find which k-point, "jk", "ik" is mapped onto by symmetry "j"
       do jk=1,recip_lattice%nkpts
          !For each k-point compute distance in unit of k-space unit cell
          if(mapped(jk))cycle
@@ -615,7 +615,7 @@ do j = 1, SymmOp%nsymm
          if(applytwist)then
             includesymm = .false.
          else
-            stop'Problem with symmetry in k-space'
+            stop 'Problem with symmetry in k-space'
          endif
       endif
    enddo
@@ -649,7 +649,7 @@ if(msymm /= SymmOp%nsymm.and.applytwist)then
      nsymm = msymm
      if(SymmOp%addTimeRev) nsymm = nsymm + 1
      allocate(SymmOp%map_symm_k(recip_lattice%nkpts,nsymm))
-   
+
      !copy valid symmetries
      do i = 1, msymm
         SymmOp%map_symm(:,i)   = tmp_symm(:,valid_symm(i))
@@ -673,7 +673,7 @@ if(SymmOp%addTimeRev)then
    call apply_point_symm('I', zerovec, zerovec, 0.d0,&
     recip_lattice%klist,newklist,recip_lattice%nkpts,.true.)
    do ik = 1, recip_lattice%nkpts
-      !Find which k-point, "jk", "ik" is mapped onto by symmetry "j" 
+      !Find which k-point, "jk", "ik" is mapped onto by symmetry "j"
       do jk = 1, recip_lattice%nkpts
          !For each k-point compute distance in unit of k-space unit cell
          if(mapped(jk))cycle
@@ -693,7 +693,7 @@ if(SymmOp%addTimeRev)then
           exit
          endif
       enddo
-      if (jk > recip_lattice%nkpts) stop'Problem with symmetry in k-space'
+      if (jk > recip_lattice%nkpts) stop 'Problem with symmetry in k-space'
    enddo
 endif
 
@@ -726,7 +726,7 @@ subroutine map_symm_bonds(Bonds,SymmOp,Lattice)
  real*8, allocatable :: xxpair(:,:)
  logical, allocatable :: bond_on(:,:)
 
- if(.not.lattice%analyzed)stop'Need to analyze lattice before mapping bonds'
+ if(.not.lattice%analyzed) stop 'Need to analyze lattice before mapping bonds'
  if(Bonds%ntotbond==0)return
 
  natom=Lattice%natom; nsites=Lattice%nsites; ndim=Lattice%ndim
@@ -759,7 +759,7 @@ subroutine map_symm_bonds(Bonds,SymmOp,Lattice)
  !Include all bonds which were left out but that are equivalent by symmetry...
  ntotpair=2*natom*nsites
  allocate(pair_label(ntotpair),pair_origin(ntotpair),pair_target(ntotpair),xxpair(3,ntotpair))
- !Save bond attribute in temporary "pair" variables 
+ !Save bond attribute in temporary "pair" variables
  ntotpair=Bonds%ntotbond
  pair_origin(1:ntotpair)=bond_origin(1:ntotpair)
  pair_target(1:ntotpair)=bond_target(1:ntotpair)
@@ -802,7 +802,7 @@ subroutine map_symm_bonds(Bonds,SymmOp,Lattice)
        ntotpair=ntotpair+1
        pair_label(ntotpair)=-newlabel
        !Find the translation that maps iat inside the unit cell
-       it=SymmOp%translback(jat) 
+       it=SymmOp%translback(jat)
        !Translate jat and iat. jat returns the origin of the bond.
        pair_origin(ntotpair)=SymmOp%translate(jat,it)
        pair_target(ntotpair)=SymmOp%translate(iat,it)
@@ -842,10 +842,10 @@ subroutine map_symm_bonds(Bonds,SymmOp,Lattice)
    iat=SymmOp%map_symm(pair_origin(ibond),isymm)
    jat=SymmOp%map_symm(pair_target(ibond),isymm)
    !Translate them back do that origin is inside unit cell
-   it=SymmOp%translback(iat) 
+   it=SymmOp%translback(iat)
    iat=SymmOp%translate(iat,it)
    jat=SymmOp%translate(jat,it)
-   !Find which bond is defined by (iat,jat) 
+   !Find which bond is defined by (iat,jat)
    do jbond=1,ntotpair
     if(pair_origin(jbond)==iat.and.pair_target(jbond)==jat)exit
    enddo
@@ -877,7 +877,7 @@ subroutine map_symm_bonds(Bonds,SymmOp,Lattice)
  Bonds%analyzed=.true.
 
 end subroutine
- 
+
 
 
 
@@ -914,7 +914,7 @@ end subroutine
 ! returns the class to which they belong. A class contains pairs of orbitals
 ! that, because of symmetry, are going to have identical pair-correlation
 ! functions.
-!  Returns nclass, the number of classes, and class_size(iclass), the 
+!  Returns nclass, the number of classes, and class_size(iclass), the
 ! number of pairs inside class iclass.
 !  Returns class_label. This is a 4-components array. The first three are the
 ! cartesian separation of the two orbitals in the pair. The last component is
@@ -930,7 +930,7 @@ integer, pointer      :: myclass(:,:)
 type(symm_operations) :: SymmOp
 type(lattice_t)       :: lattice
 
-if(.not.SymmOp%lattice_mapped)stop'Need to map symmetries over lattice before classes'
+if(.not.SymmOp%lattice_mapped) stop 'Need to map symmetries over lattice before classes'
 
 !initialize local variables
 natom=lattice%natom
@@ -941,7 +941,7 @@ ntransl=SymmOp%ntransl
 !allocate internal arrays
 nclass=(natom*(natom+1))/2+natom*(nsites-natom)
 allocate(patom(2,nclass),satom(2,nclass),csizev(nclass))
-                                                
+
 !At the beginning each distance is a separate class and only
 !pairs with at least one atom in the primitive cell are considered.
 !The pair (patom(ix,iclass) , satom(ix,iclas)) is the ix-th
@@ -952,13 +952,13 @@ do ip=0,natom-1
  !first loop over sites inside primitive cell
  do is=ip,natom-1
   nclass=nclass+1
-  if(is/=ip)then 
+  if(is/=ip)then
    csizev(nclass)=2
    patom(1,nclass)=ip; satom(1,nclass)=is
    patom(2,nclass)=is; satom(2,nclass)=ip
    myclass(ip,is)=nclass; myclass(is,ip)=nclass
-  else 
-   csizev(nclass)=1 
+  else
+   csizev(nclass)=1
    patom(1,nclass)=ip; satom(1,nclass)=is
    myclass(ip,is)=nclass
   endif
@@ -979,7 +979,7 @@ do isymm=1,nsymm+1
  !in the primitive cell and the second anywhere inside the supercell)
  do iclass=1,nclass
   istart=1
-  do 
+  do
    csize=csizev(iclass)
    csizenew=csize
    do id=istart,csize
@@ -1014,7 +1014,7 @@ do isymm=1,nsymm+1
      csizev(jclass)=0
     endif
    enddo
-   !if class size did not change we have found all the classes equivalent 
+   !if class size did not change we have found all the classes equivalent
    !to "iclass"
    if(csizenew==csize)exit
    !Update loop bounds to find new equivalence due to newly added elements
@@ -1117,7 +1117,7 @@ type(symm_operations) :: SymmOp
 type(recip_lattice_t) :: recip_lattice
 logical,intent(in)    :: applytwist
 
-if(.not.SymmOp%recip_lattice_mapped)stop'Need to map symmetries over lattice before classes (reciprocal)'
+if(.not.SymmOp%recip_lattice_mapped) stop 'Need to map symmetries over lattice before classes (reciprocal)'
 
 !initialize local variables
 nsymm=SymmOp%nsymm
@@ -1146,7 +1146,7 @@ do isymm=1,nsymm
  !loop over classes
  do iclass=1,nkpts
   istart=1
-  do 
+  do
    csize=csizev(iclass)
    csizenew=csize
    do id=istart,csize
@@ -1218,10 +1218,10 @@ type(symm_operations),intent(in) :: SymmOp
 type(bonds_t),intent(inout) :: Bonds
 integer :: ib,nclass,ntotbond,ntotbondsq,isymm,iclass,istart,csize,csizenew,&
 & id,bx,by,jclass,jstart,idj,mclass,jb,i,j
-integer,pointer :: myclass(:,:) 
+integer,pointer :: myclass(:,:)
 integer, allocatable :: bond1(:,:),bond2(:,:),csizev(:)
 
-if(.not.SymmOp%bonds_mapped)stop'Need to map bonds before analyzing symmetry'
+if(.not.SymmOp%bonds_mapped) stop 'Need to map bonds before analyzing symmetry'
 
 ntotbond=size(SymmOp%map_symm_b,1)
 ntotbondsq=(ntotbond**2+ntotbond)/2

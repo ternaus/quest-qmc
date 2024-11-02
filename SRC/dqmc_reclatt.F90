@@ -11,10 +11,10 @@ type :: recip_lattice_t
  integer                :: ndim
  integer                :: nkpts              !number of k-points (equal to ncell)
  real*8, pointer        :: klist(:,:)         !list of k-points(nkpts,rdim)
- real*8                 :: kpoint(rdim)       !Input k-point 
+ real*8                 :: kpoint(rdim)       !Input k-point
  real*8                 :: ktwist(rdim)       !Twist vector
  real*8                 :: kcs(rdim,rdim)     !cartesian component of reciprocal superlattice***
- real*8                 :: ks(rdim,rdim)      !fractional components of reciprocal superlattice*** 
+ real*8                 :: ks(rdim,rdim)      !fractional components of reciprocal superlattice***
  real*8                 :: kc(rdim,rdim)      !cartesian components of reciprocal unit cell***
                                               !*** rows of these matrices are the vectors
 
@@ -27,8 +27,8 @@ type :: recip_lattice_t
  integer, pointer       :: myclass_k(:)       !class for each k-point (nkpts)
  integer, pointer       :: class_size_k(:)    !number of equivalent k-points in each class (nclass_k)
  integer, pointer       :: class_repr_k(:)    !representative k-point for each class (nclass_k)
-   
- complex*16, pointer    :: FourierC(:,:) 
+
+ complex*16, pointer    :: FourierC(:,:)
 
  logical                :: initialized
  logical                :: constructed
@@ -49,7 +49,7 @@ contains
  if(associated(reclatt%myclass_k))     deallocate(reclatt%myclass_k)
  if(associated(reclatt%class_size_k))  deallocate(reclatt%class_size_k)
  if(associated(reclatt%class_repr_k))  deallocate(reclatt%class_repr_k)
-  
+
  end subroutine free_reclatt
 
 
@@ -57,21 +57,21 @@ contains
 ! Read and fill most of the variables that define the lattices in
 ! real and reciprocal space.
 !---------------------------------------------------------------------
-subroutine init_recip_latt(lattice,recip_lattice,applytwist,cfg) 
+subroutine init_recip_latt(lattice,recip_lattice,applytwist,cfg)
  integer                                     :: ndim, i, j
  real*8                                      :: projk(rdim)
- real*8, pointer                             :: kc(:,:) 
- real*8, pointer                             :: kcs(:,:) 
- real*8, pointer                             :: ktwist(:) 
- real*8, pointer                             :: kpoint(:) 
- real*8, pointer                             :: ac(:,:) 
- real*8, pointer                             :: scc(:,:) 
+ real*8, pointer                             :: kc(:,:)
+ real*8, pointer                             :: kcs(:,:)
+ real*8, pointer                             :: ktwist(:)
+ real*8, pointer                             :: kpoint(:)
+ real*8, pointer                             :: ac(:,:)
+ real*8, pointer                             :: scc(:,:)
  type(lattice_t),intent(in),target           :: lattice
  type(recip_lattice_t),intent(out),target    :: recip_lattice
  type(config),intent(in),target              :: cfg
  logical, intent(in)                         :: applytwist
 
- if(.not.lattice%initialized)stop'Need to initialize lattice before recip_lattice'
+ if(.not.lattice%initialized) stop 'Need to initialize lattice before recip_lattice'
 
  !alias arrays
  scc=>lattice%scc
@@ -82,12 +82,12 @@ subroutine init_recip_latt(lattice,recip_lattice,applytwist,cfg)
 
  nullify(kpoint)
  ndim=lattice%ndim
- 
+
  !twist of the boundary condition in untis of pi
  recip_lattice%kpoint=0.d0
  if(applytwist)then
     call cfg_get(cfg,'bcond',i,kpoint)
-    if(i<ndim)stop'Number of boundary condition must at least equal ndim'
+    if(i<ndim) stop 'Number of boundary condition must at least equal ndim'
     recip_lattice%kpoint(1:ndim)=kpoint(1:ndim)
     !Since QUEST cannot handle complex hoppings we stop if the k-point is /=0.
     if(sum((kpoint(1:ndim)-nint(kpoint(1:ndim)))**2)>toll)then
@@ -97,7 +97,7 @@ subroutine init_recip_latt(lattice,recip_lattice,applytwist,cfg)
     deallocate(kpoint)
  endif
  kpoint=>recip_lattice%kpoint
-  
+
  !Take care of k-space cells
  !Rows of kc are reciprocal lattice basis vectors in cartesian coordinates
  call get_inverse(ac,kc)
@@ -108,7 +108,7 @@ subroutine init_recip_latt(lattice,recip_lattice,applytwist,cfg)
  kcs(:,:)=kcs(:,:)*2.d0*pi
 
  !convert twist in k-vector in cartesion coordinates
- do j=1,rdim 
+ do j=1,rdim
   ktwist(j)=0.5*sum(kpoint(:)*kcs(j,:))
  enddo
  kpoint(:)=ktwist(:)
@@ -124,10 +124,10 @@ subroutine init_recip_latt(lattice,recip_lattice,applytwist,cfg)
  enddo
 
  !find components of kcs in units of kc
- do i=1,3 
+ do i=1,3
   do j=1,3
    recip_lattice%ks(i,j)=sum(kcs(i,:)*ac(:,j))/(2.d0*pi)
-  enddo 
+  enddo
  enddo
 
  recip_lattice%ndim=ndim
@@ -164,18 +164,18 @@ subroutine construct_recip_lattice(recip_lattice)
  integer*8, allocatable :: indedge(:)
  real*8                 :: invkc(rdim,rdim)
  real*8, allocatable    :: kset(:,:)
- real*8, pointer        :: klist(:,:) 
+ real*8, pointer        :: klist(:,:)
  type(recip_lattice_t), intent(inout)  :: recip_lattice
 
- if(.not.recip_lattice%initialized)stop'Need to initialize recip_lattice before construction'
+ if(.not.recip_lattice%initialized) stop 'Need to initialize recip_lattice before construction'
 
  call get_inverse(recip_lattice%kc,invkc)
 
  ndim=recip_lattice%ndim
  allocate(klist(recip_lattice%nkpts,rdim))
 
- nkx=0; if(ndim>0)nkx=1 
- nky=0; if(ndim>1)nky=1 
+ nkx=0; if(ndim>0)nkx=1
+ nky=0; if(ndim>1)nky=1
  nkz=0; if(ndim>2)nkz=1
  !Define kset as the set of points surrouding the origin.
  !26 in 3D, 8 in 2D, 2 in 2D. This helps definining the
@@ -186,20 +186,20 @@ subroutine construct_recip_lattice(recip_lattice)
   do iky=-nky,nky; ikv(2)=iky
    do ikz=-nkz,nkz; ikv(3)=ikz
     if(sum(ikv**2)>0)then
-     i=i+1 
+     i=i+1
      do j=1,rdim
       kset(i,j)=sum(ikv(:)*recip_lattice%kc(:,j))
      enddo
     endif
-   enddo 
-  enddo 
+   enddo
+  enddo
  enddo
 
  ncubex=0; ncubey=0; ncubez=0
  !Start by including the ktwist vector
  ilist=1; klist(ilist,:)=recip_lattice%ktwist(:); nedge=0
  if(ndim>0)then
-  do 
+  do
    !Look at increasingly large "cubes" around the k-space origin.
    ncubex=ncubex+1
    if(ndim>1)ncubey=ncubey+1
@@ -210,7 +210,7 @@ subroutine construct_recip_lattice(recip_lattice)
     ikv(3)=ikz
 
     !constant y edges : kz constant equal to ikz, ky constant equal to -ncubey
-    !or ncubey, and ikx varying between +/-ncubex 
+    !or ncubey, and ikx varying between +/-ncubex
     if(ncubey/=0)then
      do iky=-ncubey,ncubey,2*ncubey
       ikv(2)=iky
@@ -260,12 +260,12 @@ subroutine construct_recip_lattice(recip_lattice)
  call vsort(klist,nkpts)
  recip_lattice%klist=>klist
 
- 
+
  ! write(*,*)'Reciprocal lattice (1st Brillouin zone)'
  ! write(*,'(/,A,1x,i4)')' Number of k-points found: ',nkpts
  ! if(nkpts/=recip_lattice%nkpts)then
  !  write(*,*)'This is different from', recip_lattice%nkpts
- !  stop 
+ !  stop
  ! endif
  ! write(*,'(3f12.6)')((klist(i,j),j=1,rdim),i=1,recip_lattice%nkpts)
  ! write(*,*)'================================================================'
@@ -305,7 +305,7 @@ subroutine construct_recip_lattice(recip_lattice)
    endif
 
    if(.not.included)then
-    !Include the point in klist 
+    !Include the point in klist
     nfound=nfound+1
     ilist=ilist+1
     klist(ilist,:)=kpt(:)
@@ -313,7 +313,7 @@ subroutine construct_recip_lattice(recip_lattice)
     if(on_edge)then
      nedge=nedge+1
      indedge(nedge)=ilist
-    endif 
+    endif
    endif
   endif
  end subroutine check_and_update
@@ -372,7 +372,7 @@ do i=1,3**ndim-1
   !ktp is rougly equidistant from kset(i,:) and k=0.0 : on edge of 1st BZ
   if(dist-toll<dist0)on_edge=.true.
  endif
-enddo 
+enddo
 closer_to_zero=.true.
 end function closer_to_zero
 
@@ -438,7 +438,7 @@ end function closer_to_zero
      write(*,*)'==============================================================='
   enddo
 
-  end subroutine 
+  end subroutine
 
   !--------------------------------------------------------------------!
 
@@ -447,9 +447,9 @@ end function closer_to_zero
   type(lattice_t),intent(in),target           :: lattice
   type(recip_lattice_t),intent(inout),target    :: Reciplattice
   integer               :: nt,nk,i,ii,j
-  real*8, pointer       :: tr(:,:)  
+  real*8, pointer       :: tr(:,:)
   real*8, pointer       :: kpts(:,:)
-  integer, pointer      :: indx(:)  
+  integer, pointer      :: indx(:)
 
   !initialize
   tr   => lattice%translation
@@ -472,4 +472,3 @@ end function closer_to_zero
 
 
 end module DQMC_RECLATT
-

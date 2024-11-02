@@ -2,6 +2,7 @@
 #  QUEST Makefile - Using Apple Accelerate Framework
 ############################################################################
 QUEST_DIR = $(shell pwd)
+export QUEST_DIR
 
 # Compiler settings
 FC        = gfortran
