@@ -1,200 +1,68 @@
 ############################################################################
-#  QUEST Makefile    
-#    Date:   08/03/2014
-#  Author:   Chia-Chen Chang
+#  QUEST Makefile - Simplified for MacOS
 ############################################################################
 QUEST_DIR = $(shell pwd)
 
-# 1) gnu, 2) intel
-COMPILER  = gnu
+# Compiler settings
+FC        = gfortran
+CXX       = g++
+FC_FLAGS  = -fopenmp -Wall -O3 -funroll-loops
+CXX_FLAGS = -Wall -O3 -funroll-loops
 
-# 1) default, 2) mkl_seq, 3) mkl_par
-LAPACK    = default
+# Libraries
+CXXLIB    = -lstdc++
+libOpenBLAS = $(QUEST_DIR)/OpenBLAS/libopenblas.a
+LAPACKLIB = $(libOpenBLAS)
 
-# intel MKL library path
-MKLPATH   = $(MKLROOT)/lib/intel64
+# Archiver
+ARCH    = ar
+ARFLAG  = cr
+RANLIB  = ranlib
 
-# MAGMA library path
-MAGMAPATH = 
+# Main library
+DQMCLIB = libdqmc.a
 
-# nVidia CUDA installation path
-CUDAPATH  = 
+# Required libraries for driver routines
+LIB = $(CXXLIB) $(LAPACKLIB)
 
-# Checkboard decomposition
-FLAG_CKB  = #-DDQMC_CKB
+.PHONY: all libdqmc example lapack clean
 
-# GPU version equal-time Green's function kernel
-FLAG_ASQRD = -DDQMC_ASQRD
+# Default target
+all: libdqmc example
 
-# GPU version time-dependent Green's function kernel
-FLAG_BSOFI = #-DDQMC_BSOFI
+# Check if OpenBLAS exists before building main targets
+libdqmc: check_openblas
+	$(MAKE) -C SRC
 
-# Enabling nVidia CUDA support in DQMC
-FLAG_CUDA = #-DDQMC_CUDA
+example: libdqmc
+	$(MAKE) -C EXAMPLE
 
-# --------------------------------------------------------------------------
-#  Check ASQRD and CKB compatibility
-# --------------------------------------------------------------------------
-ifdef FLAG_ASQRD
-  ifdef FLAG_CKB
-    $(error ASQRD method does not support checkerboard decomposition at the moment. \
-      Please turn off the flag FLAG_CKB or FLAG_ASQRD)
-  endif
-endif
+# OpenBLAS handling
+lapack:
+	$(MAKE) -C $(QUEST_DIR)/OpenBLAS
 
+check_openblas:
+	@if [ ! -f $(libOpenBLAS) ]; then \
+		echo "OpenBLAS not found. Building it first..." ; \
+		$(MAKE) lapack ; \
+	fi
 
+# Cleanup
+clean:
+	$(MAKE) -C $(QUEST_DIR)/OpenBLAS clean
+	$(MAKE) -C $(QUEST_DIR)/SRC clean
+	$(MAKE) -C $(QUEST_DIR)/EXAMPLE clean
+	$(RM) $(QUEST_DIR)/$(DQMCLIB)
 
-# --------------------------------------------------------------------------
-#  Compiler and flags
-# --------------------------------------------------------------------------
-ifndef COMPILER
-  $(error "COMPILER" is not defined in the Makefile.)
-endif
+# Help target
+help:
+	@echo "Available targets:"
+	@echo "  all     - Build everything (default)"
+	@echo "  libdqmc - Build DQMC library"
+	@echo "  example - Build examples"
+	@echo "  lapack  - Build OpenBLAS"
+	@echo "  clean   - Clean all built files"
+	@echo "  help    - Show this help message"
 
-ifeq ($(COMPILER), intel)
-  FC        = ifort
-  CXX       = icpc
-  FC_FLAGS  = -openmp -m64 -warn all -O3 -unroll
-  #FC_FLAGS = -m64 -g -traceback -check all -O0 -ftrapuv -debug all
-  #CXX_FLAGS = -m64 -g -traceback -O0 -check-uninit -ftrapuv -debug all
-  CXX_FLAGS = -m64 -Wall -O3 -unroll $(CUDAINC) $(MAGMAINC)
-endif
-ifeq ($(COMPILER), gnu)
-  FC        = gfortran
-  CXX       = g++
-  FC_FLAGS  = -fopenmp -m64 -Wall -O3 -funroll-loops
-  CXX_FLAGS = -m64 -Wall -O3 -funroll-loops $(CUDAINC) $(MAGMAINC)
-endif
-
-
-
-# --------------------------------------------------------------------------
-# C++ libraries
-# --------------------------------------------------------------------------
-CXXLIB = -lstdc++ #-lrt
-
-
-
-# --------------------------------------------------------------------------
-#  BLAS and LAPACK
-# --------------------------------------------------------------------------
-ifndef LAPACK
-  $(error "LAPACK" is not defined in the Makefile.)
-endif
-
-ifeq ($(LAPACK), default)
-  libOpenBLAS   = $(QUEST_DIR)/OpenBLAS/libopenblas.a
-
-  # Pass if the target is 'clean' or 'lapack'
-  ifneq ($(MAKECMDGOALS), clean)
-  ifneq ($(MAKECMDGOALS), lapack)
-    ifeq ($(wildcard $(libOpenBLAS)),)
-      $(error It appears that LAPACK is set to be "default", but libopenblas.a is missing. \
-        Use "make lapack" to build the required library.)
-    endif
-  endif
-  endif
-  LAPACKLIB = $(libOpenBLAS)
-endif
-
-ifeq ($(LAPACK), mkl_seq)
-  ifdef MKLPATH
-    LAPACKLIB = -L$(MKLPATH) -Wl,--no-as-needed -lmkl_intel_lp64 -lmkl_sequential -lmkl_core -lpthread
-  else
-    $(error "MKLPATH" is not defined in the Makefile.)
-  endif
-endif
-
-ifeq ($(LAPACK), mkl_par)
-  ifdef MKLPATH
-    LAPACKLIB = -L$(MKLPATH) -mkl:parallel -lpthread
-  else
-    $(error "MKLPATH" is not defined in the Makefile.)
-  endif
-endif
-
-
-# --------------------------------------------------------------------------
-# MAGMA library path
-# --------------------------------------------------------------------------
-ifdef MAGMAPATH
-  MAGMALIB = -L$(MAGMAPATH)/lib -lmagma -lmagmablas -lmagma 
-  MAGMAINC = -I$(MAGMAPATH)/include
-endif
-
-
-
-# --------------------------------------------------------------------------
-# CUDA compiler and libraries
-# --------------------------------------------------------------------------
-ifdef CUDAPATH
-  ifeq ($(MAGMAINC),)
-    $(error In Makefile, variable MAGMATH is not defined in Makefile)
-  endif
-  NVCC = $(CUDAPATH)/bin/nvcc
-  CU_FLAGS = -O3 -Xptxas -v -m 64 -arch sm_20 $(MAGMAINC)
-  CUDALIB = -L$(CUDAPATH)/lib64 -lcublas -lcudart -lcuda
-  CUDAINC = -I$(CUDAPATH)/include
-endif
-
-
-# --------------------------------------------------------------------------
-# DQMC library
-# --------------------------------------------------------------------------
-DQMCLIB    = libdqmc.a
-
-
-# --------------------------------------------------------------------------
-# Libraries required by driver routines 
-# --------------------------------------------------------------------------
-LIB        = $(CXXLIB) $(LAPACKLIB) $(CUDALIB) $(MAGMALIB)
-
-INC        = $(MPIINC)
-
-
-# --------------------------------------------------------------------------
-# Archiver and flags
-# --------------------------------------------------------------------------
-ifeq ($(COMPILER), intel) 
-	ARCH       = xiar
-else ifeq ($(COMPILER), gnu)
-	ARCH = ar
-endif
-ARFLAG     = cr
-RANLIB     = ranlib
-
-
-
-# --------------------------------------------------------------------------
-# Optional complication flags
-# -D_SXX, -D_QMC_MPI
-# --------------------------------------------------------------------------
-PRG_FLAGS = $(FLAG_BSOFI) $(FLAG_ASQRD) $(FLAG_CKB) $(FLAG_CUDA) 
-
-FLAGS = $(FC_FLAGS) $(PRG_FLAGS)
-
-
-
-# --------------------------------------------------------------------------
-export 
-
-.PHONY: libdqmc example libopenblas clean
-
-all : libdqmc example
-
-libdqmc :
-	(cd SRC; $(MAKE))
-example : libdqmc
-	(cd EXAMPLE; $(MAKE))
-
-lapack : libopenblas
-
-libopenblas : 
-	(cd $(QUEST_DIR)/OpenBLAS; $(MAKE))
-
-clean :
-	(cd $(QUEST_DIR)/OpenBLAS; $(MAKE) clean)
-	(cd $(QUEST_DIR)/SRC; $(MAKE) clean)
-	(cd $(QUEST_DIR)/EXAMPLE; $(MAKE) clean)
-	(rm -f $(QUEST_DIR)/$(DQMCLIB))
-
+# Export variables for sub-makefiles
+export FC FC_FLAGS CXX CXX_FLAGS ARCH ARFLAG RANLIB DQMCLIB LIB
