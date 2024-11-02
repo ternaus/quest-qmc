@@ -1,0 +1,73 @@
+# Dual License
+
+This software is released under a dual license model:
+
+## For Research and Non-Commercial Use
+
+Copyright (c) 2024 Vladimir Iglovikov
+
+Permission is hereby granted, free of charge, to any person or organization obtaining a copy of this software and associated documentation files (the "Software") for research or non-commercial purposes, subject to the following conditions:
+
+1. The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+
+2. Use of the Software is restricted to non-commercial research, educational, and personal experimentation purposes only.
+
+3. "Non-commercial use" means use that is not intended for or directed towards commercial advantage or monetary compensation.
+
+4. Research publications resulting from the use of this Software shall cite the following reference: https://github.com/ternaus/quest-qmc
+
+5. Redistributions of the source code must retain the above copyright notice, this list of conditions, and the following disclaimer.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+## For Commercial Use
+
+For commercial use of this Software, please contact Vladimir Iglovikov to obtain a commercial license.
+
+Commercial use includes, but is not limited to:
+
+1. Using the Software to provide commercial hosted services
+2. Integrating the Software into a commercial product
+3. Using the Software in a commercial service offering
+4. Using the Software to generate revenue
+5. Using the Software in a business's operational infrastructure
+
+The commercial license will grant you additional rights in exchange for licensing fees. Commercial licenses include:
+
+- Full rights to use the Software in commercial products
+- Technical support
+- Priority bug fixes
+- Access to proprietary extensions
+- Indemnification protection
+
+# Definition of Commercial Use
+
+"Commercial Use" means any use of the Software intended for or directed towards commercial advantage or monetary compensation. This includes, but is not limited to:
+
+1. Integration into a product or service that generates revenue
+2. Use in a company's internal operations
+3. Use to provide services to paying customers
+4. Use in a product that is sold or licensed
+5. Use to support commercial activities
+
+# Enforcement
+
+The copyright holder reserves the right to enforce this dual license agreement through legal action. Unauthorized commercial use of the Software constitutes copyright infringement and will be prosecuted to the maximum extent possible under law.
+
+# License Verification
+
+If you are uncertain whether your use case qualifies as non-commercial, please contact [Contact Information] for clarification before using the Software.
+
+# Converting Licenses
+
+Users who begin with non-commercial use and later transition to commercial use must obtain a commercial license before beginning commercial operations.
+
+# Patent Rights
+
+No patent rights are granted under either license without separate express authorization from the copyright holder.
+
+# Questions and Contact
+
+For any questions about licensing or to obtain a commercial license, please contact:
+
+Vladimir Iglovikov
