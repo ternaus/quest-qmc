@@ -6,14 +6,14 @@ use DQMC_UTIL
 implicit none
 
 type :: lattice_t
- integer                :: nsites            !number of total sites 
+ integer                :: nsites            !number of total sites
  integer                :: natom             !number of sites inside the primitive cell
  integer                :: ncell             !number of cells inside supercell
  integer                :: ndim              !number of extended dimensions
  integer                :: sc(rdim,rdim)     !fractionary components of supercell**
 
  real*8                 :: ac(rdim,rdim)     !cartesian components of primitive cell**
- real*8                 :: scc(rdim,rdim)    !cartesian components of supercell** 
+ real*8                 :: scc(rdim,rdim)    !cartesian components of supercell**
  real*8, pointer        :: pos(:,:)          !fractionary position of each site (rdim,0,nsites-1)
  real*8, pointer        :: cartpos(:,:)      !cartesian coordinates of each site (rdim,0,nsites-1)
  real*8, pointer        :: xat(:,:)          !fractional coordinate of site inside primitive cell(rdim,0:natom-1)
@@ -21,11 +21,11 @@ type :: lattice_t
  real*8, pointer        :: translation(:,:)  !list of translation vectors(columns)(rdim,0:ncell-1)
                                                        !** columns of these matrices are the vectors
 
- integer                :: nclass            !number of classes for distance 
+ integer                :: nclass            !number of classes for distance
  integer, pointer       :: myclass(:,:)      !class for pair of sites (0:nsites-1, 0:nsites-1)
  integer, pointer       :: class_size(:)     !number of equivalent pairs in each class (nclass)
  real*8, pointer        :: class_label(:,:)  !label for pair classes
- integer, pointer       :: gf_phase(:,:) 
+ integer, pointer       :: gf_phase(:,:)
 
  character*3, pointer   :: olabel(:)         !label of each site in primitive cell
 
@@ -62,12 +62,12 @@ end subroutine free_lattice
 ! real and reciprocal space.
 !---------------------------------------------------------------------
 subroutine init_lattice(lattice, SOP)
- integer, intent(in) :: SOP 
+ integer, intent(in) :: SOP
  integer          :: ndim,nsites,natom,ncell,ios,i,j
  real*8           :: ainv(rdim,rdim)
- real*8, pointer  :: ac(:,:) 
- real*8, pointer  :: scc(:,:) 
- integer, pointer :: sc(:,:) 
+ real*8, pointer  :: ac(:,:)
+ real*8, pointer  :: scc(:,:)
+ integer, pointer :: sc(:,:)
  character*3      :: olab1
  character*50     :: string
  logical          :: ldum
@@ -77,12 +77,12 @@ subroutine init_lattice(lattice, SOP)
  sc=>lattice%sc
  scc=>lattice%scc
  ac=>lattice%ac
- 
+
  !Read number of dimensions
  ldum=move_to_record(INPUT_FIELDS(NDIM_F),inpunit)
  read(inpunit,*,iostat=ios)ndim
- if(ios/=0)stop ' Problem reading #NDIM field. Stop.'
-  
+ if(ios/=0) stop ' Problem reading #NDIM field. Stop.'
+
  !read basis cell vectors(cartesian). Basis vectors are columns of ac.
  ldum=move_to_record(INPUT_FIELDS(PRIM_F),inpunit)
  ac(:,:)=0.d0
@@ -93,8 +93,8 @@ subroutine init_lattice(lattice, SOP)
    ac(j,j)=1.d3
  enddo
  !read(inpunit,*,iostat=ios)((ac(i,j),i=1,rdim),j=1,rdim)
- if(ios/=0)stop ' Problem reading #PRIM field. Stop.'
-  
+ if(ios/=0) stop ' Problem reading #PRIM field. Stop.'
+
  !read supercell vectors in unit of the basis ones. Vectors are columns of sc.
  ldum=move_to_record(INPUT_FIELDS(SUPER_F),inpunit)
  sc(:,:)=0
@@ -102,9 +102,9 @@ subroutine init_lattice(lattice, SOP)
   do j=1,ndim
     read(inpunit,*,iostat=ios)(sc(i,j),i=1,ndim)
   enddo
-  if(ios/=0)stop ' Problem reading #SUPER field. Stop.'
-  do i=ndim+1,rdim 
-   sc(i,i)=1 
+  if(ios/=0) stop ' Problem reading #SUPER field. Stop.'
+  do i=ndim+1,rdim
+   sc(i,i)=1
   enddo
  endif
 
@@ -112,15 +112,15 @@ subroutine init_lattice(lattice, SOP)
  !Use scc as temporary real*8 array
  scc(:,:)=dble(sc(:,:))
  ncell=nint(abs(get_det(scc)))
-  
+
  !find cartesian component of the supercell
- do i=1,rdim 
+ do i=1,rdim
   do j=1,rdim
    scc(i,j)=sum(ac(i,:)*sc(:,j))
   enddo
  enddo
-  
- !cartesian coordinates for each orbital 
+
+ !cartesian coordinates for each orbital
  natom=count_atom()
  nsites=ncell*natom
  ldum=move_to_record(INPUT_FIELDS(ORB_F),inpunit)
@@ -128,10 +128,10 @@ subroutine init_lattice(lattice, SOP)
  do i=0,natom-1
   read(inpunit,'(A)')string
   read(string,*,iostat=ios)olab1,lattice%xat(1:rdim,i)
-  if(ios/=0)stop ' Problem reading #ORB field. Stop.'
+  if(ios/=0) stop ' Problem reading #ORB field. Stop.'
   lattice%olabel(i)=olab1
  enddo
- 
+
  !load values on lattice
  lattice%natom=natom
  lattice%nsites=nsites
@@ -145,7 +145,7 @@ subroutine init_lattice(lattice, SOP)
  enddo
 
  lattice%initialized=.true.
- 
+
  !write to stdout
  write(SOP,*)'================================================================'
  write(SOP,*)'Basic real space geometry info'
@@ -163,7 +163,7 @@ subroutine init_lattice(lattice, SOP)
  write(SOP,'(3f14.7)')((scc(i,j),i=1,rdim),j=1,rdim)
  write(SOP,*)
  write(SOP,*)'================================================================'
- 
+
 end subroutine init_lattice
 
 
@@ -176,16 +176,16 @@ subroutine construct_lattice(lattice, SOP)
  type(lattice_t),intent(inout),target         :: lattice
  integer, intent(in)     :: SOP
  integer                 :: natom,nsites,iat,jat,xxmax(rdim),xxmin(rdim),ix,iy,iz,icount,j,jcount,ndim,it
- real*8, pointer         :: ac(:,:)  
- real*8, pointer         :: pos(:,:) 
- real*8, pointer         :: xat(:,:) 
- real*8, pointer         :: cartpos(:,:) 
- real*8, pointer         :: translation(:,:) 
- integer, pointer        :: sc(:,:) 
+ real*8, pointer         :: ac(:,:)
+ real*8, pointer         :: pos(:,:)
+ real*8, pointer         :: xat(:,:)
+ real*8, pointer         :: cartpos(:,:)
+ real*8, pointer         :: translation(:,:)
+ integer, pointer        :: sc(:,:)
  real*8                  :: projk(rdim),xxat(rdim),xx(rdim),invscc(rdim,rdim),ainv(rdim,rdim),cmin,cmax
- 
- if(.not.lattice%initialized)stop'Need to initialize lattice before construct_lattice'
- 
+
+ if(.not.lattice%initialized) stop ' Need to initialize lattice before construct_lattice'
+
  !Initialize local variables/pointers
  ndim   =  lattice%ndim
  natom  =  lattice%natom
@@ -220,7 +220,7 @@ subroutine construct_lattice(lattice, SOP)
     if(cmin>-toll .and. cmax<1.d0+toll)then
      jcount=icount+1
      !If on edge check whether translation has already  been added
-     if(cmin<toll .and. cmax>1.d0-toll)then 
+     if(cmin<toll .and. cmax>1.d0-toll)then
       !Ok, lattice point is on the edge of supercell
       do jcount=0,icount
        !See whether it differs by an already stored translation by a
@@ -244,7 +244,7 @@ subroutine construct_lattice(lattice, SOP)
  enddo
 
  !Deal with the  orbitals in such a way that the set [0,1...natom-1]
- !is translated into a set of the form [natom*it,natom*it+1,....,natom*(it+1)-1] 
+ !is translated into a set of the form [natom*it,natom*it+1,....,natom*(it+1)-1]
  !for any arbitrary translation ("it" is an integer running from 0 to ncell-1)
  call get_inverse(ac,ainv)
  do iat=0,natom-1
@@ -295,7 +295,7 @@ integer function count_atom()  result (natom)
  rewind(inpunit)
  ldum=move_to_record(INPUT_FIELDS(ORB_F),inpunit)
  natom=0
- do 
+ do
   read(inpunit,'(A)')string
   read(string,*,iostat=ios)olab1,x,y,z
   if(ios.ne.0)exit
@@ -309,7 +309,7 @@ end function count_atom
 
 !-------------------------------------------------------------
 !Given cartesian coordinates in 3D space returns coordinates
-!in units of primitive cell vectors. 
+!in units of primitive cell vectors.
 !-------------------------------------------------------------
 subroutine convert_to_fractional(xat,ainv)
  integer::h
@@ -321,7 +321,7 @@ subroutine convert_to_fractional(xat,ainv)
   xat(h)=sum(ainv(h,:)*xc(:))
  enddo
 end subroutine convert_to_fractional
- 
+
 
 
 
@@ -340,7 +340,7 @@ real*8              :: rpc(rdim,rdim),volume_ph,inv(rdim,rdim),projph(rdim,rdim)
 character*50        :: string
 character*3         :: olab1
 real*8, allocatable :: xat_ph(:,:),tmp_phase(:)
-real*8, pointer     :: phase(:) 
+real*8, pointer     :: phase(:)
 logical             :: phase_assigned(0:lattice%nsites-1)
 
 ndim=lattice%ndim
@@ -362,13 +362,13 @@ if(move_to_record(INPUT_FIELDS(PHASE_F),inpunit))then
 
  !check that the supercell is a multiple of the phase cell
  call get_inverse(rpc,inv)
- do i=1,rdim 
+ do i=1,rdim
   do j=1,rdim
    projph(i,j)=sum(lattice%sc(:,j)*inv(i,:))
-  enddo 
+  enddo
  enddo
  projph(:,:)=(projph(:,:)-nint(projph(:,:)))**2
- if(sqrt(sum(projph))>toll)stop 'Supercell frustrates the phase. Stop.'
+ if(sqrt(sum(projph))>toll) stop ' Supercell frustrates the phase. Stop.'
 
  !Read atom positions and their phases
  natom_ph=nint(volume_ph*natom)
@@ -376,7 +376,7 @@ if(move_to_record(INPUT_FIELDS(PHASE_F),inpunit))then
  do iat=0,natom_ph-1
   read(inpunit,'(A)')string
   read(string,*,iostat=ios)olab1,(xat_ph(i,iat),i=1,rdim),tmp_phase(iat)
-  if(ios.ne.0)stop 'Problem with reading phases.'
+  if(ios.ne.0) stop ' Problem with reading phases.'
  enddo
 
  !need to use inv corresponding to primitive cell
@@ -386,7 +386,7 @@ if(move_to_record(INPUT_FIELDS(PHASE_F),inpunit))then
  enddo
 
  phase_assigned(:)=.false.
- !Assign the same phase to all sites equivalent by "phase-cell" translation 
+ !Assign the same phase to all sites equivalent by "phase-cell" translation
  do iat=0,natom_ph-1
   do jat=0,nsites-1
    if(phase_assigned(jat))cycle
@@ -429,7 +429,7 @@ integer function hoptowho(iat,delta,jat,lattice)
  real*8             :: projk(rdim),xxat(rdim),invscc(rdim,rdim),xx(rdim)
  real*8, pointer    :: cartpos(:,:)
 
- if(.not.lattice%constructed)stop'Need to construct lattice before hoptowho'
+ if(.not.lattice%constructed) stop ' Need to construct lattice before hoptowho'
 
  cartpos=>lattice%cartpos
  ndim=lattice%ndim
@@ -488,7 +488,7 @@ do ic=1,lattice%nclass
                   if(abs(rphase-nint(rphase))<1.d-6)then
                      lattice%gf_phase(j,i)=nint(rphase)
                   else
-                     stop'problem with phase'
+                     stop ' Problem with phase'
                   endif
                endif
             endif
@@ -496,41 +496,8 @@ do ic=1,lattice%nclass
          csize=csize+1
       enddo
    enddo
-   if(csize/=lattice%class_size(ic))stop'problem with classes'
+   if(csize/=lattice%class_size(ic)) stop ' Problem with classes'
 enddo
 end subroutine
 
-
-!type(lattice_t), intent(inout) :: lattice
-!real*8, intent(in) :: twist(3)
-!integer :: i, j, k, n, natom, ic, jt, i0, j0, iat, jat
-!real*8 :: R(3), delta(3)
-!complex*16 :: phase1, phase2
-!n=lattice%nsites
-!natom=lattice%natom
-!allocate(lattice%gf_phase(0:n-1,0:n-1))
-!!Loop over cell
-!do ic=0,lattice%ncell-1
-!   !loop over translation
-!   do jt=0,lattice%ncell-1
-!      delta(:)=lattice%translation(:,jt)
-!      !Find the two sites (orbital 0) connected by delta
-!      i0=natom*ic
-!      j0=hoptowho(i0,delta,0,lattice)
-!      !Compute the winding vector
-!      R=lattice%cartpos(:,j0)-lattice%cartpos(:,i0)-delta
-!      phase=exp(-im*sum(R*twist))
-!      !Loop over all orbitals contained in the two cells
-!      do iat=0,natom-1
-!         do jat=0,natom-1
-!            i=i0+iat
-!            j=j0+jat
-!            lattice%gf_phase(j,i)=phase
-!         enddo
-!      enddo
-!   enddo
-!enddo   
-
-
 end module DQMC_LATT
-
