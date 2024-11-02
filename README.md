@@ -53,10 +53,6 @@ cd EXAMPLE
 ./example1  # Replace with actual example name
 ```
 
-## Performance Notes
-
-The package uses OpenBLAS for linear algebra operations, which automatically detects and utilizes available CPU cores for optimal performance.
-
 ## License
 
 QUEST is licensed under the Dual License. See the LICENSE file for details.

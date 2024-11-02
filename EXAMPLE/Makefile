@@ -1,11 +1,11 @@
-# add other example programs as needed
+.PHONY: all clean geom
 
-all:
-	(cd geom; $(MAKE))
-	(cd test; $(MAKE))
-	(cd verify; $(MAKE))
+# Default target
+all: geom
+
+# Compile the geometry example
+geom:
+	$(MAKE) -C geom
 
 clean:
-	(cd geom; $(MAKE) clean)
-	(cd test; $(MAKE) clean)
-	(cd verify; $(MAKE) clean)
+	$(MAKE) -C geom clean

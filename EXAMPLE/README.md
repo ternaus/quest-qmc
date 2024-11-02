@@ -33,7 +33,7 @@ cd geom
 2. Run the simulation:
 
 ```bash
-./ggeom < in
+./ggeom in
 ```
 
 Example files provided:

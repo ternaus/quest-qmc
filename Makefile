@@ -2,7 +2,6 @@
 #  QUEST Makefile - Using Apple Accelerate Framework
 ############################################################################
 QUEST_DIR = $(shell pwd)
-export QUEST_DIR
 
 # Compiler settings
 FC        = gfortran
@@ -34,8 +33,9 @@ all: libdqmc example
 libdqmc:
 	$(MAKE) -C SRC
 
+# Build examples
 example: libdqmc
-	$(MAKE) -C EXAMPLE
+	$(MAKE) -C EXAMPLE all
 
 # Cleanup
 clean:
@@ -43,14 +43,5 @@ clean:
 	$(MAKE) -C $(QUEST_DIR)/EXAMPLE clean
 	$(RM) $(QUEST_DIR)/$(DQMCLIB)
 
-# Help target
-help:
-	@echo "Available targets:"
-	@echo "  all     - Build everything (default)"
-	@echo "  libdqmc - Build DQMC library"
-	@echo "  example - Build examples"
-	@echo "  clean   - Clean all built files"
-	@echo "  help    - Show this help message"
-
 # Export variables for sub-makefiles
-export FC FC_FLAGS CXX CXX_FLAGS ARCH ARFLAG RANLIB DQMCLIB LIB
+export FC FC_FLAGS CXX CXX_FLAGS ARCH ARFLAG RANLIB DQMCLIB LIB QUEST_DIR

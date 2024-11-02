@@ -184,3 +184,6 @@ verify
 *.a
 *.so
 *.dylib
+
+*.geometry
+*.out
